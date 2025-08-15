@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu</title>
+  <link rel="stylesheet" href="css menu pizza website take 1.css">
+</head>
+<body>
+  <header>
+  <h1 class="main-heading no-underline">Inspired by Naples, perfected at None Go Bye.</h1>
+    <nav class="main-nav">
+  <a href="pizza website take 1.html"><b>Home</b></a>
+  <a href="menu pizza website take 1.html"><b>Menu</b></a>
+  <a href="checkout.html"><b>Checkout</b></a>
+  <a href="allergens.html"><b>Allergens</b></a>
+    </nav>
+  </header>
+  <section id="menu">
+    <h2 class="menu-heading underlined">Pizza's</h2>
+    <!-- Your menu items here -->
+    <div class="menu-item">
+      <p><strong>Margherita</strong> – £10</p>
+      <p>Tomato base with Mozzarella and Basil leaves</p>
+      <form class="pizza-size-form">
+        <label for="margherita-size" class="label-bold">Size:</label>
+        <select id="margherita-size" name="pizza-size">
+          <option value="12in" data-price="8.99">12in (£8.99)</option>
+          <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
+          <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
+        </select>
+        <button type="button" class="menu-item" onclick="addPizzaToCart('Margherita', 'margherita-size')">Add to Cart</button>
+      </form>
+    </div>
+    <div class="menu-item">
+      <p><strong>Prosciutto E Fungi</strong> – £8.99</p>
+      <p>Tomato base with Mozzarella, Prosciutto, and Mushrooms</p>
+      <form class="pizza-size-form">
+        <label for="prosciutto-size" class="label-bold">Size:</label>
+        <select id="prosciutto-size" name="pizza-size">
+          <option value="12in" data-price="8.99">12in (£8.99)</option>
+          <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
+          <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
+        </select>
+        <button type="button" onclick="addPizzaToCart('Prosciutto E Fungi', 'prosciutto-size')">Add to Cart</button>
+      </form>
+    </div>
+    <div class="menu-item">
+      <p><strong>Farmhouse Feast</strong> – £9.49</p>
+      <p>Tomato base with Mozzarella, Chicken, Bacon, Ham, and Farmhouse sausage</p>
+      <form class="pizza-size-form">
+        <label for="farmhouse-size" class="label-bold">Size:</label>
+        <select id="farmhouse-size" name="pizza-size">
+          <option value="12in" data-price="8.99">12in (£8.99)</option>
+          <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
+          <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
+        </select>
+        <button type="button" onclick="addPizzaToCart('Farmhouse Feast', 'farmhouse-size')">Add to Cart</button>
+      </form>
+    </div>
+    <div class="menu-item">
+      <p><strong>Pollo Picante</strong> – £9.49</p>
+      <p>Tomato base with Mozzarella, Chicken, Peppers, Chilli</p>
+      <form class="pizza-size-form">
+        <label for="pollo-size" class="label-bold">Size:</label>
+        <select id="pollo-size" name="pizza-size">
+          <option value="12in" data-price="8.99">12in (£8.99)</option>
+          <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
+          <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
+        </select>
+        <button type="button" onclick="addPizzaToCart('Pollo Picante', 'pollo-size')">Add to Cart</button>
+      </form>
+    </div>
+    <div class="menu-item">
+      <p><strong>Foragers Favourite</strong> – £9.49</p>
+      <p>Tomato base with Mozzarella, Mushrooms, Peppers, Onions, Sweetcorn</p>
+      <form class="pizza-size-form">
+        <label for="foragers-size" class="label-bold">Size:</label>
+        <select id="foragers-size" name="pizza-size">
+          <option value="12in" data-price="8.99">12in (£8.99)</option>
+          <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
+          <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
+        </select>
+        <button type="button" onclick="addPizzaToCart('Foragers Favourite', 'foragers-size')">Add to Cart</button>
+      </form>
+    </div>
+    <div class="menu-item">
+      <p><strong>Romanesco(Vegan)</strong> – £9.49</p>
+      <p>Cashew Cream, Salsa Verde, Pine Nuts, Broccoli</p>
+      <form class="pizza-size-form">
+        <label for="Romanesco-size" class="label-bold">Size:</label>
+        <select id="Romanesco-size" name="pizza-size">
+          <option value="12in" data-price="8.99">12in (£8.99)</option>
+          <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
+          <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
+        </select>
+        <button type="button" onclick="addPizzaToCart('Romanesco(Vegan)', 'Romanesco-size')">Add to Cart</button>
+      </form>
+    </div>
+    <div class="menu-item">
+      <p><strong>Create Your Own Pizza</strong> – £11.99</p>
+      <p>Choose 4 toppings!</p>
+      <form id="custom-pizza-form">
+        <div class="topping-grid">
+          <label for="pizza-size" class="label-bold">Size:</label>
+          <select id="pizza-size" name="pizza-size">
+            <option value="12in" data-price="8.99">12in (£8.99)</option>
+            <option value="9in" data-price="11.99" selected>9in (£11.99)</option>
+            <option value="12in Gluten Free" data-price="14.99">12in Gluten Free (£14.99)</option>
+          </select>
+          <label><input type="checkbox" name="topping" value="Ham"><b>Ham</b></label><br>
+          <label><input type="checkbox" name="topping" value="Chicken"><b>Chicken</b></label><br>
+          <label><input type="checkbox" name="topping" value="Bacon"><b>Bacon</b></label><br>
+          <label><input type="checkbox" name="topping" value="Pepperoni"><b>Pepperoni</b></label><br>
+          <label><input type="checkbox" name="topping" value="Farmhouse Sausage"><b>Farmhouse Sausage</b></label><br>
+          <label><input type="checkbox" name="topping" value="Mozzarella"><b>Mozzarella</b></label><br>
+          <label><input type="checkbox" name="topping" value="Peppers"><b>Peppers</b></label><br>
+          <label><input type="checkbox" name="topping" value="Chilli"><b>Chilli</b></label><br>
+          <label><input type="checkbox" name="topping" value="Mushrooms"><b>Mushrooms</b></label><br>
+          <label><input type="checkbox" name="topping" value="Onions"><b>Onions</b></label><br>
+          <label><input type="checkbox" name="topping" value="Garlic"><b>Garlic</b></label><br>
+          <label><input type="checkbox" name="topping" value="Sweetcorn"><b>Sweetcorn</b></label><br>
+          <label><input type="checkbox" name="topping" value="Tomato Base"><b>Tomato Base</b></label><br>
+          <label><input type="checkbox" name="topping" value="Cashew Cream"><b>Cashew Cream</b></label><br>
+          <label><input type="checkbox" name="topping" value="Broccoli"><b>Broccoli</b></label><br>
+          <label><input type="checkbox" name="topping" value="Salsa Verde"><b>Salsa Verde</b></label><br>
+          <label><input type="checkbox" name="topping" value="Pine Nuts"><b>Pine Nuts</b></label><br>
+          <!-- Add more toppings as needed -->
+        </div>
+        <button type="button" onclick="addCustomPizzaToCart()">Add Custom Pizza to Cart</button>
+      </form>
+    </div>
+    </section>
+  <section id="sides">
+  <h2 class="menu-heading underlined">Sides</h2>
+    <div class="menu-item">
+      <p><strong>Doughballs</strong> – £3.99</p>
+      <label><input type="radio" name="topping" value="Ham"><b>Ham</b></label><br>
+    <label><input type="radio" name="topping" value="Garlic Butter"><b>Garlic Butter</b></label><br>
+    <label><input type="radio" name="topping" value="Bacon"><b>Bacon</b></label><br>
+      <button onclick="addToCart('Doughballs', 3.99)">Add to Cart</button>
+    </div>
+    <div class="menu-item">
+      <p><strong>Garlic Bread</strong> – £4.49</p>
+      <p> Tomato base with Garlic Oil</p>
+       <form class="pizza-size-form">
+  <label for="garlic-bread-size" class="label-bold">Size:</label>
+    <select id="garlic-bread-size" name="pizza-size">
+      <option value="12in" data-price="8.99">12in (£8.99)</option>
+      <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
+      <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
+    </select>
+        <button type="button" onclick="addPizzaToCart('Garlic Bread', 'garlic-bread-size')">Add to Cart</button>
+      </form>
+    </div>
+    <div class="menu-item">
+      <p><strong>Homemade Chicken Nuggets and Fries</strong> – £11.99</p>
+    <button onclick="addToCart('Homemade Chicken Nuggets and Fries', 11.99)">Add to Cart</button>
+  </div>
+  <div class="menu-item">
+      <p><strong>Sweet Potato Fries</strong> – £11.99</p>
+    <button onclick="addToCart('Sweet Potato Fries', 11.99)">Add to Cart</button>
+  </div>
+  <div class="menu-item">
+      <p><strong>Fries</strong> – £11.99</p>
+    <button onclick="addToCart('Fries', 11.99)">Add to Cart</button>
+  </div>
+  <div class="menu-item">
+      <p><strong>Coleslaw</strong> – £11.99</p>
+    <button onclick="addToCart('Coleslaw', 11.99)">Add to Cart</button>
+  </div><div class="menu-item">
+      <p><strong>Dips</strong> – £11.99</p>
+      <label><input type="radio" name="topping" value="BBQ"><b>BBQ</b></label><br>
+    <label><input type="radio" name="topping" value="Garlic Butter"><b>Garlic Butter</b></label><br>
+    <label><input type="radio" name="topping" value="MAYO"><b>MAYO</b></label><br>
+    <label><input type="radio" name="topping" value="GARLIC MAYO"><b>GARLIC MAYO</b></label><br>
+    <label><input type="radio" name="topping" value="Garlic Butter"><b>Garlic Butter</b></label><br>
+    <label><input type="radio" name="topping" value="TOMATO KETCHUP"><b>TOMATO KETCHUP</b></label><br>
+    <label><input type="radio" name="topping" value="TOMATO BASE"><b>TOMATO BASE</b></label><br>
+    <button onclick="addToCart('Dips', 11.99)">Add to Cart</button>
+  </div>
+  </section>
+  <section id="salads">
+  <h2 class="menu-heading underlined">Salads</h2>
+  <div class="menu-item">
+  <p><strong>Caesar Salad</strong> – £7.99</p>
+  <p>
+    Lettuce, Cucumber, Tomatoes, Red Onion mixed with our homemade Caesar Dressing topped with Croutons and Parmesan cheese and a twist of Black Pepper
+  </p>
+  <form id="caesar-toppings-form">
+    <label><input type="checkbox" name="topping" value="Croutons" checked><b>Croutons</b></label>
+    <label><input type="checkbox" name="topping" value="Parmesan" checked><b>Parmesan</b></label>
+    <label><input type="checkbox" name="topping" value="Black Pepper" checked><b>Black Pepper</b></label>
+    <label><input type="checkbox" name="topping" value="Cucumber" checked><b>Cucumber</b></label>
+    <label><input type="checkbox" name="topping" value="Tomatoes" checked><b>Tomatoes</b></label>
+    <label><input type="checkbox" name="topping" value="Red Onions" checked><b>Red Onions</b></label>
+    <!-- Add more toppings as needed -->
+      <button type="button" onclick="removeSaladToppings('Caesar Salad', 7.99, 'caesar-toppings-form')">Add to Cart</button>
+    </form>
+    </div>
+</div>
+  <div class="menu-item">
+  <p><strong>House Salad</strong> – £7.99</p>
+  <p>
+    Lettuce, Cucumber, Tomatoes, Red Onion with a drizzle of olive oil and a twist of Black Pepper
+  </p>
+  <form id="house-toppings-form">
+    <label><input type="checkbox" name="topping" value="Black Pepper" checked><b>Black Pepper</b></label>
+    <label><input type="checkbox" name="topping" value="Cucumber" checked><b>Cucumber</b></label>
+    <label><input type="checkbox" name="topping" value="Tomatoes" checked><b>Tomatoes</b></label>
+    <label><input type="checkbox" name="topping" value="Red Onions" checked><b>Red Onions</b></label>
+    <label><input type="checkbox" name="topping" value="Olive Oil" checked><b>Olive Oil</b></label>
+    <!-- Add more toppings as needed -->
+      <button type="button" onclick="removeSaladToppings('House Salad', 7.99, 'house-toppings-form')">Add to Cart</button>
+    </form>
+    </div>
+</div>
+</section>
+<section id="desserts">
+  <h2 class="menu-heading underlined">Desserts</h2>
+  <section>
+  <div class="menu-item">
+    <p><strong>Chocolate Brownie</strong> – £11.99</p>
+    <button onclick="addToCart('Chocolate Brownie', 11.99)">Add to Cart</button>
+  </div>
+  <div class="menu-item">
+    <p><strong>Jammie Dodger Blondie</strong> – £11.99</p>
+    <button onclick="addToCart('Jammie Dodger Blondie', 11.99)">Add to Cart</button>
+  </div>
+</section>
+
+<!-- Cart Section -->
+<section id="cart">
+</section>
+<section>
+  <div class="centered">
+  <p id="cart-total" class="centered"><strong>Total: £0.00</strong></p>
+  <button class="menu-item" onclick="checkout()">Checkout</button>
+  </div>
+</section>
+
+<script>
+  let cart = [];
+
+  function addPizzaToCart(name, selectId) {
+    const select = document.getElementById(selectId);
+    const size = select.options[select.selectedIndex].value;
+    const price = parseFloat(select.options[select.selectedIndex].getAttribute('data-price'));
+    cart.push({ name: `${name} (${size})`, price });
+    updateCartDisplay();
+    showAddToCartTicket(`${name} (${size})`);
+  }
+
+  function addCustomPizzaToCart() {
+    const sizeSelect = document.getElementById('pizza-size');
+    const size = sizeSelect.options[sizeSelect.selectedIndex].value;
+    const price = parseFloat(sizeSelect.options[sizeSelect.selectedIndex].getAttribute('data-price'));
+    const toppings = Array.from(document.querySelectorAll('#custom-pizza-form input[name="topping"]:checked')).map(el => el.value);
+    const name = `Custom Pizza (${size}, ${toppings.join(', ')})`;
+    cart.push({ name, price });
+    updateCartDisplay();
+    showAddToCartTicket(name);
+  }
+  function showAddToCartTicket(itemName) {
+    let ticket = document.getElementById('add-to-cart-ticket');
+    if (!ticket) {
+      ticket = document.createElement('div');
+      ticket.id = 'add-to-cart-ticket';
+      ticket.style.position = 'fixed';
+      ticket.style.top = '30px';
+      ticket.style.left = '50%';
+      ticket.style.transform = 'translateX(-50%)';
+    ticket.style.background = '#000';
+    ticket.style.color = '#fff';
+      ticket.style.fontWeight = 'bold';
+      ticket.style.fontSize = '1.2em';
+      ticket.style.padding = '1em 2em';
+      ticket.style.borderRadius = '8px';
+      ticket.style.boxShadow = '0 2px 8px #0002';
+      ticket.style.zIndex = '9999';
+      ticket.style.display = 'none';
+      document.body.appendChild(ticket);
+    }
+    ticket.textContent = `✔️ "${itemName}" added to checkout!`;
+    ticket.style.display = 'block';
+    setTimeout(() => { ticket.style.display = 'none'; }, 1800);
+  }
+
+  function addToCart(name, price) {
+    cart.push({ name, price });
+    updateCartDisplay();
+  }
+
+  function removeSaladToppings(name, price, formId) {
+    const form = document.getElementById(formId);
+    const toppings = Array.from(form.querySelectorAll('input[name="topping"]:checked')).map(el => el.value);
+    const itemName = `${name} (${toppings.join(', ')})`;
+    cart.push({ name: itemName, price });
+    updateCartDisplay();
+  }
+
+  function updateCartDisplay() {
+    const cartItems = document.getElementById('cart-items');
+    let total = 0;
+    cart.forEach(function(item) {
+      total += item.price;
+    });
+    document.getElementById('cart-total').innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+  }
+
+  function checkout() {
+    if (cart.length === 0) {
+      alert('Your cart is empty!');
+      return;
+    }
+    localStorage.setItem('cart', JSON.stringify(cart));
+    window.location.href = 'checkout.html';
+  }
+</script>
+</script>
+</body>
+</html>

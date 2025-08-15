@@ -1,0 +1,10 @@
+/* Utility classes for inline style cleanup */
+.underlined {
+  text-decoration: underline;
+}
+.label-bold {
+  font-weight: bold;
+}
+.centered {
+  text-align: center;
+}
