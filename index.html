@@ -4,6 +4,8 @@
   <meta charset="UTF-8">
   <title>Coming Soon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="pizza-icon-192.png">
   <style>
     body {
       background: #fff;
@@ -29,5 +31,10 @@
 <body>
   <h1>Coming Soon</h1>
   <p>Our new website is on its way. Stay tuned!</p>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+  </script>
 </body>
 </html>
