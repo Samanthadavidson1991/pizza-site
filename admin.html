@@ -66,7 +66,7 @@
     };
     // Load orders from orders.json (must be served from a server, not file://)
     function loadOrders() {
-      fetch('orders.json')
+  fetch('https://pizza-site-c8t6.onrender.com/orders')
         .then(res => res.json())
         .then(data => {
           const tbody = document.querySelector('#orders-table tbody');
