@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 0; }
+    .container { max-width: 800px; margin: 2rem auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 2rem; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    th { background: #222; color: #fff; }
+    tr:nth-child(even) { background: #f4f4f4; }
+    .login { max-width: 300px; margin: 4rem auto; background: #fff; padding: 2rem; border-radius: 8px; box-shadow: 0 2px 8px #0001; }
+    .hidden { display: none; }
+    .logout-btn { float: right; margin-top: -2.5rem; }
+  </style>
+</head>
+<body>
+  <div class="login" id="login-box">
+    <h2>Admin Login</h2>
+    <input type="password" id="admin-pass" placeholder="Enter password" style="width:100%;padding:0.5rem;">
+    <button id="login-btn" style="width:100%;margin-top:1rem;">Login</button>
+    <p id="login-msg" style="color:red;"></p>
+  </div>
+  <div class="container hidden" id="dashboard">
+    <button class="logout-btn" id="logout-btn">Logout</button>
+    <h1>Order Dashboard</h1>
+    <table id="orders-table">
+      <thead>
+        <tr>
+          <th>Order #</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Items</th>
+          <th>Total (£)</th>
+          <th>Time Slot</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <script>
+    // Simple password protection (for demo only)
+    const PASSWORD = "admin123"; // Change this to your own password
+    const loginBox = document.getElementById('login-box');
+    const dashboard = document.getElementById('dashboard');
+    const loginBtn = document.getElementById('login-btn');
+    const logoutBtn = document.getElementById('logout-btn');
+    const loginMsg = document.getElementById('login-msg');
+    loginBtn.onclick = function() {
+      if (document.getElementById('admin-pass').value === PASSWORD) {
+        loginBox.classList.add('hidden');
+        dashboard.classList.remove('hidden');
+        loadOrders();
+      } else {
+        loginMsg.textContent = "Incorrect password.";
+      }
+    };
+    logoutBtn.onclick = function() {
+      dashboard.classList.add('hidden');
+      loginBox.classList.remove('hidden');
+      document.getElementById('admin-pass').value = '';
+      loginMsg.textContent = '';
+    };
+    // Load orders from orders.json (must be served from a server, not file://)
+    function loadOrders() {
+      fetch('orders.json')
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.querySelector('#orders-table tbody');
+          tbody.innerHTML = '';
+          data.forEach((order, idx) => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+              <td>${idx + 1}</td>
+              <td>${order.customerName || ''}</td>
+              <td>${order.orderType || ''}</td>
+              <td>${order.cart ? order.cart.map(i => i.name + ' x' + (i.count || 1)).join('<br>') : ''}</td>
+              <td>${order.total ? order.total.toFixed(2) : ''}</td>
+              <td>${order.orderTimeSlot || ''}</td>
+            `;
+            tbody.appendChild(tr);
+          });
+        })
+        .catch(err => {
+          const tbody = document.querySelector('#orders-table tbody');
+          tbody.innerHTML = '<tr><td colspan="6">Could not load orders.json</td></tr>';
+        });
+    }
+  </script>
+</body>
+</html>

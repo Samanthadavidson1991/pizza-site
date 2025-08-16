@@ -2,48 +2,39 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <title>Coming Soon</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="css pizza website take 1.css">
-  <link rel="stylesheet" href="css menu pizza website take 1.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="pizza-icon-192.png">
+  <style>
+    body {
+      background: #fff;
+      color: #222;
+      font-family: 'Segoe UI', Arial, sans-serif;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      margin: 0;
+    }
+    h1 {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    p {
+      font-size: 1.5rem;
+      color: #555;
+    }
+  </style>
 </head>
 <body>
-  <header>
-    <h1 class="main-heading underline">Inspired by Naples, perfected at None Go Bye.</h1>
-    <nav class="main-nav">
-  <a href="index.html"><b>Home</b></a>
-  <a href="menu pizza website take 1.html"><b>Menu</b></a>
-  <a href="checkout.html"><b>Checkout</b></a>
-  <a href="allergens.html"><b>Allergens</b></a>
-    </nav>
-  </header>
-    <style>
-      .main-heading.underline {
-        text-decoration: underline;
-      }
-    </style>
-  <main>
-    <section id="blurb">
-      <p class="intro"><strong>We are a small family-run pizzeria dedicated to bringing you the best hand-stretched pizza experience.<br>
-      Working alongside the family farmshop, we excel at bringing the best quality pizzas as well as the best ingredients sourced locally.<br>
-      Bringing you Farm to Fork wherever possible. To preserve the integrity of our craft, we prepare a limited number of pizzas each evening. This ensures every pizza meets our highest standards of freshness and flavor.<br>
-      <b>ONCE THEY'RE GONE, THEY'RE GONE!</b></strong></p>
-    </section>
-    <section id="cart">
-      <h2>Your Cart</h2>
-      <ul id="cart-items"></ul>
-      <p><strong>Total: £<span id="cart-total">0.00</span></strong></p>
-      <button onclick="checkout()">Checkout</button>
-    </section>
-  </main>
-  <footer id="contact">
-    <address>
-      <p>📍<b>NONE-GO-BYE FARM<br>Leeds<br>LS18 5HZ</b></p>
-      <p><a href="mailto:thecrustngb@hotmail.com"><b>thecrustngb@hotmail.com</b></a></p>
-      <p>📞<a href="tel:07730126481"><b>07730126481</b></a></p>
-      <p><b>Open: Fri-Sun 5pm to 11pm</b></p>
-    </address>
-  </footer>
-  <script src="pizza website take 1.js"></script>
+  <h1>Coming Soon</h1>
+  <p>Our new website is on its way. Stay tuned!</p>
+  <script>
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('service-worker.js');
+  }
+  </script>
 </body>
 </html>
-

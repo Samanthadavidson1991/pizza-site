@@ -407,4 +407,5 @@ app.get('/orders', (req, res) => {
   res.send(html);
 });
 
-app.listen(4242, () => console.log('Stripe server running on http://localhost:4242'));
+const PORT = process.env.PORT || 4242;
+app.listen(PORT, () => console.log(`Stripe server running on http://localhost:${PORT}`));
