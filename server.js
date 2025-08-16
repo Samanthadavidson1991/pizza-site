@@ -1,6 +1,13 @@
 
-// All requires at the top
 
+// All requires at the very top
+const express = require('express');
+const Stripe = require('stripe');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 
@@ -98,13 +105,6 @@ app.post('/update-order', (req, res) => {
 // 1. Run: npm install express stripe cors
 // 2. Replace 'sk_test_REPLACE_WITH_YOUR_SECRET_KEY' with your Stripe secret key
 // 3. Run: node server.js
-
-const express = require('express');
-const Stripe = require('stripe');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const nodemailer = require('nodemailer');
 
 const app = express();
 const stripe = Stripe('sk_test_REPLACE_WITH_YOUR_SECRET_KEY'); // Replace with your real secret key
