@@ -1,3 +1,96 @@
+const bcrypt = require('bcryptjs');
+const USERS_FILE = path.join(__dirname, 'users.json');
+
+// --- USER LOGIN ENDPOINT ---
+app.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
+  let users = [];
+  if (fs.existsSync(USERS_FILE)) {
+    users = JSON.parse(fs.readFileSync(USERS_FILE));
+  }
+  const user = users.find(u => u.username === username);
+  if (!user) return res.status(401).json({ error: 'Invalid credentials.' });
+  const match = await bcrypt.compare(password, user.passwordHash);
+  if (!match) return res.status(401).json({ error: 'Invalid credentials.' });
+  res.json({ success: true, username });
+});
+// --- MENU MANAGEMENT ENDPOINTS ---
+const MENU_FILE = path.join(__dirname, 'menu.json');
+
+// Get all menu items
+app.get('/menu', (req, res) => {
+  let menu = [];
+  if (fs.existsSync(MENU_FILE)) {
+    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+  }
+  res.json(menu);
+});
+
+// Add a new menu item
+app.post('/menu', (req, res) => {
+  let menu = [];
+  if (fs.existsSync(MENU_FILE)) {
+    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+  }
+  const { username, ...newItem } = req.body;
+  newItem.id = Date.now();
+  if (username) newItem.lastEditedBy = username;
+  menu.push(newItem);
+  fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  res.json({ success: true, item: newItem });
+});
+
+// Update a menu item by id
+app.put('/menu/:id', (req, res) => {
+  let menu = [];
+  if (fs.existsSync(MENU_FILE)) {
+    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+  }
+  const id = parseInt(req.params.id);
+  const idx = menu.findIndex(item => item.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
+  const { username, ...updateFields } = req.body;
+  menu[idx] = { ...menu[idx], ...updateFields };
+  if (username) menu[idx].lastEditedBy = username;
+  fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  res.json({ success: true, item: menu[idx] });
+});
+
+// Delete a menu item by id
+app.delete('/menu/:id', (req, res) => {
+  let menu = [];
+  if (fs.existsSync(MENU_FILE)) {
+    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+  }
+  const id = parseInt(req.params.id);
+  const idx = menu.findIndex(item => item.id === id);
+  if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
+  const { username } = req.body;
+  if (username) menu[idx].lastEditedBy = username;
+  const removed = menu.splice(idx, 1);
+  fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  res.json({ success: true, item: removed[0] });
+});
+// Update order status or notes by index
+app.post('/update-order', (req, res) => {
+  const { index, status, note, username } = req.body;
+  if (typeof index !== 'number') {
+    return res.status(400).json({ error: 'Order index required.' });
+  }
+  let orders = [];
+  if (fs.existsSync(ORDERS_FILE)) {
+    orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
+  }
+  if (!orders[index]) {
+    return res.status(404).json({ error: 'Order not found.' });
+  }
+  if (status) orders[index].status = status;
+  if (note !== undefined) orders[index].adminNote = note;
+  if (username) orders[index].lastEditedBy = username;
+  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+  res.json({ success: true, order: orders[index] });
+});
 // Simple Stripe Checkout backend for Node.js
 // 1. Run: npm install express stripe cors
 // 2. Replace 'sk_test_REPLACE_WITH_YOUR_SECRET_KEY' with your Stripe secret key

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Margherita Pizza",
+    "description": "Classic cheese & tomato pizza.",
+    "price": 7.99,
+    "image": "pizza1.jpg"
+  },
+  {
+    "id": 2,
+    "name": "Pepperoni Pizza",
+    "description": "Pepperoni, cheese & tomato.",
+    "price": 8.99,
+    "image": "pizza2.jpg"
+  }
+]

@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Order Dashboard</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 0; }
+    .container { max-width: 1000px; margin: 2rem auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 2rem; }
+    h1 { text-align: center; }
+    table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+    th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+    th { background: #222; color: #fff; }
+    tr:nth-child(even) { background: #f4f4f4; }
+    .status-btn { padding: 0.3em 0.8em; border: none; border-radius: 4px; margin-right: 0.3em; cursor: pointer; }
+    .completed { background: #2ecc40; color: #fff; }
+    .refunded { background: #e67e22; color: #fff; }
+    .cancelled { background: #e74c3c; color: #fff; }
+    .pending { background: #f1c40f; color: #222; }
+    .note-input { width: 90%; }
+    .save-note-btn { margin-left: 0.5em; }
+    .filter-bar { margin-bottom: 1em; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="text-align:right; margin-bottom:1em;">
+      <a href="admin-menu.html" style="margin-right:1em;">Menu Management</a>
+    </div>
+    <div id="login-box">
+      <h2>Admin Login</h2>
+      <input type="text" id="login-username" placeholder="Username" style="width:100%;padding:0.5rem;">
+      <input type="password" id="login-password" placeholder="Password" style="width:100%;padding:0.5rem;margin-top:0.5rem;">
+      <button id="login-btn" style="width:100%;margin-top:1rem;">Login</button>
+      <p id="login-msg" style="color:red;"></p>
+    </div>
+    <div id="dashboard" style="display:none;">
+      <h1>Order Management Dashboard</h1>
+      <div class="filter-bar">
+        <input type="text" id="search" placeholder="Search by name, phone, status..." style="width: 300px; padding: 0.5em;">
+        <button onclick="loadOrders()">Refresh</button>
+        <button id="logout-btn" style="float:right;">Logout</button>
+      </div>
+      <table id="orders-table">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>Name</th>
+            <th>Phone</th>
+            <th>Type</th>
+            <th>Items</th>
+            <th>Total (£)</th>
+            <th>Time Slot</th>
+            <th>Status</th>
+            <th>Note</th>
+            <th>Actions</th>
+          </tr>
+        </thead>
+        <tbody></tbody>
+      </table>
+    </div>
+  </div>
+  <script>
+    const BACKEND = 'https://pizza-site-c8t6.onrender.com';
+    let allOrders = [];
+    let currentUser = localStorage.getItem('adminUser') || '';
+    function showLogin(show) {
+      document.getElementById('login-box').style.display = show ? '' : 'none';
+      document.getElementById('dashboard').style.display = show ? 'none' : '';
+    }
+    async function login() {
+      const username = document.getElementById('login-username').value;
+      const password = document.getElementById('login-password').value;
+      const msg = document.getElementById('login-msg');
+      msg.textContent = '';
+      try {
+        const res = await fetch(`${BACKEND}/login`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ username, password })
+        });
+        const data = await res.json();
+        if (data.success) {
+          localStorage.setItem('adminUser', username);
+          currentUser = username;
+          showLogin(false);
+          loadOrders();
+        } else {
+          msg.textContent = data.error || 'Login failed.';
+        }
+      } catch (e) {
+        msg.textContent = 'Login error.';
+      }
+    }
+    document.getElementById('login-btn').onclick = login;
+    document.getElementById('logout-btn').onclick = function() {
+      localStorage.removeItem('adminUser');
+      currentUser = '';
+      showLogin(true);
+    };
+    if (currentUser) {
+      showLogin(false);
+    }
+    async function loadOrders() {
+      const res = await fetch(`${BACKEND}/orders`);
+      // fallback: parse from HTML (not ideal, but works for now)
+      try {
+        const jsonRes = await fetch(`${BACKEND}/orders.json`);
+        if (jsonRes.ok) {
+          allOrders = await jsonRes.json();
+        } else {
+          throw new Error('orders.json not found');
+        }
+      } catch {
+        allOrders = [];
+      }
+      renderOrders();
+    }
+    function renderOrders() {
+      const search = document.getElementById('search').value.toLowerCase();
+      const tbody = document.querySelector('#orders-table tbody');
+      tbody.innerHTML = '';
+      allOrders.forEach((order, idx) => {
+        if (
+          search &&
+          !(
+            (order.customerName || '').toLowerCase().includes(search) ||
+            (order.customerPhone || '').toLowerCase().includes(search) ||
+            (order.status || '').toLowerCase().includes(search)
+          )
+        ) return;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td>${idx + 1}</td>
+          <td>${order.customerName || ''}</td>
+          <td>${order.customerPhone || ''}</td>
+          <td>${order.orderType || ''}</td>
+          <td>${order.cart ? order.cart.map(i => i.name + ' x' + (i.count || 1)).join('<br>') : ''}</td>
+          <td>${order.total ? order.total.toFixed(2) : ''}</td>
+          <td>${order.orderTimeSlot || ''}</td>
+          <td><span class="status-btn ${order.status || 'pending'}">${order.status || 'pending'}</span></td>
+          <td>
+            <input class="note-input" type="text" value="${order.adminNote || ''}" id="note-${idx}">
+            <button class="save-note-btn" onclick="updateNote(${idx})">Save</button>
+          </td>
+          <td>
+            <button class="status-btn completed" onclick="updateStatus(${idx}, 'completed')">Completed</button>
+            <button class="status-btn refunded" onclick="updateStatus(${idx}, 'refunded')">Refunded</button>
+            <button class="status-btn cancelled" onclick="updateStatus(${idx}, 'cancelled')">Cancelled</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+    async function updateStatus(index, status) {
+      if (!currentUser) return alert('Please log in.');
+      await fetch(`${BACKEND}/update-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, status, username: currentUser })
+      });
+      await loadOrders();
+    }
+    async function updateNote(index) {
+      if (!currentUser) return alert('Please log in.');
+      const note = document.getElementById(`note-${index}`).value;
+      await fetch(`${BACKEND}/update-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ index, note, username: currentUser })
+      });
+      await loadOrders();
+    }
+    document.getElementById('search').addEventListener('input', renderOrders);
+    if (currentUser) loadOrders();
+  </script>
+</body>
+</html>
