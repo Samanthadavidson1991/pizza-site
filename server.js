@@ -9,6 +9,8 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 
+const app = express(); // <-- This must come before any app.post, app.use, etc.
+
 const USERS_FILE = path.join(__dirname, 'users.json');
 
 // --- USER LOGIN ENDPOINT ---
@@ -107,7 +109,6 @@ app.post('/update-order', (req, res) => {
 // 3. Run: node server.js
 
 
-const app = express();
 const stripe = Stripe('sk_test_REPLACE_WITH_YOUR_SECRET_KEY'); // Replace with your real secret key
 
 // Configure nodemailer (replace with your SMTP details)
