@@ -1,4 +1,13 @@
+
+// All requires at the top
+const express = require('express');
+const Stripe = require('stripe');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
+
 const USERS_FILE = path.join(__dirname, 'users.json');
 
 // --- USER LOGIN ENDPOINT ---
