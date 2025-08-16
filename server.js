@@ -106,6 +106,7 @@ app.post('/update-order', (req, res) => {
 // 2. Replace 'sk_test_REPLACE_WITH_YOUR_SECRET_KEY' with your Stripe secret key
 // 3. Run: node server.js
 
+
 const app = express();
 const stripe = Stripe('sk_test_REPLACE_WITH_YOUR_SECRET_KEY'); // Replace with your real secret key
 
