@@ -186,19 +186,16 @@ function sendReceiptEmail(order) {
   });
 }
 
-// Allow CORS from local file, localhost, and deployed frontend
-app.use(cors({
-  origin: [
-    'http://localhost:5500',
-    'http://127.0.0.1:5500',
-    'file://',
-    'https://pizza-site-c8t6.onrender.com',
-    'null'
-  ],
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// Allow all origins for local development (fixes CORS for file:// and localhost)
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
 app.use(express.json());
 
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
