@@ -1,6 +1,4 @@
-
 // TEMPORARY DEBUG ENDPOINT - REMOVE AFTER USE
-// Place this after app is initialized
 app.get('/debug-users', (req, res) => {
   let users = [];
   if (fs.existsSync(USERS_FILE)) {
@@ -8,6 +6,8 @@ app.get('/debug-users', (req, res) => {
   }
   res.json(users);
 });
+
+
 
 
 // All requires at the very top
