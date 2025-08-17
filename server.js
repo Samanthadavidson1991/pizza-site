@@ -24,18 +24,29 @@ app.post('/login', async (req, res) => {
     console.log('req.headers:', req.headers);
     console.log('req.body:', req.body);
     if (!req.body) {
+      console.log('RETURN: No body received');
       return res.status(400).json({ error: 'No body received.' });
     }
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
+    if (!username || !password) {
+      console.log('RETURN: Username and password required');
+      return res.status(400).json({ error: 'Username and password required.' });
+    }
     let users = [];
     if (fs.existsSync(USERS_FILE)) {
       users = JSON.parse(fs.readFileSync(USERS_FILE));
     }
     const user = users.find(u => u.username === username);
-    if (!user) return res.status(401).json({ error: 'Invalid credentials.' });
+    if (!user) {
+      console.log('RETURN: Invalid credentials (user not found)');
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
     const match = await bcrypt.compare(password, user.passwordHash);
-    if (!match) return res.status(401).json({ error: 'Invalid credentials.' });
+    if (!match) {
+      console.log('RETURN: Invalid credentials (password mismatch)');
+      return res.status(401).json({ error: 'Invalid credentials.' });
+    }
+    console.log('RETURN: Success');
     res.json({ success: true, username });
   } catch (err) {
     console.error('LOGIN ERROR:', err);
