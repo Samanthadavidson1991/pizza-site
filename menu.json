@@ -1,16 +1,20 @@
 [
-  {
-    "id": 1,
-    "name": "Margherita Pizza",
-    "description": "Classic cheese & tomato pizza.",
-    "price": 7.99,
-    "image": "pizza1.jpg"
-  },
-  {
-    "id": 2,
-    "name": "Pepperoni Pizza",
-    "description": "Pepperoni, cheese & tomato.",
-    "price": 8.99,
-    "image": "pizza2.jpg"
-  }
+  { "id": 1, "name": "Margherita", "description": "Tomato base with Mozzarella and Basil leaves", "price": 8.99, "image": "pizza1.jpg" },
+  { "id": 2, "name": "Prosciutto E Fungi", "description": "Tomato base with Mozzarella, Prosciutto, and Mushrooms", "price": 8.99, "image": "pizza2.jpg" },
+  { "id": 3, "name": "Farmhouse Feast", "description": "Tomato base with Mozzarella, Chicken, Bacon, Ham, and Farmhouse sausage", "price": 9.49, "image": "pizza3.jpg" },
+  { "id": 4, "name": "Pollo Picante", "description": "Tomato base with Mozzarella, Chicken, Peppers, Chilli", "price": 9.49, "image": "pizza4.jpg" },
+  { "id": 5, "name": "Foragers Favourite", "description": "Tomato base with Mozzarella, Mushrooms, Peppers, Onions, Sweetcorn", "price": 9.49, "image": "pizza5.jpg" },
+  { "id": 6, "name": "Romanesco (Vegan)", "description": "Cashew Cream, Salsa Verde, Pine Nuts, Broccoli", "price": 9.49, "image": "pizza6.jpg" },
+  { "id": 7, "name": "Create Your Own Pizza", "description": "Choose 4 toppings!", "price": 11.99, "image": "pizza7.jpg" },
+  { "id": 8, "name": "Doughballs", "description": "", "price": 3.99, "image": "side1.jpg" },
+  { "id": 9, "name": "Garlic Bread", "description": "Tomato base with Garlic Oil", "price": 4.49, "image": "side2.jpg" },
+  { "id": 10, "name": "Homemade Chicken Nuggets and Fries", "description": "", "price": 11.99, "image": "side3.jpg" },
+  { "id": 11, "name": "Sweet Potato Fries", "description": "", "price": 11.99, "image": "side4.jpg" },
+  { "id": 12, "name": "Fries", "description": "", "price": 11.99, "image": "side5.jpg" },
+  { "id": 13, "name": "Coleslaw", "description": "", "price": 11.99, "image": "side6.jpg" },
+  { "id": 14, "name": "Dips", "description": "", "price": 11.99, "image": "side7.jpg" },
+  { "id": 15, "name": "Caesar Salad", "description": "Lettuce, Cucumber, Tomatoes, Red Onion mixed with our homemade Caesar Dressing topped with Croutons and Parmesan cheese and a twist of Black Pepper", "price": 7.99, "image": "salad1.jpg" },
+  { "id": 16, "name": "House Salad", "description": "Lettuce, Cucumber, Tomatoes, Red Onion with a drizzle of olive oil and a twist of Black Pepper", "price": 7.99, "image": "salad2.jpg" },
+  { "id": 17, "name": "Chocolate Brownie", "description": "", "price": 11.99, "image": "dessert1.jpg" },
+  { "id": 18, "name": "Jammie Dodger Blondie", "description": "", "price": 11.99, "image": "dessert2.jpg" }
 ]
