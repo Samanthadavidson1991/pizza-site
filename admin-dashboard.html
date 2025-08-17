@@ -29,10 +29,12 @@
     </div>
     <div id="login-box">
       <h2>Admin Login</h2>
-      <input type="text" id="login-username" placeholder="Username" style="width:100%;padding:0.5rem;">
-      <input type="password" id="login-password" placeholder="Password" style="width:100%;padding:0.5rem;margin-top:0.5rem;">
-      <button id="login-btn" style="width:100%;margin-top:1rem;">Login</button>
-      <p id="login-msg" style="color:red;"></p>
+      <form id="login-form" autocomplete="off">
+        <input type="text" id="login-username" placeholder="Username" style="width:100%;padding:0.5rem;">
+        <input type="password" id="login-password" placeholder="Password" style="width:100%;padding:0.5rem;margin-top:0.5rem;">
+        <button id="login-btn" type="submit" style="width:100%;margin-top:1rem;">Login</button>
+        <p id="login-msg" style="color:red;"></p>
+      </form>
     </div>
     <div id="dashboard" style="display:none;">
       <h1>Order Management Dashboard</h1>
@@ -92,6 +94,11 @@
         msg.textContent = 'Login error.';
       }
     }
+    // Prevent default form submission and always use JS login
+    document.getElementById('login-form').addEventListener('submit', function(e) {
+      e.preventDefault();
+      login();
+    });
     document.getElementById('login-btn').onclick = login;
     document.getElementById('logout-btn').onclick = function() {
       localStorage.removeItem('adminUser');
