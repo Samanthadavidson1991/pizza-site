@@ -9,9 +9,22 @@ const bcrypt = require('bcryptjs');
 
 
 
+
 const app = express();
 app.disable('x-powered-by');
-app.use(express.json()); // <-- This must come before any app.post, app.use, etc.
+
+// CORS middleware MUST be before express.json() and all routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
+app.use(express.json()); // <-- This must come after CORS
 
 // Security headers middleware
 app.use((req, res, next) => {
