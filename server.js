@@ -9,7 +9,9 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 
-const app = express(); // <-- This must come before any app.post, app.use, etc.
+
+const app = express();
+app.use(express.json()); // <-- This must come before any app.post, app.use, etc.
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 
