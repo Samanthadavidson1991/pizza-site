@@ -15,6 +15,12 @@ const USERS_FILE = path.join(__dirname, 'users.json');
 
 // --- USER LOGIN ENDPOINT ---
 app.post('/login', async (req, res) => {
+  console.log('LOGIN ENDPOINT HIT');
+  console.log('req.headers:', req.headers);
+  console.log('req.body:', req.body);
+  if (!req.body) {
+    return res.status(400).json({ error: 'No body received.' });
+  }
   const { username, password } = req.body;
   if (!username || !password) return res.status(400).json({ error: 'Username and password required.' });
   let users = [];
