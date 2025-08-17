@@ -1,20 +1,3 @@
-// /orders.json endpoint for frontend compatibility
-app.get('/orders.json', (req, res) => {
-  let orders = [];
-  if (fs.existsSync(ORDERS_FILE)) {
-    try {
-      orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
-    } catch (e) {
-      console.error('ORDERS.JSON PARSE ERROR:', e);
-      orders = [];
-    }
-  }
-  res.json(Array.isArray(orders) ? orders : []);
-});
-
-
-
-
 // All requires at the very top
 const express = require('express');
 const Stripe = require('stripe');
@@ -471,3 +454,19 @@ app.get('/orders', (req, res) => {
 
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => console.log(`Stripe server running on http://localhost:${PORT}`));
+
+// Place this after app is initialized and ORDERS_FILE is defined
+
+// /orders.json endpoint for frontend compatibility
+app.get('/orders.json', (req, res) => {
+  let orders = [];
+  if (fs.existsSync(ORDERS_FILE)) {
+    try {
+      orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
+    } catch (e) {
+      console.error('ORDERS.JSON PARSE ERROR:', e);
+      orders = [];
+    }
+  }
+  res.json(Array.isArray(orders) ? orders : []);
+});
