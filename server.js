@@ -1,3 +1,14 @@
+// TEMPORARY DEBUG ENDPOINT - REMOVE AFTER USE
+app.get('/debug-users', (req, res) => {
+  const fs = require('fs');
+  const path = require('path');
+  const USERS_FILE = path.join(__dirname, 'users.json');
+  let users = [];
+  if (fs.existsSync(USERS_FILE)) {
+    users = JSON.parse(fs.readFileSync(USERS_FILE));
+  }
+  res.json(users);
+});
 
 
 // All requires at the very top
