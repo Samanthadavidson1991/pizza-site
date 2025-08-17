@@ -8,8 +8,17 @@ const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 
 
+
 const app = express();
+app.disable('x-powered-by');
 app.use(express.json()); // <-- This must come before any app.post, app.use, etc.
+
+// Security headers middleware
+app.use((req, res, next) => {
+  res.setHeader('Cache-Control', 'no-store');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  next();
+});
 
 const USERS_FILE = path.join(__dirname, 'users.json');
 
