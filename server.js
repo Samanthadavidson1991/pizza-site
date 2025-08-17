@@ -1,11 +1,3 @@
-// TEMPORARY DEBUG ENDPOINT - REMOVE AFTER USE
-app.get('/debug-users', (req, res) => {
-  let users = [];
-  if (fs.existsSync(USERS_FILE)) {
-    users = JSON.parse(fs.readFileSync(USERS_FILE));
-  }
-  res.json(users);
-});
 
 
 
