@@ -1,6 +1,7 @@
 [
   {
     "username": "admin",
-    "passwordHash": "$2b$10$FdQsDDcmGDvXCXZwVOmTze0ALEvr.DBSKzVQ56igtk/7IVwlDotkK" // replace with real bcrypt hash
+    "passwordHash": "$2b$10$FdQsDDcmGDvXCXZwVOmTze0ALEvr.DBSKzVQ56igtk/7IVwlDotkK"
   }
 ]
+
