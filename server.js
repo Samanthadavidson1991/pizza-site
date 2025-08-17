@@ -60,9 +60,14 @@ const MENU_FILE = path.join(__dirname, 'menu.json');
 app.get('/menu', (req, res) => {
   let menu = [];
   if (fs.existsSync(MENU_FILE)) {
-    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+    try {
+      menu = JSON.parse(fs.readFileSync(MENU_FILE));
+    } catch (e) {
+      console.error('MENU JSON PARSE ERROR:', e);
+      menu = [];
+    }
   }
-  res.json(menu);
+  res.json(Array.isArray(menu) ? menu : []);
 });
 
 // Add a new menu item
@@ -437,98 +442,18 @@ app.post('/cash-order', (req, res) => {
   }
 });
 
-// Dashboard to view orders
+// Dashboard to view orders (returns JSON array for frontend)
 app.get('/orders', (req, res) => {
   let orders = [];
   if (fs.existsSync(ORDERS_FILE)) {
-    orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
+    try {
+      orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
+    } catch (e) {
+      console.error('ORDERS JSON PARSE ERROR:', e);
+      orders = [];
+    }
   }
-  let html = `
-  <html>
-  <head>
-    <title>Orders Dashboard</title>
-    <style>
-      body { font-family: Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 0; }
-      h1 { background: #222; color: #fff; margin: 0; padding: 1rem; text-align: center; }
-      .orders-container { max-width: 700px; margin: 2rem auto; }
-      .ticket { background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; margin-bottom: 2rem; padding: 1.5rem 2rem; position: relative; page-break-after: always; }
-      .ticket-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
-      .ticket-method { font-weight: bold; color: #635bff; }
-      .ticket-status { font-size: 0.95em; color: #888; }
-      .ticket-time { font-size: 0.95em; color: #888; }
-      .ticket-items { margin: 1rem 0; }
-      .ticket-items li { font-size: 1.1em; margin-bottom: 0.3em; }
-      .ticket-total { font-size: 1.2em; font-weight: bold; margin-top: 1rem; }
-      .print-btn { background: #2ecc40; color: #fff; border: none; border-radius: 4px; padding: 0.5em 1.2em; font-size: 1em; cursor: pointer; margin-top: 1em; }
-      @media print {
-        body { background: #fff; }
-        .print-btn, h1, .orders-container { display: none !important; }
-        .ticket { box-shadow: none; border: 1px dashed #888; margin: 0 0 2rem 0; }
-      }
-    </style>
-  </head>
-  <body>
-    <h1>Orders Dashboard</h1>
-    <div class="orders-container">
-  `;
-  if (orders.length === 0) {
-    html += '<p>No orders yet.</p>';
-  } else {
-    // Group orders by main order (isMainOrder or unique time+customerName+phone)
-    const shown = new Set();
-    orders.forEach((order, i) => {
-      // Only show main order or single-slot orders
-      if (order.isMainOrder || typeof order.isMainOrder === 'undefined') {
-        // Find all related orders (same time, name, phone, total)
-        const related = orders.filter(o =>
-          o.customerName === order.customerName &&
-          o.customerPhone === order.customerPhone &&
-          o.total === order.total &&
-          o.time.slice(0,19) === order.time.slice(0,19)
-        );
-        // Get the latest slot
-        let lastSlot = order.orderTimeSlot;
-        if (related.length > 1) {
-          // Sort slots by slot order
-          const slots = [
-            '17:00-17:30','17:30-18:00','18:00-18:30','18:30-19:00','19:00-19:30','19:30-20:00','20:00-20:30','20:30-21:00','21:00-21:30','21:30-22:00'
-          ];
-          const slotIndexes = related.map(r => slots.indexOf(r.orderTimeSlot)).filter(idx => idx !== -1);
-          if (slotIndexes.length) {
-            const maxIdx = Math.max(...slotIndexes);
-            lastSlot = slots[maxIdx];
-          }
-        }
-        // Only show once per group
-        const groupKey = `${order.customerName}|${order.customerPhone}|${order.total}|${order.time.slice(0,19)}`;
-        if (shown.has(groupKey)) return;
-        shown.add(groupKey);
-        html += `<div class="ticket">
-          <div class="ticket-header">
-            <span class="ticket-method">${order.method ? order.method.toUpperCase() : ''}</span>
-            <span class="ticket-status">${order.status || ''}</span>
-            <span class="ticket-time">${order.time ? new Date(order.time).toLocaleString() : ''}</span>
-          </div>
-            <div class="ticket-details" style="margin-bottom:0.7em; font-size:1.15em; font-weight:bold;">
-              <div><span style="font-size:1.1em;">Type:</span> <span style="font-size:1.1em;">${order.orderType ? order.orderType.charAt(0).toUpperCase() + order.orderType.slice(1) : 'N/A'}</span></div>
-              <div><span style="font-size:1.1em;">Name:</span> <span style="font-size:1.1em;">${order.customerName || 'N/A'}</span></div>
-              <div><span style="font-size:1.1em;">Phone:</span> <span style="font-size:1.1em;">${order.customerPhone || 'N/A'}</span></div>
-                <div><span style="font-size:1.1em;">Time Slot:</span> <span style="font-size:1.1em;">${lastSlot || 'N/A'}</span></div>
-                ${order.orderComments ? `<div><span style="font-size:1.1em;">Comments:</span> <span style="font-size:1.1em;">${order.orderComments}</span></div>` : ''}
-              ${(order.orderType === 'delivery') ? `<div><span style="font-size:1.1em;">Address:</span> <span style="font-size:1.1em;">${order.customerAddress || 'N/A'}</span></div>
-              <div><span style="font-size:1.1em;">Postcode:</span> <span style="font-size:1.1em;">${order.customerPostcode || 'N/A'}</span></div>` : ''}
-            </div>
-          <ul class="ticket-items">
-            ${order.cart.map(item => `<li>${item.name} <span style='float:right'>£${item.price.toFixed(2)}</span></li>`).join('')}
-          </ul>
-          <div class="ticket-total">Total: £${order.total.toFixed(2)}</div>
-          <button class="print-btn" onclick="(function(e){e.stopPropagation();var el=this.parentNode;el.classList.add('printme');window.print();el.classList.remove('printme');})(event)">Print Ticket</button>
-        </div>`;
-      }
-    });
-  }
-  html += `</div></body></html>`;
-  res.send(html);
+  res.json(Array.isArray(orders) ? orders : []);
 });
 
 const PORT = process.env.PORT || 4242;
