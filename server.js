@@ -23,6 +23,11 @@ app.use((req, res, next) => {
 const USERS_FILE = path.join(__dirname, 'users.json');
 
 // --- USER LOGIN ENDPOINT ---
+// Handle accidental GET requests to /login with a JSON error
+app.get('/login', (req, res) => {
+  res.status(405).json({ error: 'Use POST for /login.' });
+});
+
 app.post('/login', async (req, res) => {
   try {
     console.log('LOGIN ENDPOINT HIT');
