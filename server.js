@@ -1,15 +1,3 @@
-// TEMPORARY DEBUG ENDPOINT - REMOVE AFTER USE
-app.get('/debug-users', (req, res) => {
-  let users = [];
-  if (fs.existsSync(USERS_FILE)) {
-    users = JSON.parse(fs.readFileSync(USERS_FILE));
-  }
-  res.json(users);
-});
-
-
-
-
 // All requires at the very top
 const express = require('express');
 const Stripe = require('stripe');
@@ -525,3 +513,13 @@ app.get('/orders', (req, res) => {
 
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => console.log(`Stripe server running on http://localhost:${PORT}`));
+
+// TEMPORARY DEBUG ENDPOINT - REMOVE AFTER USE
+app.get('/debug-users', (req, res) => {
+  let users = [];
+  if (fs.existsSync(USERS_FILE)) {
+    users = JSON.parse(fs.readFileSync(USERS_FILE));
+  }
+  res.json(users);
+});
+
