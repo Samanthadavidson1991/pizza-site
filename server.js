@@ -1,3 +1,16 @@
+// /orders.json endpoint for frontend compatibility
+app.get('/orders.json', (req, res) => {
+  let orders = [];
+  if (fs.existsSync(ORDERS_FILE)) {
+    try {
+      orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
+    } catch (e) {
+      console.error('ORDERS.JSON PARSE ERROR:', e);
+      orders = [];
+    }
+  }
+  res.json(Array.isArray(orders) ? orders : []);
+});
 
 
 
