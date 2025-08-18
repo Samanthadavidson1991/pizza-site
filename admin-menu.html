@@ -71,8 +71,35 @@
     </div>
   </div>
   <script>
-    const BACKEND = 'https://pizza-site-c8t6.onrender.com';
-    let menu = [];
+    // Local menuData grouped by section, restored from menu.json
+    let menuData = {
+      'Pizzas': [
+        { name: 'Margherita', price: 8.99, description: 'Tomato base with Mozzarella and Basil leaves', image: 'pizza1.jpg' },
+        { name: 'Prosciutto E Fungi', price: 8.99, description: 'Tomato base with Mozzarella, Prosciutto, and Mushrooms', image: 'pizza2.jpg' },
+        { name: 'Farmhouse Feast', price: 9.49, description: 'Tomato base with Mozzarella, Chicken, Bacon, Ham, and Farmhouse sausage', image: 'pizza3.jpg' },
+        { name: 'Pollo Picante', price: 9.49, description: 'Tomato base with Mozzarella, Chicken, Peppers, Chilli', image: 'pizza4.jpg' },
+        { name: 'Foragers Favourite', price: 9.49, description: 'Tomato base with Mozzarella, Mushrooms, Peppers, Onions, Sweetcorn', image: 'pizza5.jpg' },
+        { name: 'Romanesco (Vegan)', price: 9.49, description: 'Cashew Cream, Salsa Verde, Pine Nuts, Broccoli', image: 'pizza6.jpg' },
+        { name: 'Create Your Own Pizza', price: 11.99, description: 'Choose 4 toppings!', image: 'pizza7.jpg' }
+      ],
+      'Sides': [
+        { name: 'Doughballs', price: 3.99, description: '', image: 'side1.jpg' },
+        { name: 'Garlic Bread', price: 4.49, description: 'Tomato base with Garlic Oil', image: 'side2.jpg' },
+        { name: 'Homemade Chicken Nuggets and Fries', price: 11.99, description: '', image: 'side3.jpg' },
+        { name: 'Sweet Potato Fries', price: 11.99, description: '', image: 'side4.jpg' },
+        { name: 'Fries', price: 11.99, description: '', image: 'side5.jpg' },
+        { name: 'Coleslaw', price: 11.99, description: '', image: 'side6.jpg' },
+        { name: 'Dips', price: 11.99, description: '', image: 'side7.jpg' }
+      ],
+      'Salads': [
+        { name: 'Caesar Salad', price: 7.99, description: 'Lettuce, Cucumber, Tomatoes, Red Onion mixed with our homemade Caesar Dressing topped with Croutons and Parmesan cheese and a twist of Black Pepper', image: 'salad1.jpg' },
+        { name: 'House Salad', price: 7.99, description: 'Lettuce, Cucumber, Tomatoes, Red Onion with a drizzle of olive oil and a twist of Black Pepper', image: 'salad2.jpg' }
+      ],
+      'Desserts': [
+        { name: 'Chocolate Brownie', price: 11.99, description: '', image: 'dessert1.jpg' },
+        { name: 'Jammie Dodger Blondie', price: 11.99, description: '', image: 'dessert2.jpg' }
+      ]
+    };
     let editingId = null;
     let currentUser = localStorage.getItem('adminUser') || '';
     function showLogin(show) {
