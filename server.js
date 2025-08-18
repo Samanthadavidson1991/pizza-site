@@ -6,7 +6,7 @@ const fs = require('fs');
 const path = require('path');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
-
+const { generateMenuHTML } = require('./generate-menu-html');
 
 
 
@@ -34,6 +34,9 @@ app.use((req, res, next) => {
 });
 
 const USERS_FILE = path.join(__dirname, 'users.json');
+const MENU_FILE = path.join(__dirname, 'menu.json');
+const MENU_HTML_FILE = path.join(__dirname, 'menu pizza website take 1.html');
+const ORDERS_FILE = path.join(__dirname, 'orders.json');
 
 // --- USER LOGIN ENDPOINT ---
 // Handle accidental GET requests to /login with a JSON error
@@ -77,7 +80,6 @@ app.post('/login', async (req, res) => {
   }
 });
 // --- MENU MANAGEMENT ENDPOINTS ---
-const MENU_FILE = path.join(__dirname, 'menu.json');
 
 // Get all menu items
 app.get('/menu', (req, res) => {
@@ -93,6 +95,21 @@ app.get('/menu', (req, res) => {
   res.json(Array.isArray(menu) ? menu : []);
 });
 
+// Helper to update menu HTML file
+function updateMenuHTMLFile() {
+  let menu = [];
+  if (fs.existsSync(MENU_FILE)) {
+    try {
+      menu = JSON.parse(fs.readFileSync(MENU_FILE));
+    } catch (e) {
+      console.error('MENU JSON PARSE ERROR:', e);
+      menu = [];
+    }
+  }
+  const html = generateMenuHTML(menu);
+  fs.writeFileSync(MENU_HTML_FILE, html);
+}
+
 // Add a new menu item
 app.post('/menu', (req, res) => {
   let menu = [];
@@ -104,6 +121,7 @@ app.post('/menu', (req, res) => {
   if (username) newItem.lastEditedBy = username;
   menu.push(newItem);
   fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  updateMenuHTMLFile();
   res.json({ success: true, item: newItem });
 });
 
@@ -120,6 +138,7 @@ app.put('/menu/:id', (req, res) => {
   menu[idx] = { ...menu[idx], ...updateFields };
   if (username) menu[idx].lastEditedBy = username;
   fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  updateMenuHTMLFile();
   res.json({ success: true, item: menu[idx] });
 });
 
@@ -136,6 +155,7 @@ app.delete('/menu/:id', (req, res) => {
   if (username) menu[idx].lastEditedBy = username;
   const removed = menu.splice(idx, 1);
   fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
+  updateMenuHTMLFile();
   res.json({ success: true, item: removed[0] });
 });
 // Update order status or notes by index
@@ -210,8 +230,6 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.json());
-
-const ORDERS_FILE = path.join(__dirname, 'orders.json');
 
 // Helper to save order
 function saveOrder(order) {
