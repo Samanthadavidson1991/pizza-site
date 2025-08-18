@@ -41,6 +41,7 @@
       <div class="filter-bar">
         <input type="text" id="search" placeholder="Search by name, phone, status..." style="width: 300px; padding: 0.5em;">
         <button onclick="loadOrders()">Refresh</button>
+        <button onclick="printOrders()" style="margin-left:1em;">Print Orders</button>
         <button id="logout-btn" style="float:right;">Logout</button>
       </div>
       <table id="orders-table">
@@ -62,7 +63,20 @@
       </table>
     </div>
   </div>
+  <style media="print">
+    body, html { background: #fff !important; color: #000 !important; }
+    .container { box-shadow: none !important; border-radius: 0 !important; padding: 0.5em !important; }
+    .filter-bar, #login-box, #logout-btn, .save-note-btn, .status-btn, .note-input, input[type="text"], input[type="password"], button { display: none !important; }
+    table { width: 100%; font-size: 1.2em; }
+    th, td { border: 1px solid #000 !important; padding: 0.3em !important; }
+    th { background: #fff !important; color: #000 !important; }
+    tr { page-break-inside: avoid; }
+  </style>
   <script>
+    function printOrders() {
+      // Print only the orders table
+      window.print();
+    }
     const BACKEND = 'https://pizza-site-c8t6.onrender.com';
     let allOrders = [];
     let currentUser = localStorage.getItem('adminUser') || '';
