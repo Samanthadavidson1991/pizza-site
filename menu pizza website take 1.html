@@ -19,7 +19,6 @@
   </header>
   <section id="menu">
     <h2 class="menu-heading underlined">Menu</h2>
-  <!-- Menu management form removed from public menu page -->
     <div id="dynamic-menu"></div>
   </section>
   <section id="sides">
@@ -130,109 +129,31 @@
   </div>
 </section>
 
-</section>
-<!-- ...existing code... -->
 <script>
-// --- Menu Data Structure ---
-let menuData = {
-  'Pizzas': [
-    { name: 'Margherita', price: 8.99, description: 'Tomato base with Mozzarella and Basil leaves', image: 'pizza1.jpg' },
-    { name: 'Prosciutto E Fungi', price: 8.99, description: 'Tomato base with Mozzarella, Prosciutto, and Mushrooms', image: 'pizza2.jpg' },
-    { name: 'Farmhouse Feast', price: 9.49, description: 'Tomato base with Mozzarella, Chicken, Bacon, Ham, and Farmhouse sausage', image: 'pizza3.jpg' },
-    { name: 'Pollo Picante', price: 9.49, description: 'Tomato base with Mozzarella, Chicken, Peppers, Chilli', image: 'pizza4.jpg' },
-    { name: 'Foragers Favourite', price: 9.49, description: 'Tomato base with Mozzarella, Mushrooms, Peppers, Onions, Sweetcorn', image: 'pizza5.jpg' },
-    { name: 'Romanesco (Vegan)', price: 9.49, description: 'Cashew Cream, Salsa Verde, Pine Nuts, Broccoli', image: 'pizza6.jpg' },
-    { name: 'Create Your Own Pizza', price: 11.99, description: 'Choose 4 toppings!', image: 'pizza7.jpg' }
-  ],
-  'Sides': [
-    { name: 'Doughballs', price: 3.99, description: '', image: 'side1.jpg' },
-    { name: 'Garlic Bread', price: 4.49, description: 'Tomato base with Garlic Oil', image: 'side2.jpg' },
-    { name: 'Homemade Chicken Nuggets and Fries', price: 11.99, description: '', image: 'side3.jpg' },
-    { name: 'Sweet Potato Fries', price: 11.99, description: '', image: 'side4.jpg' },
-    { name: 'Fries', price: 11.99, description: '', image: 'side5.jpg' },
-    { name: 'Coleslaw', price: 11.99, description: '', image: 'side6.jpg' },
-    { name: 'Dips', price: 11.99, description: '', image: 'side7.jpg' }
-  ],
-  'Salads': [
-    { name: 'Caesar Salad', price: 7.99, description: 'Lettuce, Cucumber, Tomatoes, Red Onion mixed with our homemade Caesar Dressing topped with Croutons and Parmesan cheese and a twist of Black Pepper', image: 'salad1.jpg' },
-    { name: 'House Salad', price: 7.99, description: 'Lettuce, Cucumber, Tomatoes, Red Onion with a drizzle of olive oil and a twist of Black Pepper', image: 'salad2.jpg' }
-  ],
-  'Desserts': [
-    { name: 'Chocolate Brownie', price: 11.99, description: '', image: 'dessert1.jpg' },
-    { name: 'Jammie Dodger Blondie', price: 11.99, description: '', image: 'dessert2.jpg' }
-  ]
-};
-
+const BACKEND = 'https://pizza-site-c8t6.onrender.com';
 let cart = [];
 
-function renderMenuSections() {
+function renderMenuItems(menu) {
   const menuDiv = document.getElementById('dynamic-menu');
   menuDiv.innerHTML = '';
-  for (const section in menuData) {
-    const sectionDiv = document.createElement('div');
-    sectionDiv.className = 'menu-section';
-    sectionDiv.innerHTML = `<h3>${section}</h3>`;
-    menuData[section].forEach(item => {
-      const div = document.createElement('div');
-      div.className = 'menu-item';
-      div.innerHTML = `
-        <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
-        <p>${item.description || ''}</p>
-        ${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
-        <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
-      `;
-      sectionDiv.appendChild(div);
-    });
-    menuDiv.appendChild(sectionDiv);
-  }
-  // updateSectionSelect();
+  menu.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'menu-item';
+    div.innerHTML = `
+      <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
+      <p>${item.description || ''}</p>
+      ${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
+      <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
+    `;
+    menuDiv.appendChild(div);
+  });
 }
 
-function updateSectionSelect() {
-  const select = document.getElementById('section-select');
-  if (!select) return;
-  select.innerHTML = '';
-  for (const section in menuData) {
-    const opt = document.createElement('option');
-    opt.value = section;
-    opt.textContent = section;
-    select.appendChild(opt);
-  }
-  const newOpt = document.createElement('option');
-  newOpt.value = '__new__';
-  newOpt.textContent = '-- New Section --';
-  select.appendChild(newOpt);
+async function loadMenu() {
+  const res = await fetch(`${BACKEND}/menu`);
+  const menu = await res.json();
+  renderMenuItems(menu);
 }
-
-document.getElementById('section-select').addEventListener('change', function() {
-  const newSectionInput = document.getElementById('new-section-name');
-  if (this.value === '__new__') {
-    newSectionInput.style.display = 'inline-block';
-    newSectionInput.required = true;
-  } else {
-    newSectionInput.style.display = 'none';
-    newSectionInput.required = false;
-  }
-});
-
-document.getElementById('add-item-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  let section = document.getElementById('section-select').value;
-  if (section === '__new__') {
-    section = document.getElementById('new-section-name').value.trim();
-    if (!section) return alert('Please enter a section name!');
-    if (!menuData[section]) menuData[section] = [];
-  }
-  const name = document.getElementById('item-name').value.trim();
-  const price = parseFloat(document.getElementById('item-price').value);
-  const description = document.getElementById('item-desc').value.trim();
-  const image = document.getElementById('item-image').value.trim();
-  if (!name || isNaN(price)) return alert('Please enter a valid name and price!');
-  menuData[section].push({ name, price, description, image });
-  renderMenuSections();
-  this.reset();
-  document.getElementById('new-section-name').style.display = 'none';
-});
 
 function addToCart(name, price) {
   cart.push({ name, price });
@@ -282,10 +203,8 @@ function checkout() {
   window.location.href = 'checkout.html';
 }
 
-window.addEventListener('DOMContentLoaded', function() {
-  renderMenuSections();
-  console.log('Section select options:', Array.from(document.getElementById('section-select').options).map(o => o.textContent));
-});
+window.onload = loadMenu;
+</script>
 </script>
 </body>
 <script>
