@@ -149,6 +149,8 @@
   </div>
 </section>
 
+</section>
+<!-- ...existing code... -->
 <script>
 // --- Menu Data Structure ---
 let menuData = {
@@ -301,9 +303,8 @@ function checkout() {
 
 window.addEventListener('DOMContentLoaded', function() {
   renderMenuSections();
-  updateSectionSelect();
+  console.log('Section select options:', Array.from(document.getElementById('section-select').options).map(o => o.textContent));
 });
-</script>
 </script>
 </body>
 <script>
