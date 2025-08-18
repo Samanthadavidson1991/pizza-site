@@ -23,13 +23,7 @@
   </section>
   <section id="sides">
   <h2 class="menu-heading underlined">Sides</h2>
-    <div class="menu-item">
-      <p><strong>Doughballs</strong> – £3.99</p>
-      <label><input type="radio" name="topping" value="Ham"><b>Ham</b></label><br>
-    <label><input type="radio" name="topping" value="Garlic Butter"><b>Garlic Butter</b></label><br>
-    <label><input type="radio" name="topping" value="Bacon"><b>Bacon</b></label><br>
-      <button onclick="addToCart('Doughballs', 3.99)">Add to Cart</button>
-    </div>
+  <!-- Doughballs static menu item removed (now handled dynamically) -->
     <div class="menu-item">
       <p><strong>Garlic Bread</strong> – £4.49</p>
       <p> Tomato base with Garlic Oil</p>
@@ -51,17 +45,7 @@
       <p><strong>Sweet Potato Fries</strong> – £11.99</p>
     <button onclick="addToCart('Sweet Potato Fries', 11.99)">Add to Cart</button>
   </div>
-  <div class="menu-item">
-      <p><strong>Fries</strong> – £11.99</p>
-    <button onclick="addToCart('Fries', 11.99)">Add to Cart</button>
-  </div>
-  <div class="menu-item">
-      <p><strong>Coleslaw</strong> – £11.99</p>
-    <button onclick="addToCart('Coleslaw', 11.99)">Add to Cart</button>
-  </div><div class="menu-item">
-      <p><strong>Dips</strong> – £11.99</p>
-      <label><input type="radio" name="topping" value="BBQ"><b>BBQ</b></label><br>
-    <label><input type="radio" name="topping" value="Garlic Butter"><b>Garlic Butter</b></label><br>
+  <!-- Dips static menu item removed (now handled dynamically) -->
     <label><input type="radio" name="topping" value="MAYO"><b>MAYO</b></label><br>
     <label><input type="radio" name="topping" value="GARLIC MAYO"><b>GARLIC MAYO</b></label><br>
     <label><input type="radio" name="topping" value="Garlic Butter"><b>Garlic Butter</b></label><br>
@@ -139,11 +123,30 @@ function renderMenuItems(menu) {
   menu.forEach(item => {
     const div = document.createElement('div');
     div.className = 'menu-item';
+    let optionsHtml = '';
+    // Pizza size dropdown for pizzas with options
+    if (Array.isArray(item.options) && item.options.length > 0 && item.name.match(/pizza|garlic bread/i)) {
+      optionsHtml = `<label for='${item.name}-size'><b>Size:</b></label> <select id='${item.name}-size'>` +
+        item.options.map((opt, idx) => {
+          if (typeof opt === 'object') {
+            return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
+          } else {
+            return `<option value='${idx}'>${opt}</option>`;
+          }
+        }).join('') +
+        `</select><br>`;
+    } else if ((item.name === 'Doughballs' || item.name === 'Dips') && Array.isArray(item.options) && item.options.length > 0) {
+      // Render options as radio buttons
+      optionsHtml = item.options.map(opt =>
+        `<label><input type='radio' name='${item.name}-option' value='${opt}'><b>${opt}</b></label><br>`
+      ).join('');
+    }
     div.innerHTML = `
       <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
       <p>${item.description || ''}</p>
-      ${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
-      <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
+      ${item.image ? `<img src=\"${item.image}\" alt=\"${item.name}\" style=\"height:40px;\">` : ''}
+      ${optionsHtml}
+      <button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
     `;
     menuDiv.appendChild(div);
   });
@@ -152,6 +155,7 @@ function renderMenuItems(menu) {
 async function loadMenu() {
   const res = await fetch(`${BACKEND}/menu`);
   const menu = await res.json();
+  window.menuData = menu; // <-- Add this line here
   renderMenuItems(menu);
 }
 
@@ -201,6 +205,25 @@ function checkout() {
   }
   localStorage.setItem('cart', JSON.stringify(cart));
   window.location.href = 'checkout.html';
+}
+function addDynamicToCart(name, id) {
+  const item = window.menuData.find(i => i.id === id);
+  let price = item.price;
+  let label = name;
+  if (Array.isArray(item.options) && item.options.length > 0 && (item.name.match(/pizza|garlic bread/i))) {
+    const select = document.getElementById(`${item.name}-size`);
+    const selectedIdx = select ? select.value : 0;
+    const selectedOpt = item.options[selectedIdx];
+    if (typeof selectedOpt === 'object') {
+      price = parseFloat(selectedOpt.price);
+      label = `${item.name} (${selectedOpt.label})`;
+    } else {
+      label = `${item.name} (${selectedOpt})`;
+    }
+  }
+  cart.push({ name: label, price });
+  updateCartDisplay();
+  showAddToCartTicket(label);
 }
 
 window.onload = loadMenu;
