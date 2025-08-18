@@ -19,26 +19,7 @@
   </header>
   <section id="menu">
     <h2 class="menu-heading underlined">Menu</h2>
-    <!-- Add Item/Section Form -->
-    <form id="add-item-form" style="margin-bottom:2em; background:#f9f9f9; padding:1em; border-radius:8px;">
-      <label for="section-select" style="background: #ffe066; padding: 0.2em 0.6em; border-radius: 4px; font-weight: bold;">Choose Section:</label>
-      <select id="section-select" name="section" style="margin-left:0.5em; font-weight:bold;">
-        <!-- Options will be populated by JS -->
-      </select>
-      <input type="text" id="new-section-name" name="new-section" placeholder="New Section Name" style="display:none; margin-left:1em;" />
-      <br><br>
-      <label for="item-name"><b>Item Name:</b></label>
-      <input type="text" id="item-name" name="item-name" required>
-      <label for="item-price" style="margin-left:1em;"><b>Price (£):</b></label>
-      <input type="number" id="item-price" name="item-price" step="0.01" required>
-      <br><br>
-      <label for="item-desc"><b>Description:</b></label>
-      <input type="text" id="item-desc" name="item-desc" style="width:300px;">
-      <label for="item-image" style="margin-left:1em;"><b>Image (URL):</b></label>
-      <input type="text" id="item-image" name="item-image" style="width:200px;">
-      <br><br>
-      <button type="submit">Add Item</button>
-    </form>
+  <!-- Menu management form removed from public menu page -->
     <div id="dynamic-menu"></div>
   </section>
   <section id="sides">
@@ -204,7 +185,7 @@ function renderMenuSections() {
     });
     menuDiv.appendChild(sectionDiv);
   }
-  updateSectionSelect();
+  // updateSectionSelect();
 }
 
 function updateSectionSelect() {

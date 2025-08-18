@@ -35,6 +35,26 @@
     </div>
     <div id="menu-section" style="display:none;">
       <h1>Menu Management</h1>
+      <!-- Section/item management form from menu page -->
+      <form id="add-item-form" class="menu-manager-form">
+        <label for="section-select" class="section-label">Choose Section:</label>
+        <select id="section-select" name="section" class="section-select">
+          <!-- Options will be populated by JS -->
+        </select>
+        <input type="text" id="new-section-name" name="new-section" placeholder="New Section Name" class="new-section-input" />
+        <br><br>
+        <label for="item-name"><b>Item Name:</b></label>
+        <input type="text" id="item-name" name="item-name" required>
+        <label for="item-price" class="price-label"><b>Price (£):</b></label>
+        <input type="number" id="item-price" name="item-price" step="0.01" required>
+        <br><br>
+        <label for="item-desc"><b>Description:</b></label>
+        <input type="text" id="item-desc" name="item-desc" class="desc-input">
+        <label for="item-image" class="image-label"><b>Image (URL):</b></label>
+        <input type="text" id="item-image" name="item-image" class="image-input">
+        <br><br>
+        <button type="submit">Add Item</button>
+      </form>
       <table id="menu-table">
         <thead>
           <tr>
@@ -47,14 +67,7 @@
         </thead>
         <tbody></tbody>
       </table>
-      <form class="add-form" id="add-form">
-        <input type="text" id="add-name" placeholder="Name" required>
-        <input type="text" id="add-desc" placeholder="Description" required>
-        <input type="number" id="add-price" placeholder="Price" step="0.01" required>
-        <input type="text" id="add-image" placeholder="Image filename (optional)">
-        <button type="submit" class="action-btn save">Add Item</button>
-        <button id="logout-btn" type="button" class="action-btn cancel" style="float:right;">Logout</button>
-      </form>
+      <button id="logout-btn" type="button" class="action-btn cancel" style="float:right;">Logout</button>
     </div>
   </div>
   <script>

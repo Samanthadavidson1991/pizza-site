@@ -1,3 +1,36 @@
+/* Menu Manager Form Styles */
+.menu-manager-form {
+  margin-bottom: 2em;
+  background: #f9f9f9;
+  padding: 1em;
+  border-radius: 8px;
+}
+.section-label {
+  background: #ffe066;
+  padding: 0.2em 0.6em;
+  border-radius: 4px;
+  font-weight: bold;
+}
+.section-select {
+  margin-left: 0.5em;
+  font-weight: bold;
+}
+.new-section-input {
+  display: none;
+  margin-left: 1em;
+}
+.price-label {
+  margin-left: 1em;
+}
+.desc-input {
+  width: 300px;
+}
+.image-label {
+  margin-left: 1em;
+}
+.image-input {
+  width: 200px;
+}
 /* Make all text black on allergens page */
 body.allergens-page, body.allergens-page * {
   color: #000 !important;
