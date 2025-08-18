@@ -19,6 +19,30 @@
   </header>
   <section id="menu">
     <h2 class="menu-heading underlined">Menu</h2>
+    <!-- Add Item/Section Form -->
+    <form id="add-item-form" style="margin-bottom:2em; background:#f9f9f9; padding:1em; border-radius:8px;">
+      <label for="section-select"><b>Section:</b></label>
+      <select id="section-select" name="section">
+        <option value="Pizzas">Pizzas</option>
+        <option value="Sides">Sides</option>
+        <option value="Salads">Salads</option>
+        <option value="Desserts">Desserts</option>
+        <option value="__new__">-- New Section --</option>
+      </select>
+      <input type="text" id="new-section-name" name="new-section" placeholder="New Section Name" style="display:none; margin-left:1em;" />
+      <br><br>
+      <label for="item-name"><b>Item Name:</b></label>
+      <input type="text" id="item-name" name="item-name" required>
+      <label for="item-price" style="margin-left:1em;"><b>Price (£):</b></label>
+      <input type="number" id="item-price" name="item-price" step="0.01" required>
+      <br><br>
+      <label for="item-desc"><b>Description:</b></label>
+      <input type="text" id="item-desc" name="item-desc" style="width:300px;">
+      <label for="item-image" style="margin-left:1em;"><b>Image (URL):</b></label>
+      <input type="text" id="item-image" name="item-image" style="width:200px;">
+      <br><br>
+      <button type="submit">Add Item</button>
+    </form>
     <div id="dynamic-menu"></div>
   </section>
   <section id="sides">
@@ -130,30 +154,103 @@
 </section>
 
 <script>
-const BACKEND = 'https://pizza-site-c8t6.onrender.com';
+// --- Menu Data Structure ---
+let menuData = {
+  'Pizzas': [
+    { name: 'Margherita', price: 8.99, description: 'Tomato base with Mozzarella and Basil leaves', image: 'pizza1.jpg' },
+    { name: 'Prosciutto E Fungi', price: 8.99, description: 'Tomato base with Mozzarella, Prosciutto, and Mushrooms', image: 'pizza2.jpg' },
+    { name: 'Farmhouse Feast', price: 9.49, description: 'Tomato base with Mozzarella, Chicken, Bacon, Ham, and Farmhouse sausage', image: 'pizza3.jpg' },
+    { name: 'Pollo Picante', price: 9.49, description: 'Tomato base with Mozzarella, Chicken, Peppers, Chilli', image: 'pizza4.jpg' },
+    { name: 'Foragers Favourite', price: 9.49, description: 'Tomato base with Mozzarella, Mushrooms, Peppers, Onions, Sweetcorn', image: 'pizza5.jpg' },
+    { name: 'Romanesco (Vegan)', price: 9.49, description: 'Cashew Cream, Salsa Verde, Pine Nuts, Broccoli', image: 'pizza6.jpg' },
+    { name: 'Create Your Own Pizza', price: 11.99, description: 'Choose 4 toppings!', image: 'pizza7.jpg' }
+  ],
+  'Sides': [
+    { name: 'Doughballs', price: 3.99, description: '', image: 'side1.jpg' },
+    { name: 'Garlic Bread', price: 4.49, description: 'Tomato base with Garlic Oil', image: 'side2.jpg' },
+    { name: 'Homemade Chicken Nuggets and Fries', price: 11.99, description: '', image: 'side3.jpg' },
+    { name: 'Sweet Potato Fries', price: 11.99, description: '', image: 'side4.jpg' },
+    { name: 'Fries', price: 11.99, description: '', image: 'side5.jpg' },
+    { name: 'Coleslaw', price: 11.99, description: '', image: 'side6.jpg' },
+    { name: 'Dips', price: 11.99, description: '', image: 'side7.jpg' }
+  ],
+  'Salads': [
+    { name: 'Caesar Salad', price: 7.99, description: 'Lettuce, Cucumber, Tomatoes, Red Onion mixed with our homemade Caesar Dressing topped with Croutons and Parmesan cheese and a twist of Black Pepper', image: 'salad1.jpg' },
+    { name: 'House Salad', price: 7.99, description: 'Lettuce, Cucumber, Tomatoes, Red Onion with a drizzle of olive oil and a twist of Black Pepper', image: 'salad2.jpg' }
+  ],
+  'Desserts': [
+    { name: 'Chocolate Brownie', price: 11.99, description: '', image: 'dessert1.jpg' },
+    { name: 'Jammie Dodger Blondie', price: 11.99, description: '', image: 'dessert2.jpg' }
+  ]
+};
+
 let cart = [];
 
-function renderMenuItems(menu) {
+function renderMenuSections() {
   const menuDiv = document.getElementById('dynamic-menu');
   menuDiv.innerHTML = '';
-  menu.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'menu-item';
-    div.innerHTML = `
-      <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
-      <p>${item.description || ''}</p>
-      ${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
-      <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
-    `;
-    menuDiv.appendChild(div);
-  });
+  for (const section in menuData) {
+    const sectionDiv = document.createElement('div');
+    sectionDiv.className = 'menu-section';
+    sectionDiv.innerHTML = `<h3>${section}</h3>`;
+    menuData[section].forEach(item => {
+      const div = document.createElement('div');
+      div.className = 'menu-item';
+      div.innerHTML = `
+        <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
+        <p>${item.description || ''}</p>
+        ${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
+        <button onclick="addToCart('${item.name.replace(/'/g, "\\'")}', ${item.price})">Add to Cart</button>
+      `;
+      sectionDiv.appendChild(div);
+    });
+    menuDiv.appendChild(sectionDiv);
+  }
+  updateSectionSelect();
 }
 
-async function loadMenu() {
-  const res = await fetch(`${BACKEND}/menu`);
-  const menu = await res.json();
-  renderMenuItems(menu);
+function updateSectionSelect() {
+  const select = document.getElementById('section-select');
+  if (!select) return;
+  // Remove all except the last (new section)
+  while (select.options.length > 1) select.remove(0);
+  for (const section in menuData) {
+    const opt = document.createElement('option');
+    opt.value = section;
+    opt.textContent = section;
+    select.insertBefore(opt, select.lastElementChild);
+  }
 }
+
+document.getElementById('section-select').addEventListener('change', function() {
+  const newSectionInput = document.getElementById('new-section-name');
+  if (this.value === '__new__') {
+    newSectionInput.style.display = 'inline-block';
+    newSectionInput.required = true;
+  } else {
+    newSectionInput.style.display = 'none';
+    newSectionInput.required = false;
+  }
+});
+
+document.getElementById('add-item-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  let section = document.getElementById('section-select').value;
+  if (section === '__new__') {
+    section = document.getElementById('new-section-name').value.trim();
+    if (!section) return alert('Please enter a section name!');
+    if (!menuData[section]) menuData[section] = [];
+  }
+  const name = document.getElementById('item-name').value.trim();
+  const price = parseFloat(document.getElementById('item-price').value);
+  const description = document.getElementById('item-desc').value.trim();
+  const image = document.getElementById('item-image').value.trim();
+  if (!name || isNaN(price)) return alert('Please enter a valid name and price!');
+  menuData[section].push({ name, price, description, image });
+  renderMenuSections();
+  this.reset();
+  document.getElementById('new-section-name').style.display = 'none';
+});
 
 function addToCart(name, price) {
   cart.push({ name, price });
@@ -203,7 +300,7 @@ function checkout() {
   window.location.href = 'checkout.html';
 }
 
-window.onload = loadMenu;
+window.onload = renderMenuSections;
 </script>
 </script>
 </body>
