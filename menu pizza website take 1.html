@@ -208,9 +208,6 @@ function renderMenuSections() {
 function updateSectionSelect() {
   const select = document.getElementById('section-select');
   if (!select) return;
-  // Remove all except the last (new section)
-  while (select.options.length > 1) select.remove(0);
-  // Clear all options
   select.innerHTML = '';
   for (const section in menuData) {
     const opt = document.createElement('option');
@@ -218,7 +215,6 @@ function updateSectionSelect() {
     opt.textContent = section;
     select.appendChild(opt);
   }
-  // Always add the new section option at the end
   const newOpt = document.createElement('option');
   newOpt.value = '__new__';
   newOpt.textContent = '-- New Section --';
@@ -303,10 +299,10 @@ function checkout() {
   window.location.href = 'checkout.html';
 }
 
-window.onload = function() {
+window.addEventListener('DOMContentLoaded', function() {
   renderMenuSections();
   updateSectionSelect();
-};
+});
 </script>
 </script>
 </body>
