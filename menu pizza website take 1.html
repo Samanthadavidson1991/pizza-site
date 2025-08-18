@@ -21,13 +21,9 @@
     <h2 class="menu-heading underlined">Menu</h2>
     <!-- Add Item/Section Form -->
     <form id="add-item-form" style="margin-bottom:2em; background:#f9f9f9; padding:1em; border-radius:8px;">
-      <label for="section-select"><b>Section:</b></label>
-      <select id="section-select" name="section">
-        <option value="Pizzas">Pizzas</option>
-        <option value="Sides">Sides</option>
-        <option value="Salads">Salads</option>
-        <option value="Desserts">Desserts</option>
-        <option value="__new__">-- New Section --</option>
+      <label for="section-select" style="background: #ffe066; padding: 0.2em 0.6em; border-radius: 4px; font-weight: bold;">Choose Section:</label>
+      <select id="section-select" name="section" style="margin-left:0.5em; font-weight:bold;">
+        <!-- Options will be populated by JS -->
       </select>
       <input type="text" id="new-section-name" name="new-section" placeholder="New Section Name" style="display:none; margin-left:1em;" />
       <br><br>
@@ -214,12 +210,19 @@ function updateSectionSelect() {
   if (!select) return;
   // Remove all except the last (new section)
   while (select.options.length > 1) select.remove(0);
+  // Clear all options
+  select.innerHTML = '';
   for (const section in menuData) {
     const opt = document.createElement('option');
     opt.value = section;
     opt.textContent = section;
-    select.insertBefore(opt, select.lastElementChild);
+    select.appendChild(opt);
   }
+  // Always add the new section option at the end
+  const newOpt = document.createElement('option');
+  newOpt.value = '__new__';
+  newOpt.textContent = '-- New Section --';
+  select.appendChild(newOpt);
 }
 
 document.getElementById('section-select').addEventListener('change', function() {
@@ -300,7 +303,10 @@ function checkout() {
   window.location.href = 'checkout.html';
 }
 
-window.onload = renderMenuSections;
+window.onload = function() {
+  renderMenuSections();
+  updateSectionSelect();
+};
 </script>
 </script>
 </body>
