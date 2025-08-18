@@ -43,6 +43,7 @@
             <th>Price (£)</th>
             <th>Image</th>
             <th>Actions</th>
+            <th>Options</th>
           </tr>
         </thead>
         <tbody></tbody>
@@ -109,6 +110,12 @@
       tbody.innerHTML = '';
       menu.forEach(item => {
         const tr = document.createElement('tr');
+        let optionsHtml = '';
+        if (item.name === 'Doughballs' || item.name === 'Dips') {
+          optionsHtml = `<div id="options-list-${item.id}"></div>
+            <input type="text" id="option-input-${item.id}" placeholder="Add option">
+            <button class="action-btn save" onclick="addOption(${item.id})">Add</button>`;
+        }
         if (editingId === item.id) {
           tr.innerHTML = `
             <td><input type="text" id="edit-name" value="${item.name}"></td>
@@ -119,6 +126,7 @@
               <button class="action-btn save" onclick="saveEdit(${item.id})">Save</button>
               <button class="action-btn cancel" onclick="cancelEdit()">Cancel</button>
             </td>
+            <td>${optionsHtml}</td>
           `;
         } else {
           tr.innerHTML = `
@@ -130,10 +138,51 @@
               <button class="action-btn edit" onclick="editItem(${item.id})">Edit</button>
               <button class="action-btn delete" onclick="deleteItem(${item.id})">Delete</button>
             </td>
+            <td>${optionsHtml}</td>
           `;
         }
         tbody.appendChild(tr);
+        // Render options if present
+        if ((item.name === 'Doughballs' || item.name === 'Dips') && item.options) {
+          setTimeout(() => renderOptions(item.id, item.options), 0);
+        }
       });
+    }
+
+    function renderOptions(itemId, options) {
+      const listDiv = document.getElementById(`options-list-${itemId}`);
+      if (!listDiv) return;
+      listDiv.innerHTML = options.map((opt, idx) =>
+        `<span style='display:inline-block;margin:2px 6px 2px 0;padding:2px 8px;background:#eee;border-radius:12px;'>${opt} <button onclick='removeOption(${itemId},${idx})' style='background:#e74c3c;color:#fff;border:none;border-radius:8px;padding:0 6px;cursor:pointer;'>x</button></span>`
+      ).join('');
+    }
+
+    async function addOption(itemId) {
+      const input = document.getElementById(`option-input-${itemId}`);
+      const value = input.value.trim();
+      if (!value) return;
+      const item = menu.find(i => i.id === itemId);
+      if (!item.options) item.options = [];
+      item.options.push(value);
+      await fetch(`${BACKEND}/menu/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...item, username: currentUser })
+      });
+      input.value = '';
+      await loadMenu();
+    }
+
+    async function removeOption(itemId, idx) {
+      const item = menu.find(i => i.id === itemId);
+      if (!item.options) return;
+      item.options.splice(idx, 1);
+      await fetch(`${BACKEND}/menu/${itemId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ ...item, username: currentUser })
+      });
+      await loadMenu();
     }
     function editItem(id) {
       editingId = id;
