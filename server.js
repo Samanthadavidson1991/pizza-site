@@ -1,4 +1,5 @@
 // All requires at the very top
+const { MongoClient, ObjectId } = require('mongodb');
 const express = require('express');
 const Stripe = require('stripe');
 const cors = require('cors');
@@ -12,6 +13,22 @@ const { generateMenuHTML } = require('./generate-menu-html');
 
 
 const app = express();
+// MongoDB connection setup
+const mongoUri = 'mongodb+srv://thecrustngb:1FulWR9u2F7ii0Ef@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+let menuCollection;
+
+async function connectMongo() {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    menuCollection = db.collection('menu');
+    console.log('Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+  }
+}
+connectMongo();
 app.use(express.static(__dirname));
 app.disable('x-powered-by');
 
@@ -36,7 +53,6 @@ app.use((req, res, next) => {
 });
 
 const USERS_FILE = path.join(__dirname, 'users.json');
-const MENU_FILE = path.join(__dirname, 'menu.json');
 const MENU_HTML_FILE = path.join(__dirname, 'menu pizza website take 1.html');
 const ORDERS_FILE = path.join(__dirname, 'orders.json');
 
@@ -112,58 +128,55 @@ function updateMenuHTMLFile() {
   fs.writeFileSync(MENU_HTML_FILE, html);
 }
 
-// Add a new menu item
-app.post('/menu', (req, res) => {
-  let menu = [];
-  if (fs.existsSync(MENU_FILE)) {
-    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+// --- MENU ENDPOINTS (MongoDB) ---
+// GET menu
+app.get('/menu', async (req, res) => {
+  try {
+    const menu = await menuCollection.find({}).toArray();
+    res.json(menu);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch menu.' });
   }
-  const { username, ...newItem } = req.body;
-  newItem.id = Date.now();
-  if (username) newItem.lastEditedBy = username;
-  menu.push(newItem);
-  fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
-  updateMenuHTMLFile();
-  res.json({ success: true, item: newItem });
 });
 
-// Update a menu item by id
-app.put('/menu/:id', (req, res) => {
-  let menu = [];
-  if (fs.existsSync(MENU_FILE)) {
-    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+// POST new menu item
+app.post('/menu', async (req, res) => {
+  try {
+    const item = req.body;
+    // Generate a numeric id for compatibility with old code
+    const last = await menuCollection.find().sort({ id: -1 }).limit(1).toArray();
+    item.id = last.length ? last[0].id + 1 : 1;
+    await menuCollection.insertOne(item);
+    res.json({ success: true, id: item.id });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to add menu item.' });
   }
-  const id = parseInt(req.params.id);
-  const idx = menu.findIndex(item => item.id === id);
-  if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
-  const { username, ...updateFields } = req.body;
-  menu[idx] = { ...menu[idx], ...updateFields };
-  if (username) menu[idx].lastEditedBy = username;
-  fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
-  updateMenuHTMLFile();
-  res.json({ success: true, item: menu[idx] });
 });
 
-// Delete a menu item by id
-app.delete('/menu/:id', (req, res) => {
-  let menu = [];
-  if (fs.existsSync(MENU_FILE)) {
-    menu = JSON.parse(fs.readFileSync(MENU_FILE));
+// PUT update menu item
+app.put('/menu/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const updated = req.body;
+    const result = await menuCollection.updateOne({ id }, { $set: updated });
+    if (result.matchedCount === 0) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update menu item.' });
   }
-  const id = parseInt(req.params.id);
-  const idx = menu.findIndex(item => item.id === id);
-  if (idx === -1) return res.status(404).json({ error: 'Menu item not found' });
-  const { username } = req.body;
-  if (username) menu[idx].lastEditedBy = username;
-  const removed = menu.splice(idx, 1);
-  fs.writeFileSync(MENU_FILE, JSON.stringify(menu, null, 2));
-  updateMenuHTMLFile();
-  res.json({ success: true, item: removed[0] });
 });
-// Update order status or notes by index
-app.post('/update-order', (req, res) => {
-  const { index, status, note, username } = req.body;
-  if (typeof index !== 'number') {
+
+// DELETE menu item
+app.delete('/menu/:id', async (req, res) => {
+  try {
+    const id = parseInt(req.params.id);
+    const result = await menuCollection.deleteOne({ id });
+    if (result.deletedCount === 0) return res.status(404).json({ error: 'Not found' });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to delete menu item.' });
+  }
+});
     return res.status(400).json({ error: 'Order index required.' });
   }
   let orders = [];
