@@ -53,6 +53,16 @@
         <input type="text" id="add-desc" placeholder="Description" required>
         <input type="number" id="add-price" placeholder="Price" step="0.01" required>
         <input type="text" id="add-image" placeholder="Image filename (optional)">
+        <input type="text" id="add-toppings" placeholder="Toppings (comma separated)">
+        <input type="number" id="add-extra-topping-price" placeholder="Extra topping price (optional)" step="0.01">
+        <select id="add-section" required>
+          <option value="">Select Section</option>
+          <option value="PIZZA'S">PIZZA'S</option>
+          <option value="SALADS">SALADS</option>
+          <option value="DRINKS">DRINKS</option>
+          <option value="SIDES">SIDES</option>
+          <option value="DESSERTS">DESSERTS</option>
+        </select>
         <button type="submit" class="action-btn save">Add Item</button>
         <button id="logout-btn" type="button" class="action-btn cancel" style="float:right;">Logout</button>
       </form>
@@ -232,10 +242,15 @@
       const description = document.getElementById('add-desc').value;
       const price = parseFloat(document.getElementById('add-price').value);
       const image = document.getElementById('add-image').value;
+      const toppingsRaw = document.getElementById('add-toppings').value;
+      const toppings = toppingsRaw ? toppingsRaw.split(',').map(t => t.trim()).filter(Boolean) : [];
+      const extraToppingPriceRaw = document.getElementById('add-extra-topping-price').value;
+      const extraToppingPrice = extraToppingPriceRaw ? parseFloat(extraToppingPriceRaw) : undefined;
+      const section = document.getElementById('add-section').value;
       await fetch(`${BACKEND}/menu`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, description, price, image, username: currentUser })
+        body: JSON.stringify({ name, description, price, image, toppings, extraToppingPrice, section, username: currentUser })
       });
       document.getElementById('add-form').reset();
       await loadMenu();

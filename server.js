@@ -10,7 +10,9 @@ const { generateMenuHTML } = require('./generate-menu-html');
 
 
 
+
 const app = express();
+app.use(express.static(__dirname));
 app.disable('x-powered-by');
 
 // CORS middleware MUST be before express.json() and all routes

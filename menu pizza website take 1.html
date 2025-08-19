@@ -21,87 +21,8 @@
     <h2 class="menu-heading underlined">Menu</h2>
     <div id="dynamic-menu"></div>
   </section>
-  <section id="sides">
-  <h2 class="menu-heading underlined">Sides</h2>
-  <!-- Doughballs static menu item removed (now handled dynamically) -->
-    <div class="menu-item">
-      <p><strong>Garlic Bread</strong> – £4.49</p>
-      <p> Tomato base with Garlic Oil</p>
-       <form class="pizza-size-form">
-  <label for="garlic-bread-size" class="label-bold">Size:</label>
-    <select id="garlic-bread-size" name="pizza-size">
-      <option value="12in" data-price="8.99">12in (£8.99)</option>
-      <option value="9in" data-price="10.99" selected>9in (£10.99)</option>
-      <option value="12in Gluten Free" data-price="12.99">12in Gluten Free (£12.99)</option>
-    </select>
-        <button type="button" onclick="addPizzaToCart('Garlic Bread', 'garlic-bread-size')">Add to Cart</button>
-      </form>
-    </div>
-    <div class="menu-item">
-      <p><strong>Homemade Chicken Nuggets and Fries</strong> – £11.99</p>
-    <button onclick="addToCart('Homemade Chicken Nuggets and Fries', 11.99)">Add to Cart</button>
-  </div>
-  <div class="menu-item">
-      <p><strong>Sweet Potato Fries</strong> – £11.99</p>
-    <button onclick="addToCart('Sweet Potato Fries', 11.99)">Add to Cart</button>
-  </div>
-  <!-- Dips static menu item removed (now handled dynamically) -->
-    <label><input type="radio" name="topping" value="MAYO"><b>MAYO</b></label><br>
-    <label><input type="radio" name="topping" value="GARLIC MAYO"><b>GARLIC MAYO</b></label><br>
-    <label><input type="radio" name="topping" value="Garlic Butter"><b>Garlic Butter</b></label><br>
-    <label><input type="radio" name="topping" value="TOMATO KETCHUP"><b>TOMATO KETCHUP</b></label><br>
-    <label><input type="radio" name="topping" value="TOMATO BASE"><b>TOMATO BASE</b></label><br>
-    <button onclick="addToCart('Dips', 11.99)">Add to Cart</button>
-  </div>
-  </section>
-  <section id="salads">
-  <h2 class="menu-heading underlined">Salads</h2>
-  <div class="menu-item">
-  <p><strong>Caesar Salad</strong> – £7.99</p>
-  <p>
-    Lettuce, Cucumber, Tomatoes, Red Onion mixed with our homemade Caesar Dressing topped with Croutons and Parmesan cheese and a twist of Black Pepper
-  </p>
-  <form id="caesar-toppings-form">
-    <label><input type="checkbox" name="topping" value="Croutons" checked><b>Croutons</b></label>
-    <label><input type="checkbox" name="topping" value="Parmesan" checked><b>Parmesan</b></label>
-    <label><input type="checkbox" name="topping" value="Black Pepper" checked><b>Black Pepper</b></label>
-    <label><input type="checkbox" name="topping" value="Cucumber" checked><b>Cucumber</b></label>
-    <label><input type="checkbox" name="topping" value="Tomatoes" checked><b>Tomatoes</b></label>
-    <label><input type="checkbox" name="topping" value="Red Onions" checked><b>Red Onions</b></label>
-    <!-- Add more toppings as needed -->
-      <button type="button" onclick="removeSaladToppings('Caesar Salad', 7.99, 'caesar-toppings-form')">Add to Cart</button>
-    </form>
-    </div>
-</div>
-  <div class="menu-item">
-  <p><strong>House Salad</strong> – £7.99</p>
-  <p>
-    Lettuce, Cucumber, Tomatoes, Red Onion with a drizzle of olive oil and a twist of Black Pepper
-  </p>
-  <form id="house-toppings-form">
-    <label><input type="checkbox" name="topping" value="Black Pepper" checked><b>Black Pepper</b></label>
-    <label><input type="checkbox" name="topping" value="Cucumber" checked><b>Cucumber</b></label>
-    <label><input type="checkbox" name="topping" value="Tomatoes" checked><b>Tomatoes</b></label>
-    <label><input type="checkbox" name="topping" value="Red Onions" checked><b>Red Onions</b></label>
-    <label><input type="checkbox" name="topping" value="Olive Oil" checked><b>Olive Oil</b></label>
-    <!-- Add more toppings as needed -->
-      <button type="button" onclick="removeSaladToppings('House Salad', 7.99, 'house-toppings-form')">Add to Cart</button>
-    </form>
-    </div>
-</div>
-</section>
-<section id="desserts">
-  <h2 class="menu-heading underlined">Desserts</h2>
-  <section>
-  <div class="menu-item">
-    <p><strong>Chocolate Brownie</strong> – £11.99</p>
-    <button onclick="addToCart('Chocolate Brownie', 11.99)">Add to Cart</button>
-  </div>
-  <div class="menu-item">
-    <p><strong>Jammie Dodger Blondie</strong> – £11.99</p>
-    <button onclick="addToCart('Jammie Dodger Blondie', 11.99)">Add to Cart</button>
-  </div>
-</section>
+  <!-- Sides section removed: now handled dynamically by menu.json and JS -->
+  <!-- Salads and Desserts sections removed: now handled dynamically by menu.json and JS -->
 
 <!-- Cart Section -->
 <section id="cart">
@@ -120,35 +41,78 @@ let cart = [];
 function renderMenuItems(menu) {
   const menuDiv = document.getElementById('dynamic-menu');
   menuDiv.innerHTML = '';
+  // Group items by section
+  const sections = [
+    { key: "PIZZA'S", label: "PIZZA'S" },
+    { key: "SALADS", label: "SALADS" },
+    { key: "DRINKS", label: "DRINKS" },
+    { key: "SIDES", label: "SIDES" },
+    { key: "DESSERTS", label: "DESSERTS" }
+  ];
+  const grouped = {};
   menu.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'menu-item';
-    let optionsHtml = '';
-    // Pizza size dropdown for pizzas with options
-    if (Array.isArray(item.options) && item.options.length > 0 && item.name.match(/pizza|garlic bread/i)) {
-      optionsHtml = `<label for='${item.name}-size'><b>Size:</b></label> <select id='${item.name}-size'>` +
-        item.options.map((opt, idx) => {
-          if (typeof opt === 'object') {
-            return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
-          } else {
-            return `<option value='${idx}'>${opt}</option>`;
-          }
-        }).join('') +
-        `</select><br>`;
-    } else if ((item.name === 'Doughballs' || item.name === 'Dips') && Array.isArray(item.options) && item.options.length > 0) {
-      // Render options as radio buttons
-      optionsHtml = item.options.map(opt =>
-        `<label><input type='radio' name='${item.name}-option' value='${opt}'><b>${opt}</b></label><br>`
-      ).join('');
+    const section = item.section || 'OTHER';
+    if (!grouped[section]) grouped[section] = [];
+    grouped[section].push(item);
+  });
+  sections.forEach(sec => {
+    if (grouped[sec.key] && grouped[sec.key].length > 0) {
+      const header = document.createElement('h2');
+      header.className = 'section-heading';
+      header.textContent = sec.label;
+      menuDiv.appendChild(header);
+      grouped[sec.key].forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'menu-item';
+        let optionsHtml = '';
+        // Render options dropdown if present
+        if (Array.isArray(item.options) && item.options.length > 0) {
+          optionsHtml = `<label for='${item.name}-option'><b>Options:</b></label> <select id='${item.name}-option'>` +
+            item.options.map((opt, idx) => {
+              if (typeof opt === 'object') {
+                return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
+              } else {
+                return `<option value='${idx}'>${opt}</option>`;
+              }
+            }).join('') +
+            `</select><br>`;
+        }
+        // Render toppings checkboxes if present
+        let toppingsHtml = '';
+        if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+          toppingsHtml = `<div><b>Toppings (choose up to 4 free):</b><br>` +
+            item.toppings.map((topping, idx) =>
+              `<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}'>${topping}</label>`
+            ).join('') +
+            `</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
+        }
+        div.innerHTML = `
+          <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
+          <p>${item.description || ''}</p>
+          ${item.image ? `<img src=\"${item.image}\" alt=\"${item.name}\" style=\"height:40px;\">` : ''}
+          ${optionsHtml}
+          ${toppingsHtml}
+          <button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
+        `;
+        menuDiv.appendChild(div);
+        // Add event listeners for topping checkboxes
+        if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+          const checkboxes = div.querySelectorAll('.topping-checkbox');
+          checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+              const checked = div.querySelectorAll('.topping-checkbox:checked');
+              const warning = div.querySelector(`#topping-warning-${item.id}`);
+              if (checked.length > 4) {
+                warning.style.display = '';
+                warning.textContent = `Only 4 toppings are free. Extra toppings will be charged £${item.extraToppingPrice ? item.extraToppingPrice.toFixed(2) : '0.00'} each.`;
+              } else {
+                warning.style.display = 'none';
+              }
+            });
+          });
+        }
+      });
     }
-    div.innerHTML = `
-      <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
-      <p>${item.description || ''}</p>
-      ${item.image ? `<img src=\"${item.image}\" alt=\"${item.name}\" style=\"height:40px;\">` : ''}
-      ${optionsHtml}
-      <button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
-    `;
-    menuDiv.appendChild(div);
   });
 }
 

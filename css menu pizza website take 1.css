@@ -21,6 +21,29 @@ body.allergens-page, body.allergens-page * {
   text-decoration: underline;
   letter-spacing: 0.01em;
 }
+
+h2.menu-heading.underlined {
+  font-size: 1.5rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 2.2rem 0 1.2rem 0;
+  text-decoration: underline;
+  letter-spacing: 0.01em;
+  color: #000;
+  opacity: 1;
+}
+
+/* Section headers (smaller, not bold, not underlined) */
+.section-heading {
+  font-size: 1rem;
+  font-weight: bold;
+  text-align: left;
+  margin: 2.2rem 0 1.2rem 0;
+  text-decoration: none;
+  letter-spacing: 0.01em;
+  color: #000;
+  opacity: 1;
+}
 .main-nav {
   text-align: center;
   margin-bottom: 1.2rem;
