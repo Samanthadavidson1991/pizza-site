@@ -15,7 +15,7 @@ const { generateMenuHTML } = require('./generate-menu-html');
 const app = express();
 // MongoDB connection setup
 const mongoUri = 'mongodb+srv://thecrustngb:1FulWR9u2F7ii0Ef@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const client = new MongoClient(mongoUri, { useNewUrlParser: true, useUnifiedTopology: true });
+const client = new MongoClient(mongoUri);
 let menuCollection;
 
 async function connectMongo() {
