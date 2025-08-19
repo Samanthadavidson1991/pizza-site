@@ -99,35 +99,6 @@ app.post('/login', async (req, res) => {
 });
 // --- MENU MANAGEMENT ENDPOINTS ---
 
-// Get all menu items
-app.get('/menu', (req, res) => {
-  let menu = [];
-  if (fs.existsSync(MENU_FILE)) {
-    try {
-      menu = JSON.parse(fs.readFileSync(MENU_FILE));
-    } catch (e) {
-      console.error('MENU JSON PARSE ERROR:', e);
-      menu = [];
-    }
-  }
-  res.json(Array.isArray(menu) ? menu : []);
-});
-
-// Helper to update menu HTML file
-function updateMenuHTMLFile() {
-  let menu = [];
-  if (fs.existsSync(MENU_FILE)) {
-    try {
-      menu = JSON.parse(fs.readFileSync(MENU_FILE));
-    } catch (e) {
-      console.error('MENU JSON PARSE ERROR:', e);
-      menu = [];
-    }
-  }
-  const html = generateMenuHTML(menu);
-  fs.writeFileSync(MENU_HTML_FILE, html);
-}
-
 // --- MENU ENDPOINTS (MongoDB) ---
 // GET menu
 app.get('/menu', async (req, res) => {
