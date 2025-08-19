@@ -80,10 +80,13 @@ function renderMenuItems(menu) {
         // Render toppings checkboxes if present
         let toppingsHtml = '';
         if (Array.isArray(item.toppings) && item.toppings.length > 0) {
-          toppingsHtml = `<div><b>Toppings (choose up to 4 free):</b><br>` +
+          const isPizza = item.section === "PIZZA'S";
+          toppingsHtml = `<div><b>Ingredients (click to remove):</b><br>` +
             item.toppings.map((topping, idx) =>
-              `<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}'>${topping}</label>`
+              `<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}' checked>${topping}</label>`
             ).join('') +
+            (isPizza ? `<br><label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Cheese'>No Cheese</label>` : '') +
+            (isPizza ? `<label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Sauce'>No Sauce</label>` : '') +
             `</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
         }
         div.innerHTML = `
@@ -183,6 +186,24 @@ function addDynamicToCart(name, id) {
       label = `${item.name} (${selectedOpt.label})`;
     } else {
       label = `${item.name} (${selectedOpt})`;
+    }
+  }
+  // Handle toppings and special options
+  let selectedToppings = [];
+  let specialOptions = [];
+  if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+    const checkboxes = document.querySelectorAll(`.topping-checkbox[data-itemid='${item.id}']:checked`);
+    selectedToppings = Array.from(checkboxes).map(cb => cb.value);
+    const specials = document.querySelectorAll(`.special-checkbox[data-itemid='${item.id}']:checked`);
+    specialOptions = Array.from(specials).map(cb => cb.value);
+    let labelParts = [];
+    if (selectedToppings.length > 0) labelParts.push(selectedToppings.join(', '));
+    if (specialOptions.length > 0) labelParts.push(specialOptions.join(', '));
+    if (labelParts.length > 0) {
+      label += ' [' + labelParts.join('; ') + ']';
+    }
+    if (selectedToppings.length > 4 && item.extraToppingPrice) {
+      price += (selectedToppings.length - 4) * item.extraToppingPrice;
     }
   }
   cart.push({ name: label, price });
