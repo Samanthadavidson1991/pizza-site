@@ -177,21 +177,6 @@ app.delete('/menu/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to delete menu item.' });
   }
 });
-    return res.status(400).json({ error: 'Order index required.' });
-  }
-  let orders = [];
-  if (fs.existsSync(ORDERS_FILE)) {
-    orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
-  }
-  if (!orders[index]) {
-    return res.status(404).json({ error: 'Order not found.' });
-  }
-  if (status) orders[index].status = status;
-  if (note !== undefined) orders[index].adminNote = note;
-  if (username) orders[index].lastEditedBy = username;
-  fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
-  res.json({ success: true, order: orders[index] });
-});
 // Simple Stripe Checkout backend for Node.js
 // 1. Run: npm install express stripe cors
 // 2. Replace 'sk_test_REPLACE_WITH_YOUR_SECRET_KEY' with your Stripe secret key
