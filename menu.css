@@ -1,0 +1,306 @@
+html, body, body * {
+	color: #000 !important;
+	font-family: 'Segoe UI', Arial, sans-serif !important;
+	text-align: center !important;
+}
+html, body {
+	height: 100%;
+	min-height: 100vh;
+	margin: 0;
+	padding: 0;
+	background: url('pizza-shop-logo.png') no-repeat center center fixed;
+	background-size: cover;
+	background-attachment: fixed;
+	z-index: 1;
+	overflow-y: scroll;
+}
+.main-nav {
+	text-align: center;
+	margin-bottom: 1.2rem;
+}
+.main-nav a {
+	font-family: 'Segoe UI', Arial, sans-serif;
+	font-size: 1.1rem;
+	font-weight: bold;
+	color: #000;
+	text-decoration: none;
+	margin: 0 1.2rem;
+	transition: color 0.2s;
+}
+.main-nav a:hover, .main-nav a:focus {
+	color: #b01111;
+	text-decoration: underline;
+}
+.menu-item p:first-of-type {
+	font-size: 1.5rem;
+	font-weight: bold;
+	margin-bottom: 0.25rem;
+}
+
+html, body {
+	color: #000 !important;
+	height: 100%;
+	min-height: 100vh;
+	margin: 0;
+	padding: 0;
+	font-family: 'Segoe UI', sans-serif;
+	background: url('pizza-shop-logo.png') no-repeat center center fixed;
+	background-size: cover;
+	background-attachment: fixed;
+	z-index: 1;
+	text-align: center;
+	overflow-y: scroll;
+}
+}
+
+header {
+	background: transparent;
+	color: #000;
+	padding: 1rem;
+	text-align: center;
+	font-size: 1.3rem;
+	position: relative;
+	z-index: 1;
+}
+
+#menu, #allergens, #checkout-cart, #cart, #sides, #salads, #desserts {
+	max-width: 700px;
+	margin: 2rem auto;
+	padding: 2rem;
+	background: transparent;
+	border-radius: 1rem;
+	box-shadow: none !important;
+	color: #000;
+}
+
+ .menu-item {
+	margin: 1rem 0;
+	padding: 1rem;
+	border-radius: 0.5rem;
+	text-align: center;
+	color: #000;
+	box-shadow: none;
+		background: transparent;
+}
+
+header, #menu, .menu-item, footer {
+	position: relative;
+	z-index: 1;
+}
+
+.menu-item p {
+	margin: 0.5rem 0;
+	font-size: 1.2rem;
+	font-weight: bold;
+}
+
+ .menu-item button,
+ button.menu-item {
+	background: #000000;
+	color: #fff !important;
+	border: none;
+	padding: 0.5rem 1rem;
+	border-radius: 0.3rem;
+	cursor: pointer;
+	font-size: 1rem;
+	margin-top: 0.5rem;
+	transition: transform 0.08s;
+}
+
+/* Shrink button slightly when clicked */
+button.menu-item:active,
+.menu-item button:active {
+	transform: scale(0.96);
+}
+
+ .menu-item button:hover,
+ button.menu-item:hover {
+	background: #000000;
+}
+#menu h2 {
+	color: #fff;
+	font-size: 1.8rem;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+#sides h2 {
+	position: relative;
+	z-index: 2;
+	background: none !important;
+	color: #000000 !important;
+	font-size: 1.8rem;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+#sides {
+	max-width: 600px;
+	margin: 2rem auto;
+	padding: 2rem;
+	background: transparent;
+}
+#custom-pizza-form {
+	margin-bottom: 1rem;
+	color: #000;
+	/* Remove display: grid and grid-template-columns here */
+}
+
+.topping-grid {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 1rem;
+	justify-content: center;
+	margin-bottom: 1rem;
+}
+
+.topping-grid label {
+	display: flex;
+	align-items: center;
+	font-size: 1rem;
+	color: #000;
+}
+#salads h2 {
+	position: relative;
+	z-index: 2;
+	background: none !important;
+	color: #000 !important;
+	font-size: 1.8rem;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+#salads {
+	max-width: 600px;
+	margin: 2rem auto;
+	padding: 2rem;
+	background: transparent;
+}
+#desserts h2 {
+	position: relative;
+	z-index: 2;
+	background: none !important;
+	color: #000 !important;
+	font-size: 1.8rem;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+#desserts {
+	max-width: 600px;
+	margin: 2rem auto;
+	padding: 2rem;
+	background: transparent;
+}
+#cart {
+	max-width: 600px;
+	margin: 2rem auto;
+	padding: 2rem;
+	background: transparent;
+}
+
+#cart-total {
+	position: relative;
+	z-index: 2;
+	 background: transparent;
+	color: #000000 !important;
+	font-size: 1.8rem;
+	margin-bottom: 1rem;
+	text-align: center;
+}
+.menu-heading {
+	color: #000;
+	font-size: 4rem !important;
+	font-weight: 700;
+	margin: 0.7rem 0 0.5rem 0;
+	text-align: center;
+	line-height: 1.05;
+	background: transparent !important;
+	box-shadow: none !important;
+	border: none !important;
+}
+button.menu-item {
+	background: #000000;
+	color: #fff !important;
+	border: none;
+	padding: 0.5rem 1rem;
+	border-radius: 0.3rem;
+	cursor: pointer;
+	font-size: 1rem;
+	margin-top: 0.5rem;
+}
+
+/* Slightly smaller subtitle for hero or intro text */
+.subtitle {
+	font-size: 1.1rem;
+	font-weight: 500;
+	color: #222;
+	margin: 0.5rem 0 1.2rem 0;
+	letter-spacing: 0.01em;
+}
+
+/* Utility classes for HTML cleanup */
+.underlined {
+	text-decoration: underline;
+}
+.label-bold {
+	font-weight: bold;
+}
+.centered {
+	text-align: center;
+}
+
+/* Utility and form classes for checkout cleanup */
+.order-details-box {
+	margin: 1.5rem 0;
+	padding: 1rem;
+	background: #f4f4f4;
+	border-radius: 8px;
+	max-width: 400px;
+	margin-left: auto;
+	margin-right: auto;
+}
+.no-margin-top {
+	margin-top: 0;
+}
+.ml-1em {
+	margin-left: 1em;
+}
+.input-wide {
+	width: 90%;
+	padding: 0.4rem;
+}
+.mb-halfrem {
+	margin-bottom: 0.5rem;
+}
+.minheight-60 {
+	min-height: 60px;
+}
+.mt-halfrem {
+	margin-top: 0.5rem;
+}
+.block {
+	display: block;
+}
+.pay-card {
+	background: #635bff;
+	color: #fff !important;
+	margin-top: 0.5rem;
+}
+.pay-cash {
+	background: #2ecc40;
+	color: #fff !important;
+	margin-top: 0.5rem;
+}
+.voucher-section {
+	margin: 1rem 0;
+}
+.voucher-input {
+	padding: 0.4rem;
+	border-radius: 0.2rem;
+	border: 1px solid #ccc;
+}
+.ml-halfrem {
+	margin-left: 0.5rem;
+}
+.voucher-message {
+	color: green;
+	margin-top: 0.3rem;
+}
+.head{background: transparent;}

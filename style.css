@@ -1,0 +1,234 @@
+/* Make h2 in the first section of each page larger and bold like a title */
+section:first-of-type h2 {
+  font-size: 2.6rem;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  color: #000;
+  margin-top: 1.2rem;
+  margin-bottom: 1.1rem;
+  font-family: 'Segoe UI', Arial, sans-serif;
+}
+/* --- GLOBAL HEADER STYLES FOR CONSISTENCY --- */
+h2, h3 {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  color: #000;
+}
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+/* Center all section elements on every page */
+section {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  width: 100%;
+}
+
+/* --- PROFESSIONAL CHECKOUT STYLES --- */
+#checkout-cart {
+  background: none;
+  /* box-shadow removed for flat look */
+  border-radius: 1.2rem;
+  padding: 1rem 0.7rem 1rem 0.7rem;
+  max-width: 290px;
+  margin: 2.5rem auto 2rem auto;
+  border: none;
+}
+#order-details {
+  background: #f8f8f8;
+  border-radius: 0.7rem;
+  padding: 1.2rem 1rem 1rem 1rem;
+  margin-bottom: 1.2rem;
+  box-shadow: 0 1px 6px 0 rgba(0,0,0,0.04);
+  border: 1px solid #ececec;
+}
+#order-details label,
+#order-details input,
+#order-details textarea,
+#order-details select {
+  font-size: 1.05rem;
+  margin-bottom: 0.7rem;
+}
+#order-details input,
+#order-details textarea,
+#order-details select {
+  border: 1px solid #bbb;
+  border-radius: 0.3rem;
+  padding: 0.5rem 0.7rem;
+  width: 95%;
+  margin-bottom: 0.7rem;
+  background: #fff;
+  box-sizing: border-box;
+}
+#order-details textarea {
+  min-height: 70px;
+  resize: vertical;
+}
+#order-details input:focus,
+#order-details textarea:focus,
+#order-details select:focus {
+  outline: 2px solid #635bff;
+  border-color: #635bff;
+}
+#cart-total {
+  font-size: 1.3rem;
+  color: #222;
+  margin: 1.2rem 0 0.7rem 0;
+}
+#voucher-section {
+  margin-top: 1.2rem;
+  margin-bottom: 0.5rem;
+}
+.voucher-input {
+  width: 60%;
+  padding: 0.5rem 0.7rem;
+  border-radius: 0.3rem;
+  border: 1px solid #bbb;
+  font-size: 1rem;
+}
+.voucher-message {
+  color: #27ae60;
+  margin-top: 0.3rem;
+  font-size: 1.05rem;
+}
+#pay-with-card, #pay-with-cash {
+  width: 90%;
+  margin-bottom: 0.7rem;
+  font-size: 1.15rem;
+  letter-spacing: 0.01em;
+}
+body#index-page {
+  text-align: center;
+}
+body {
+  text-align: center;
+}
+html {
+  font-size: 22px;
+}
+body, body * {
+  color: #000 !important;
+  font-family: 'Segoe UI', Arial, sans-serif !important;
+  text-align: center !important;
+}
+html, body {
+  height: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: url('pizza-shop-logo.png') no-repeat center center fixed;
+  background-size: cover;
+  background-attachment: fixed;
+  z-index: 1;
+  overflow-y: scroll;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(255,255,255,0.45);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body > * {
+  position: relative;
+  z-index: 1;
+}
+header {
+  background: transparent;
+  color: #000;
+  padding: 1rem;
+  text-align: center;
+  font-size: 1.3rem;
+  position: relative;
+  z-index: 1;
+}
+.main-nav {
+  text-align: center;
+  margin-bottom: 1.2rem;
+}
+.main-nav a {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 1.1rem;
+  font-weight: bold !important;
+  color: #000;
+  text-decoration: none;
+  margin: 0 1.2rem;
+  transition: color 0.2s;
+}
+.main-nav a:hover, .main-nav a:focus {
+  color: #b01111;
+  text-decoration: underline;
+}
+.main-heading {
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-size: 2.3rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 1.2rem 0 0.7rem 0;
+  text-decoration: underline;
+  letter-spacing: 0.01em;
+  text-underline-offset: 0.18em;
+}
+#contact, #contact address {
+  text-align: center;
+}
+footer#contact {
+  background: none !important;
+  /* border-top: 1px solid #eee; */
+  flex-shrink: 0;
+  margin-top: auto;
+  padding: 1.5rem 0 0.5rem 0;
+  width: 100vw;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+#contact address {
+  font-size: 1.1rem;
+  line-height: 1.7;
+  margin: 0 auto;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- BUTTON STYLES: ALL BUTTONS BLACK WITH WHITE TEXT --- */
+button, .menu-item, .pay-card, .pay-cash {
+  background: #000 !important;
+  color: #fff !important;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 0.3rem;
+  cursor: pointer;
+  font-size: 1.45rem;
+  margin-top: 0.5rem;
+  transition: transform 0.08s, background 0.2s;
+  font-family: 'Segoe UI', Arial, sans-serif;
+  font-weight: bold;
+  display: inline-block;
+}
+button:active, .menu-item:active, .pay-card:active, .pay-cash:active {
+  transform: scale(0.96);
+}
+button:hover, .menu-item:hover, .pay-card:hover, .pay-cash:hover,
+button:focus, .menu-item:focus, .pay-card:focus, .pay-cash:focus {
+  background: #222 !important;
+}

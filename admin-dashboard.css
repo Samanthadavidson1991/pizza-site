@@ -1,0 +1,62 @@
+/* Admin header bar */
+.admin-header-bar {
+  text-align: right;
+  margin-bottom: 1em;
+}
+.admin-menu-link {
+  margin-right: 1em;
+}
+/* Login form inputs and button */
+.admin-input {
+  width: 100%;
+  padding: 0.5rem;
+}
+.admin-input-margin {
+  margin-top: 0.5rem;
+}
+.admin-login-btn {
+  width: 100%;
+  margin-top: 1rem;
+}
+.admin-login-msg {
+  color: red;
+}
+/* Hide dashboard by default */
+.admin-dashboard-hidden {
+  display: none;
+}
+/* Search input in filter bar */
+.admin-search-input {
+  width: 300px;
+  padding: 0.5em;
+}
+.admin-print-btn {
+  margin-left: 1em;
+}
+.admin-logout-btn {
+  float: right;
+}
+body { font-family: 'Segoe UI', Arial, sans-serif; background: #f8f8f8; margin: 0; padding: 0; }
+.container { max-width: 1000px; margin: 2rem auto; background: #fff; border-radius: 8px; box-shadow: 0 2px 8px #0001; padding: 2rem; }
+h1 { text-align: center; }
+table { width: 100%; border-collapse: collapse; margin-top: 2rem; }
+th, td { border: 1px solid #ddd; padding: 0.5rem; text-align: left; }
+th { background: #222; color: #fff; }
+tr:nth-child(even) { background: #f4f4f4; }
+.status-btn { padding: 0.3em 0.8em; border: none; border-radius: 4px; margin-right: 0.3em; cursor: pointer; }
+.completed { background: #2ecc40; color: #fff; }
+.refunded { background: #e67e22; color: #fff; }
+.cancelled { background: #e74c3c; color: #fff; }
+.pending { background: #f1c40f; color: #222; }
+.note-input { width: 90%; }
+.save-note-btn { margin-left: 0.5em; }
+.filter-bar { margin-bottom: 1em; }
+@media print {
+  body, html { background: #fff !important; color: #000 !important; }
+  .container { box-shadow: none !important; border-radius: 0 !important; padding: 0.5em !important; }
+  .filter-bar, #login-box, #logout-btn, .save-note-btn, .status-btn, .note-input, input[type="text"], input[type="password"], button { display: none !important; }
+  table { width: 100%; font-size: 1.2em; }
+  th, td { border: 1px solid #000 !important; padding: 0.3em !important; }
+  th { background: #fff !important; color: #000 !important; }
+  tr { page-break-inside: avoid; }
+}
