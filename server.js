@@ -1,4 +1,3 @@
-// All requires at the very top
 const { MongoClient, ObjectId } = require('mongodb');
 const express = require('express');
 const Stripe = require('stripe');

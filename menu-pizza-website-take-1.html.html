@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Menu</title>
+  <link rel="stylesheet" href="/css-menu-pizza-website-take-1.css">
+  <link rel="manifest" href="manifest.json">
+  <link rel="apple-touch-icon" href="pizza-icon-192.png">
+</head>
+<body>
+  <header>
+  <h1 class="main-heading no-underline">Inspired by Naples, perfected at None Go Bye.</h1>
+    <nav class="main-nav">
+  <a href="/index.html"><b>Home</b></a>
+  <a href="/menu-pizza-website-take-1.html"><b>Menu</b></a>
+  <a href="/checkout.html"><b>Checkout</b></a>
+  <a href="/allergens.html"><b>Allergens</b></a>
+    </nav>
+  </header>
+  <section id="menu">
+    <h2 class="menu-heading underlined">Menu</h2>
+    <div id="dynamic-menu"></div>
+  </section>
+  <!-- Sides section removed: now handled dynamically by menu.json and JS -->
+  <!-- Salads and Desserts sections removed: now handled dynamically by menu.json and JS -->
+
+<!-- Cart Section -->
+<section id="cart">
+</section>
+<section>
+  <div class="centered">
+  <p id="cart-total" class="centered"><strong>Total: £0.00</strong></p>
+  <button class="menu-item" onclick="checkout()">Checkout</button>
+  </div>
+</section>
+
+<script>
+const BACKEND = 'https://pizza-site-c8t6.onrender.com';
+let cart = [];
+
+function renderMenuItems(menu) {
+  const menuDiv = document.getElementById('dynamic-menu');
+  menuDiv.innerHTML = '';
+  // Group items by section
+  const sections = [
+    { key: "PIZZA'S", label: "PIZZA'S" },
+    { key: "SALADS", label: "SALADS" },
+    { key: "DRINKS", label: "DRINKS" },
+    { key: "SIDES", label: "SIDES" },
+    { key: "DESSERTS", label: "DESSERTS" }
+  ];
+  const grouped = {};
+  menu.forEach(item => {
+    const section = item.section || 'OTHER';
+    if (!grouped[section]) grouped[section] = [];
+    grouped[section].push(item);
+  });
+  sections.forEach(sec => {
+    if (grouped[sec.key] && grouped[sec.key].length > 0) {
+      const header = document.createElement('h2');
+      header.className = 'section-heading';
+      header.textContent = sec.label;
+      menuDiv.appendChild(header);
+      grouped[sec.key].forEach(item => {
+        const div = document.createElement('div');
+        div.className = 'menu-item';
+        let optionsHtml = '';
+        // Render options dropdown if present
+        if (Array.isArray(item.options) && item.options.length > 0) {
+          optionsHtml = `<label for='${item.name}-option'><b>Options:</b></label> <select id='${item.name}-option'>` +
+            item.options.map((opt, idx) => {
+              if (typeof opt === 'object') {
+                return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
+              } else {
+                return `<option value='${idx}'>${opt}</option>`;
+              }
+            }).join('') +
+            `</select><br>`;
+        }
+        // Render toppings checkboxes if present
+        let toppingsHtml = '';
+        if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+          const isPizza = item.section === "PIZZA'S";
+          toppingsHtml = `<div><b>Ingredients (click to remove):</b><br>` +
+            item.toppings.map((topping, idx) =>
+              `<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}' checked>${topping}</label>`
+            ).join('') +
+            (isPizza ? `<br><label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Cheese'>No Cheese</label>` : '') +
+            (isPizza ? `<label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Sauce'>No Sauce</label>` : '') +
+            `</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
+        }
+        div.innerHTML = `
+          <p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
+          <p>${item.description || ''}</p>
+          ${item.image ? `<img src=\"${item.image}\" alt=\"${item.name}\" style=\"height:40px;\">` : ''}
+          ${optionsHtml}
+          ${toppingsHtml}
+          <button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
+        `;
+        menuDiv.appendChild(div);
+        // Add event listeners for topping checkboxes
+        if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+          const checkboxes = div.querySelectorAll('.topping-checkbox');
+          checkboxes.forEach(cb => {
+            cb.addEventListener('change', function() {
+              const checked = div.querySelectorAll('.topping-checkbox:checked');
+              const warning = div.querySelector(`#topping-warning-${item.id}`);
+              if (checked.length > 4) {
+                warning.style.display = '';
+                warning.textContent = `Only 4 toppings are free. Extra toppings will be charged £${item.extraToppingPrice ? item.extraToppingPrice.toFixed(2) : '0.00'} each.`;
+              } else {
+                warning.style.display = 'none';
+              }
+            });
+          });
+        }
+      });
+    }
+  });
+}
+
+async function loadMenu() {
+  const res = await fetch(`${BACKEND}/menu`);
+  const menu = await res.json();
+  window.menuData = menu; // <-- Add this line here
+  renderMenuItems(menu);
+}
+
+function addToCart(name, price) {
+  cart.push({ name, price });
+  updateCartDisplay();
+  showAddToCartTicket(name);
+}
+
+function showAddToCartTicket(itemName) {
+  let ticket = document.getElementById('add-to-cart-ticket');
+  if (!ticket) {
+    ticket = document.createElement('div');
+    ticket.id = 'add-to-cart-ticket';
+    ticket.style.position = 'fixed';
+    ticket.style.top = '30px';
+    ticket.style.left = '50%';
+    ticket.style.transform = 'translateX(-50%)';
+    ticket.style.background = '#000';
+    ticket.style.color = '#fff';
+    ticket.style.fontWeight = 'bold';
+    ticket.style.fontSize = '1.2em';
+    ticket.style.padding = '1em 2em';
+    ticket.style.borderRadius = '8px';
+    ticket.style.boxShadow = '0 2px 8px #0002';
+    ticket.style.zIndex = '9999';
+    ticket.style.display = 'none';
+    document.body.appendChild(ticket);
+  }
+  ticket.textContent = `✔️ "${itemName}" added to checkout!`;
+  ticket.style.display = 'block';
+  setTimeout(() => { ticket.style.display = 'none'; }, 1800);
+}
+
+function updateCartDisplay() {
+  let total = 0;
+  cart.forEach(function(item) {
+    total += item.price;
+  });
+  document.getElementById('cart-total').innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+}
+
+function checkout() {
+  if (cart.length === 0) {
+    alert('Your cart is empty!');
+    return;
+  }
+  localStorage.setItem('cart', JSON.stringify(cart));
+  window.location.href = 'checkout.html';
+}
+function addDynamicToCart(name, id) {
+  const item = window.menuData.find(i => i.id === id);
+  let price = item.price;
+  let label = name;
+  if (Array.isArray(item.options) && item.options.length > 0 && (item.name.match(/pizza|garlic bread/i))) {
+    const select = document.getElementById(`${item.name}-size`);
+    const selectedIdx = select ? select.value : 0;
+    const selectedOpt = item.options[selectedIdx];
+    if (typeof selectedOpt === 'object') {
+      price = parseFloat(selectedOpt.price);
+      label = `${item.name} (${selectedOpt.label})`;
+    } else {
+      label = `${item.name} (${selectedOpt})`;
+    }
+  }
+  // Handle toppings and special options
+  let selectedToppings = [];
+  let specialOptions = [];
+  if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+    const checkboxes = document.querySelectorAll(`.topping-checkbox[data-itemid='${item.id}']:checked`);
+    selectedToppings = Array.from(checkboxes).map(cb => cb.value);
+    const specials = document.querySelectorAll(`.special-checkbox[data-itemid='${item.id}']:checked`);
+    specialOptions = Array.from(specials).map(cb => cb.value);
+    let labelParts = [];
+    if (selectedToppings.length > 0) labelParts.push(selectedToppings.join(', '));
+    if (specialOptions.length > 0) labelParts.push(specialOptions.join(', '));
+    if (labelParts.length > 0) {
+      label += ' [' + labelParts.join('; ') + ']';
+    }
+    if (selectedToppings.length > 4 && item.extraToppingPrice) {
+      price += (selectedToppings.length - 4) * item.extraToppingPrice;
+    }
+  }
+  cart.push({ name: label, price });
+  updateCartDisplay();
+  showAddToCartTicket(label);
+}
+
+window.onload = loadMenu;
+</script>
+</script>
+</body>
+<script>
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js');
+}
+</script>
+</html>
