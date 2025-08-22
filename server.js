@@ -11,7 +11,20 @@ const { generateMenuHTML } = require('./generate-menu-html');
 
 
 
+
 const app = express();
+
+// CORS middleware MUST be before express.json() and all routes
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
+
 // MongoDB connection setup
 const mongoUri = 'mongodb+srv://thecrustngb:1FulWR9u2F7ii0Ef@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 const client = new MongoClient(mongoUri);
@@ -30,17 +43,6 @@ async function connectMongo() {
 connectMongo();
 app.use(express.static(__dirname));
 app.disable('x-powered-by');
-
-// CORS middleware MUST be before express.json() and all routes
-app.use((req, res, next) => {
-  res.header('Access-Control-Allow-Origin', '*');
-  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
-  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  if (req.method === 'OPTIONS') {
-    return res.sendStatus(204);
-  }
-  next();
-});
 
 app.use(express.json()); // <-- This must come after CORS
 
