@@ -70,19 +70,23 @@ async function login() {
     msg.textContent = 'Login error.';
   }
 }
-document.getElementById('login-form').addEventListener('submit', function(e) {
-  e.preventDefault();
-  login();
+document.addEventListener('DOMContentLoaded', function() {
+  document.getElementById('login-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    login();
+  });
+  document.getElementById('login-btn').onclick = login;
+  document.getElementById('logout-btn').onclick = function() {
+    localStorage.removeItem('adminUser');
+    currentUser = '';
+    showLogin(true);
+  };
+  if (currentUser) {
+    showLogin(false);
+  }
+  document.getElementById('search').addEventListener('input', renderOrders);
+  if (currentUser) loadOrders();
 });
-document.getElementById('login-btn').onclick = login;
-document.getElementById('logout-btn').onclick = function() {
-  localStorage.removeItem('adminUser');
-  currentUser = '';
-  showLogin(true);
-};
-if (currentUser) {
-  showLogin(false);
-}
 async function loadOrders() {
   const res = await fetch(`${BACKEND}/orders`);
   try {
@@ -153,5 +157,4 @@ async function updateNote(index) {
   });
   await loadOrders();
 }
-document.getElementById('search').addEventListener('input', renderOrders);
-if (currentUser) loadOrders();
+
