@@ -33,59 +33,41 @@
 		function renderMenuItems(menu) {
 			const menuDiv = document.getElementById('dynamic-menu');
 			menuDiv.innerHTML = '';
-			const sections = [
-				{ key: "PIZZA'S", label: "PIZZA'S" },
+			// Group items by category/section
+			const categories = [
+				{ key: "PIZZAS", label: "PIZZAS" },
 				{ key: "SALADS", label: "SALADS" },
 				{ key: "DRINKS", label: "DRINKS" },
 				{ key: "SIDES", label: "SIDES" },
-				{ key: "DESSERTS", label: "DESSERTS" }
+				{ key: "DESSERTS", label: "DESSERTS" },
+				{ key: "CHICKEN", label: "CHICKEN" }
 			];
 			const grouped = {};
 			menu.forEach(item => {
-				const section = item.section || 'OTHER';
-				if (!grouped[section]) grouped[section] = [];
-				grouped[section].push(item);
+				// Use 'category' for admin items, fallback to 'section' for legacy
+				const cat = item.category || item.section || 'OTHER';
+				if (!grouped[cat]) grouped[cat] = [];
+				grouped[cat].push(item);
 			});
-			sections.forEach(sec => {
-				if (grouped[sec.key] && grouped[sec.key].length > 0) {
+			categories.forEach(cat => {
+				if (grouped[cat.key] && grouped[cat.key].length > 0) {
 					const header = document.createElement('h2');
 					header.className = 'section-heading';
-					header.textContent = sec.label;
+					header.textContent = cat.label;
 					menuDiv.appendChild(header);
-					grouped[sec.key].forEach(item => {
+					grouped[cat.key].forEach(item => {
 						const div = document.createElement('div');
 						div.className = 'menu-item';
-						let optionsHtml = '';
-						if (Array.isArray(item.options) && item.options.length > 0) {
-							optionsHtml = `<label for='${item.name}-option'><b>Options:</b></label> <select id='${item.name}-option'>` +
-								item.options.map((opt, idx) => {
-									if (typeof opt === 'object') {
-										return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
-									} else {
-										return `<option value='${idx}'>${opt}</option>`;
-									}
-								}).join('') +
-								`</select><br>`;
+						// Handle pizzas with sizes
+						if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
+							div.innerHTML = `<strong>${item.name}</strong><ul style='margin:0; padding-left:1.2em;'>` +
+								item.sizes.map((s, idx) => `<li>${s.size} - £${s.price.toFixed(2)} <button onclick=\"addToCart('${item.name} (${s.size})',${s.price})\">Add</button></li>`).join('') +
+								'</ul>';
+						} else {
+							div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
+								(item.description ? `<br><span>${item.description}</span>` : '') +
+								`<br><button onclick=\"addToCart('${item.name}',${item.price || 0})\">Add to Cart</button>`;
 						}
-						let toppingsHtml = '';
-						if (Array.isArray(item.toppings) && item.toppings.length > 0) {
-							const isPizza = item.section === "PIZZA'S";
-							toppingsHtml = `<div><b>Ingredients (click to remove):</b><br>` +
-								item.toppings.map((topping, idx) =>
-									`<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}' checked>${topping}</label>`
-								).join('') +
-								(isPizza ? `<br><label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Cheese'>No Cheese</label>` : '') +
-								(isPizza ? `<label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Sauce'>No Sauce</label>` : '') +
-								`</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
-						}
-						div.innerHTML = `
-							<p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
-							<p>${item.description || ''}</p>
-							${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
-							${optionsHtml}
-							${toppingsHtml}
-							<button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
-						`;
 						menuDiv.appendChild(div);
 					});
 				}
