@@ -43,8 +43,16 @@ const BACKEND = 'https://pizza-site-c8t6.onrender.com';
 let allOrders = [];
 let currentUser = localStorage.getItem('adminUser') || '';
 function showLogin(show) {
-  document.getElementById('login-box').style.display = show ? '' : 'none';
-  document.getElementById('dashboard').style.display = show ? 'none' : '';
+  console.log('showLogin called with:', show);
+  const loginBox = document.getElementById('login-box');
+  const dashboard = document.getElementById('dashboard');
+  if (!loginBox || !dashboard) {
+    console.error('Login box or dashboard element not found!');
+    return;
+  }
+  loginBox.style.display = show ? '' : 'none';
+  dashboard.style.display = show ? 'none' : '';
+  console.log('loginBox display:', loginBox.style.display, 'dashboard display:', dashboard.style.display);
 }
 async function login() {
   const username = document.getElementById('login-username').value;
@@ -59,14 +67,17 @@ async function login() {
     });
     const data = await res.json();
     if (data.success) {
+      console.log('Login successful, username:', username);
       localStorage.setItem('adminUser', username);
       currentUser = username;
       showLogin(false);
       loadOrders();
     } else {
+      console.warn('Login failed:', data.error);
       msg.textContent = data.error || 'Login failed.';
     }
   } catch (e) {
+    console.error('Login error:', e);
     msg.textContent = 'Login error.';
   }
 }
@@ -82,21 +93,24 @@ document.addEventListener('DOMContentLoaded', function() {
     showLogin(true);
   };
   if (currentUser) {
+    console.log('Already logged in as', currentUser);
     showLogin(false);
   }
   document.getElementById('search').addEventListener('input', renderOrders);
   if (currentUser) loadOrders();
 });
 async function loadOrders() {
-  const res = await fetch(`${BACKEND}/orders`);
+  console.log('Loading orders...');
   try {
     const jsonRes = await fetch(`${BACKEND}/orders.json`);
     if (jsonRes.ok) {
       allOrders = await jsonRes.json();
+      console.log('Orders loaded:', allOrders.length);
     } else {
       throw new Error('orders.json not found');
     }
-  } catch {
+  } catch (e) {
+    console.error('Error loading orders:', e);
     allOrders = [];
   }
   renderOrders();

@@ -1,3 +1,15 @@
+/* Make login box always visible and styled clearly */
+#login-box {
+  background: #fffbe6;
+  border: 2px solid #e0c97f;
+  border-radius: 8px;
+  max-width: 400px;
+  margin: 2em auto;
+  padding: 2em 2em 1em 2em;
+  box-shadow: 0 2px 8px #0002;
+  color: #7a5a00;
+  display: block !important;
+}
 /* Admin header bar */
 .admin-header-bar {
   text-align: right;
