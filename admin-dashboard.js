@@ -73,20 +73,24 @@ async function login() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password })
     });
+    if (!res.ok) {
+      msg.textContent = `Network/server error: ${res.status} ${res.statusText}`;
+      return;
+    }
     const data = await res.json();
     if (data.success) {
       console.log('Login successful, username:', username);
       localStorage.setItem('adminUser', username);
       currentUser = username;
-  showLogin(false);
-  loadOrders();
+      showLogin(false);
+      loadOrders();
     } else {
       console.warn('Login failed:', data.error);
       msg.textContent = data.error || 'Login failed.';
     }
   } catch (e) {
     console.error('Login error:', e);
-    msg.textContent = 'Login error.';
+    msg.textContent = 'Login error: ' + (e.message || e);
   }
 }
 document.addEventListener('DOMContentLoaded', function() {
@@ -102,10 +106,13 @@ document.addEventListener('DOMContentLoaded', function() {
   document.getElementById('login-username').value = '';
   document.getElementById('login-password').value = '';
   };
-  // Always start on login page
-  localStorage.removeItem('adminUser');
-  currentUser = '';
-  showLogin(true);
+  // Only show login page if not already logged in
+  if (!currentUser) {
+    showLogin(true);
+  } else {
+    showLogin(false);
+    loadOrders();
+  }
   document.getElementById('search').addEventListener('input', renderOrders);
   if (currentUser) loadOrders();
 });

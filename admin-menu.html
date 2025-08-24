@@ -6,6 +6,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Admin Menu Management</title>
 	<link rel="stylesheet" href="admin-dashboard.css">
+<script src="admin-menu-auth.js"></script>
 </head>
 <body>
 	<div class="container">
@@ -13,13 +14,33 @@
 			<a href="admin-dashboard.html" class="admin-menu-link">Back to Dashboard</a>
 		</div>
 		<h1>Menu Management</h1>
-		<p>Welcome to the admin menu management page. Here you can add, edit, or remove menu items. (Feature coming soon!)</p>
-		<ul>
-			<li>View all menu items</li>
-			<li>Add a new menu item</li>
-			<li>Edit or delete existing items</li>
-		</ul>
-		<p style="color:#888;">(This is a placeholder page. Please specify what features you want to manage the menu.)</p>
+		<div class="menu-category-bar">
+			<button class="menu-category-btn active" data-category="PIZZAS">PIZZAS</button>
+			<button class="menu-category-btn" data-category="SALADS">SALADS</button>
+			<button class="menu-category-btn" data-category="SIDES">SIDES</button>
+			<button class="menu-category-btn" data-category="DRINKS">DRINKS</button>
+			<button class="menu-category-btn" data-category="DESSERTS">DESSERTS</button>
+			<button class="menu-category-btn" data-category="CHICKEN">CHICKEN</button>
+		</div>
+		<div class="menu-items-section">
+						<form id="add-item-form" class="add-item-form">
+								<input type="text" id="new-item-name" placeholder="Item name" required>
+																<div id="pizza-sizes-section">
+																	<label style="font-weight:bold;">Add size and price options for this pizza:</label>
+																	<div id="pizza-sizes-list"></div>
+																	<div class="pizza-sizes-flex">
+																		<input type="text" id="new-size-name" placeholder="Size (e.g. 12in)" autocomplete="off">
+																		<input type="number" id="new-size-price" placeholder="Price (£)" step="0.01" min="0" autocomplete="off">
+																		<button type="button" id="add-size-price-btn">Add Size/Price</button>
+																	</div>
+																	<small style="color:#888;">Add as many size/price options as you need, then click 'Add New Item' to save the pizza.</small>
+																</div>
+												<input type="number" id="new-item-price" placeholder="Price (£)" step="0.01" min="0" class="hide-price">
+								<button type="submit">Add New Item</button>
+						</form>
+			<ul id="menu-items-list" class="menu-items-list"></ul>
+		</div>
 	</div>
+<script src="admin-menu.js"></script>
 </body>
 </html>

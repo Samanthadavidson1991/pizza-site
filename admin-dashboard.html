@@ -12,12 +12,12 @@
     <div class="admin-header-bar">
       <a href="admin-menu.html" class="admin-menu-link">Menu Management</a>
     </div>
-  <div id="login-box" class="hidden">
+  <div id="login-box">
   <h2>Admin Login</h2>
   <p class="login-info-msg">Please log in to access the admin dashboard.</p>
       <form id="login-form" autocomplete="off">
-  <input type="text" id="login-username" placeholder="Username" class="admin-input" autocomplete="off" value="">
-  <input type="password" id="login-password" placeholder="Password" class="admin-input admin-input-margin" autocomplete="off" value="">
+        <input type="text" id="login-username" name="no-autofill-username" placeholder="Username" class="admin-input" autocomplete="off" value="">
+        <input type="password" id="login-password" name="no-autofill-password" placeholder="Password" class="admin-input admin-input-margin" autocomplete="new-password" value="">
         <button id="login-btn" type="submit" class="admin-login-btn">Login</button>
         <p id="login-msg" class="admin-login-msg"></p>
       </form>
