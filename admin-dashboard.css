@@ -1,3 +1,13 @@
+#dashboard {
+  background: #fffbe6 !important;
+  border: 3px solid #e67e22 !important;
+  border-radius: 10px !important;
+  box-shadow: 0 2px 12px #0002 !important;
+  margin-top: 2em !important;
+  padding: 2em 1em !important;
+  color: #222 !important;
+  min-height: 200px;
+}
 /* Make login box always visible and styled clearly */
 #login-box {
   background: #fffbe6;
