@@ -8,9 +8,10 @@ let menuData = {
   CHICKEN: []
 };
 
+const API_BASE = 'http://localhost:4242';
 async function loadMenuData() {
   try {
-    const res = await fetch('/menu');
+    const res = await fetch(`${API_BASE}/menu`);
     const items = await res.json();
     // Reset
     menuData = { PIZZAS: [], SALADS: [], SIDES: [], DRINKS: [], DESSERTS: [], CHICKEN: [] };
@@ -27,7 +28,7 @@ async function loadMenuData() {
 
 async function addMenuItem(category, item) {
   try {
-    await fetch('/menu', {
+    await fetch(`${API_BASE}/menu`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...item, category })
@@ -40,7 +41,7 @@ async function addMenuItem(category, item) {
 
 async function deleteMenuItem(category, id) {
   try {
-    await fetch(`/menu/${id}`, { method: 'DELETE' });
+    await fetch(`${API_BASE}/menu/${id}`, { method: 'DELETE' });
     await loadMenuData();
   } catch (err) {
     alert('Failed to delete menu item.');
