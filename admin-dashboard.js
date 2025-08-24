@@ -71,6 +71,12 @@ async function login() {
       localStorage.setItem('adminUser', username);
       currentUser = username;
       showLogin(false);
+      // Force dashboard to display in case of any JS/CSS issues
+      var dashboard = document.getElementById('dashboard');
+      if (dashboard) {
+        dashboard.style.display = '';
+        dashboard.insertAdjacentHTML('afterbegin', '<div style="color:green;font-weight:bold;">Login successful! Dashboard forced visible.</div>');
+      }
       loadOrders();
     } else {
       console.warn('Login failed:', data.error);
