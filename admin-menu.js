@@ -8,7 +8,7 @@ let menuData = {
   CHICKEN: []
 };
 
-const API_BASE = 'http://localhost:4242';
+const API_BASE = 'https://pizza-site-c8t6.onrender.com';
 async function loadMenuData() {
   try {
     const res = await fetch(`${API_BASE}/menu`);
