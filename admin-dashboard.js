@@ -119,6 +119,7 @@ function renderOrders() {
   const search = document.getElementById('search').value.toLowerCase();
   const tbody = document.querySelector('#orders-table tbody');
   tbody.innerHTML = '';
+  let found = false;
   allOrders.forEach((order, idx) => {
     if (
       search &&
@@ -128,6 +129,7 @@ function renderOrders() {
         (order.status || '').toLowerCase().includes(search)
       )
     ) return;
+    found = true;
     const tr = document.createElement('tr');
     tr.innerHTML = `
       <td>${idx + 1}</td>
@@ -151,6 +153,11 @@ function renderOrders() {
     `;
     tbody.appendChild(tr);
   });
+  if (!found) {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td colspan="10" style="text-align:center;color:#b00;font-weight:bold;">No orders found or nothing matches your search.</td>`;
+    tbody.appendChild(tr);
+  }
 }
 async function updateStatus(index, status) {
   if (!currentUser) return alert('Please log in.');
