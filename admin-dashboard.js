@@ -50,8 +50,16 @@ function showLogin(show) {
     console.error('Login box or dashboard element not found!');
     return;
   }
-  loginBox.style.display = show ? '' : 'none';
-  dashboard.style.display = show ? 'none' : '';
+  if (show) {
+    loginBox.classList.remove('hidden');
+    dashboard.classList.add('hidden');
+    // Clear login fields every time login is shown
+    document.getElementById('login-username').value = '';
+    document.getElementById('login-password').value = '';
+  } else {
+    loginBox.classList.add('hidden');
+    dashboard.classList.remove('hidden');
+  }
   console.log('loginBox display:', loginBox.style.display, 'dashboard display:', dashboard.style.display);
 }
 async function login() {
@@ -70,14 +78,8 @@ async function login() {
       console.log('Login successful, username:', username);
       localStorage.setItem('adminUser', username);
       currentUser = username;
-      showLogin(false);
-      // Force dashboard to display in case of any JS/CSS issues
-      var dashboard = document.getElementById('dashboard');
-      if (dashboard) {
-        dashboard.style.display = '';
-        dashboard.insertAdjacentHTML('afterbegin', '<div style="color:green;font-weight:bold;">Login successful! Dashboard forced visible.</div>');
-      }
-      loadOrders();
+  showLogin(false);
+  loadOrders();
     } else {
       console.warn('Login failed:', data.error);
       msg.textContent = data.error || 'Login failed.';
@@ -94,14 +96,16 @@ document.addEventListener('DOMContentLoaded', function() {
   });
   document.getElementById('login-btn').onclick = login;
   document.getElementById('logout-btn').onclick = function() {
-    localStorage.removeItem('adminUser');
-    currentUser = '';
-    showLogin(true);
+  localStorage.removeItem('adminUser');
+  currentUser = '';
+  showLogin(true);
+  document.getElementById('login-username').value = '';
+  document.getElementById('login-password').value = '';
   };
-  if (currentUser) {
-    console.log('Already logged in as', currentUser);
-    showLogin(false);
-  }
+  // Always start on login page
+  localStorage.removeItem('adminUser');
+  currentUser = '';
+  showLogin(true);
   document.getElementById('search').addEventListener('input', renderOrders);
   if (currentUser) loadOrders();
 });

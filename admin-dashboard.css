@@ -1,3 +1,9 @@
+/* Login info message styling */
+.login-info-msg {
+  color: #444;
+  font-size: 1.1em;
+  margin-bottom: 1em;
+}
 #dashboard {
   background: #fffbe6 !important;
   border: 3px solid #e67e22 !important;
@@ -9,6 +15,7 @@
   min-height: 200px;
 }
 /* Make login box always visible and styled clearly */
+/* Show/hide login box */
 #login-box {
   background: #fffbe6;
   border: 2px solid #e0c97f;
@@ -18,7 +25,9 @@
   padding: 2em 2em 1em 2em;
   box-shadow: 0 2px 8px #0002;
   color: #7a5a00;
-  display: block !important;
+}
+.hidden {
+  display: none !important;
 }
 /* Admin header bar */
 .admin-header-bar {
