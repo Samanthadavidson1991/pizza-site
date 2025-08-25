@@ -1,12 +1,18 @@
-const CACHE_NAME = 'pizza-site-v1';
+const CACHE_NAME = 'pizza-site-v3';
 const urlsToCache = [
-	'/pizza website/index.html',
-	'/pizza website/menu pizza website take 1.html',
-	'/pizza website/checkout.html',
-	'/pizza website/allergens.html',
-	'/pizza website/css menu pizza website take 1.css',
-	'/pizza website/pizza website/new better image 5.png',
-	// Add other assets as needed
+	'/index.html',
+	'/menu.html',
+	'/checkout.html',
+	'/allergens.html',
+	'/admin-menu.html',
+	'/admin-dashboard.html',
+	'/style.css',
+	'/admin-dashboard.css',
+	'/menu.css',
+	'/pizza-icon-192.png',
+	'/pizza-shop-logo.png',
+	'/manifest.json'
+	// Only include files that exist in your deployed site root
 ];
 
 self.addEventListener('install', event => {

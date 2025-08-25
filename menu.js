@@ -1,3 +1,57 @@
+// Fetch and render menu from backend
+const API_BASE = 'https://pizza-site-c8t6.onrender.com';
+window.addEventListener('DOMContentLoaded', loadAndRenderMenu);
+
+function loadAndRenderMenu() {
+	fetch(`${API_BASE}/menu`)
+		.then(res => res.json())
+		.then(renderMenuFromAPI)
+		.catch(() => {
+			document.getElementById('dynamic-menu').innerHTML = '<p style="color:red">Failed to load menu from server.</p>';
+		});
+}
+
+function renderMenuFromAPI(menu) {
+	const menuDiv = document.getElementById('dynamic-menu');
+	if (!menuDiv) return;
+	menuDiv.innerHTML = '';
+	const categories = [
+		{ key: 'PIZZAS', label: 'PIZZAS' },
+		{ key: 'SALADS', label: 'SALADS' },
+		{ key: 'DRINKS', label: 'DRINKS' },
+		{ key: 'SIDES', label: 'SIDES' },
+		{ key: 'DESSERTS', label: 'DESSERTS' },
+		{ key: 'CHICKEN', label: 'CHICKEN' }
+	];
+	const grouped = {};
+	menu.forEach(item => {
+		const cat = item.category || item.section || 'OTHER';
+		if (!grouped[cat]) grouped[cat] = [];
+		grouped[cat].push(item);
+	});
+	categories.forEach(cat => {
+		if (grouped[cat.key] && grouped[cat.key].length > 0) {
+			const header = document.createElement('h2');
+			header.className = 'section-heading';
+			header.textContent = cat.label;
+			menuDiv.appendChild(header);
+			grouped[cat.key].forEach(item => {
+				const div = document.createElement('div');
+				div.className = 'menu-item';
+				if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
+					div.innerHTML = `<strong>${item.name}</strong><ul style='margin:0; padding-left:1.2em;'>` +
+						item.sizes.map(s => `<li>${s.size} - £${s.price.toFixed(2)} <button onclick=\"addToCart('${item.name} (${s.size})',${s.price})\">Add</button></li>`).join('') +
+						'</ul>';
+				} else {
+					div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
+						(item.description ? `<br><span>${item.description}</span>` : '') +
+						`<br><button onclick=\"addToCart('${item.name}',${item.price || 0})\">Add to Cart</button>`;
+				}
+				menuDiv.appendChild(div);
+			});
+		}
+	});
+}
 let cart = [];
 
 function addToCart(item, price) {
