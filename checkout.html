@@ -59,5 +59,24 @@
 			</div>
 		</section>
 	</main>
+	<script>
+	// Load cart from localStorage and display items and total
+	function loadCheckoutCart() {
+		// Only use cart data saved from menu.js (backend-driven)
+		const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+		const cartItemsDiv = document.getElementById('cart-items');
+		const cartTotalP = document.getElementById('cart-total');
+		let total = 0;
+		cartItemsDiv.innerHTML = '';
+		cart.forEach(entry => {
+			const li = document.createElement('li');
+			li.textContent = `${entry.name} – £${entry.price.toFixed(2)}`;
+			cartItemsDiv.appendChild(li);
+			total += entry.price;
+		});
+		cartTotalP.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+	}
+	window.onload = loadCheckoutCart;
+	</script>
 </body>
 </html>

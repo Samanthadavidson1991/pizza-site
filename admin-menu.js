@@ -70,8 +70,9 @@ function renderMenuItems() {
       delBtn.style.padding = '0.2em 0.7em';
       delBtn.style.fontSize = '0.95em';
       delBtn.style.cursor = 'pointer';
+      // Always use backend-generated id for deletes
       delBtn.onclick = function() {
-        deleteMenuItem('PIZZAS', item.id || item._id);
+        deleteMenuItem('PIZZAS', item.id);
       };
       li.appendChild(delBtn);
     } else {
