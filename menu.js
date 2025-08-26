@@ -23,7 +23,19 @@ function showFriendlyMenuError(msg) {
 	setTimeout(() => { errDiv.style.display = 'none'; }, 4000);
 }
 const API_BASE = 'https://pizza-site-c8t6.onrender.com';
-window.addEventListener('DOMContentLoaded', loadAndRenderMenu);
+window.addEventListener('DOMContentLoaded', () => {
+	// Load cart from localStorage if present
+	const savedCart = localStorage.getItem('cart');
+	if (savedCart) {
+		try {
+			cart = JSON.parse(savedCart);
+		} catch (e) {
+			cart = [];
+		}
+	}
+	updateCart();
+	loadAndRenderMenu();
+});
 
 function loadAndRenderMenu() {
 	fetch(`${API_BASE}/menu`)
@@ -242,20 +254,16 @@ function showAddToCartTicket(itemName) {
 }
 
 function updateCart() {
-	const cartItems = document.getElementById('cart-items');
-	const cartTotal = document.getElementById('cart-total');
-	if (!cartItems || !cartTotal) return; // Prevent error if elements are missing
-	cartItems.innerHTML = '';
-	let total = 0;
-
-	cart.forEach((entry, index) => {
-		const li = document.createElement('li');
-		li.textContent = `${entry.name} – £${entry.price.toFixed(2)}`;
-		cartItems.appendChild(li);
-		total += entry.price;
-	});
-
-	cartTotal.textContent = total.toFixed(2);
+				const cartTotal = document.getElementById('cart-total');
+				if (!cartTotal) return;
+				let total = 0;
+				// Hide individual cart items, only show total
+				const cartItems = document.getElementById('cart-items');
+				if (cartItems) {
+					cartItems.style.display = 'none';
+				}
+				cart.forEach(entry => { total += entry.price; });
+				cartTotal.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
 }
 
 function checkout() {

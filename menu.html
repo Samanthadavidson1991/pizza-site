@@ -21,17 +21,15 @@
 		<h2 class="menu-heading underlined">Menu</h2>
 		<div id="dynamic-menu"></div>
 	</section>
-	<section id="cart"></section>
-	<section>
-		<p id="cart-total"><strong>Total: £0.00</strong></p>
-		<button onclick="checkout()">Checkout</button>
-		<button onclick="window.location.href='checkout.html'" style="margin-left:1em;">Go to Checkout</button>
-	</section>
 	<script src="menu.js"></script>
 		 <footer>
-				 <div class="footer-notice" style="color:#7a5a00;font-size:0.92em;margin:2em auto 1em auto;text-align:center;">
-					 <strong>Gluten-Free Pizza Notice 🍕</strong> We take every care to prepare our gluten-free pizzas with minimal risk of cross-contamination. However, please note that they are made in a kitchen where gluten is present and cooked in the same oven as our regular pizzas. While we follow strict procedures to reduce exposure, we cannot guarantee a completely gluten-free environment.
-				 </div>
+			<section id="cart">
+  <h2>Your Cart</h2>
+  <ul id="cart-items"></ul>
+  <p id="cart-total"><strong>Total: £0.00</strong></p>
+  <button onclick="checkout()">Checkout</button>
+  <button onclick="window.location.href='checkout.html'" style="margin-left:1em;">Go to Checkout</button>
+</section>
 		 </footer>
 	</body>
 </html>

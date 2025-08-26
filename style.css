@@ -146,10 +146,51 @@ section {
   outline: 2px solid #635bff;
   border-color: #635bff;
 }
+/* Make the Your Cart section smaller font but keep everything proportional */
+#cart {
+  font-size: 0.92rem;
+  max-width: 320px;
+  margin: 1.2rem auto 1.2rem auto;
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  padding: 0;
+}
+#cart h2 {
+  font-size: 1.15rem;
+  margin-bottom: 0.7em;
+}
+#cart-items {
+  font-size: 0.95em;
+  margin-bottom: 0.7em;
+}
 #cart-total {
-  font-size: 1.3rem;
+  font-size: 1.08em;
   color: #222;
-  margin: 1.2rem 0 0.7rem 0;
+  margin: 0.7em 0 0.7em 0;
+}
+#cart-total-bottom {
+  font-weight: bold;
+  font-size: 1.08em;
+  color: #b01111;
+  letter-spacing: 0.01em;
+  margin: 1.2em 0 1.2em 0;
+}
+#cart button {
+  font-size: 0.98em;
+  padding: 0.45em 1.2em;
+  margin: 0.3em 0.2em;
+  border-radius: 0.4em;
+  background: #b01111;
+  color: #fff;
+  border: none;
+  font-weight: 600;
+  box-shadow: 0 1px 4px #0001;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+}
+#cart button:hover {
+  background: #d32f2f;
 }
 #voucher-section {
   margin-top: 1.2rem;
@@ -375,6 +416,9 @@ html {
 
 /* --- Menu select style --- */
 #dynamic-menu select {
+  background: #cbbac0 !important;
+  border: 1px solid #e0c97f !important;
+  color: #3a2a00 !important;
   font-size: 1.05em;
   padding: 0.22em 0.7em;
   border-radius: 0.15em;
@@ -460,3 +504,19 @@ html {
   margin-bottom: 0.2em;
 }
 /* --- Responsive: Mobile Menu Items --- */
+
+input[type="checkbox"] {
+  accent-color: #cbbac0 !important;
+  width: 1.3em;
+  height: 1.3em;
+  border-radius: 6px !important;
+  border: 2px solid #e0c97f !important;
+  box-shadow: 0 1px 4px #e0c97f33;
+  background: #cbbac0 !important;
+  outline: none !important;
+}
+input[type="checkbox"]:checked {
+  accent-color: #cbbac0 !important;
+  background: #cbbac0 !important;
+  border-color: #a89a9e !important;
+}

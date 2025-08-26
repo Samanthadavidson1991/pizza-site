@@ -50,6 +50,9 @@
 				</select>
 			</div>
 			<p id="cart-total"><strong>Total: £0.00</strong></p>
+			<div style="text-align:center;margin:2em 0 1em 0;">
+				<p id="cart-total-bottom"><strong>Total: £0.00</strong></p>
+			</div>
 			<button class="menu-item pay-card" id="pay-with-card">Pay with Card</button>
 			<button class="menu-item pay-cash" id="pay-with-cash">Pay with Cash</button>
 			<div id="voucher-section" class="voucher-section">
@@ -62,10 +65,10 @@
 	<script>
 	// Load cart from localStorage and display items and total
 	function loadCheckoutCart() {
-		// Only use cart data saved from menu.js (backend-driven)
 		const cart = JSON.parse(localStorage.getItem('cart') || '[]');
 		const cartItemsDiv = document.getElementById('cart-items');
 		const cartTotalP = document.getElementById('cart-total');
+		const cartTotalBottom = document.getElementById('cart-total-bottom');
 		let total = 0;
 		cartItemsDiv.innerHTML = '';
 		cart.forEach(entry => {
@@ -75,6 +78,9 @@
 			total += entry.price;
 		});
 		cartTotalP.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+		if (cartTotalBottom) {
+			cartTotalBottom.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+		}
 	}
 	window.onload = loadCheckoutCart;
 	</script>
