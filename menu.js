@@ -244,6 +244,7 @@ function showAddToCartTicket(itemName) {
 function updateCart() {
 	const cartItems = document.getElementById('cart-items');
 	const cartTotal = document.getElementById('cart-total');
+	if (!cartItems || !cartTotal) return; // Prevent error if elements are missing
 	cartItems.innerHTML = '';
 	let total = 0;
 
