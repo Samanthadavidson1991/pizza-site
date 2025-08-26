@@ -50,6 +50,7 @@ async function deleteMenuItem(category, id) {
 
 let currentCategory = 'PIZZAS';
 let newPizzaSizes = [];
+let newPizzaToppings = [];
 
 function renderMenuItems() {
   const list = document.getElementById('menu-items-list');
@@ -116,9 +117,11 @@ document.getElementById('add-item-form').addEventListener('submit', function(e) 
   const name = document.getElementById('new-item-name').value.trim();
   if (currentCategory === 'PIZZAS') {
     if (name && newPizzaSizes.length > 0) {
-      addMenuItem('PIZZAS', { name, sizes: [...newPizzaSizes] });
+      addMenuItem('PIZZAS', { name, sizes: [...newPizzaSizes], toppings: [...newPizzaToppings] });
       newPizzaSizes = [];
+      newPizzaToppings = [];
       renderPizzaSizesList();
+      renderToppingsList();
       this.reset();
       document.getElementById('pizza-sizes-list').innerHTML = '';
       document.getElementById('new-item-name').value = '';
@@ -129,6 +132,35 @@ document.getElementById('add-item-form').addEventListener('submit', function(e) 
       addMenuItem(currentCategory, { name, price });
       this.reset();
     }
+  }
+});
+function renderToppingsList() {
+  const list = document.getElementById('pizza-toppings-list');
+  if (!list) return;
+  list.innerHTML = '';
+  newPizzaToppings.forEach((topping, idx) => {
+    const div = document.createElement('div');
+    div.style.display = 'inline-block';
+    div.style.marginRight = '0.7em';
+    div.textContent = topping;
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.type = 'button';
+    btn.style.marginLeft = '0.5em';
+    btn.onclick = function() {
+      newPizzaToppings.splice(idx, 1);
+      renderToppingsList();
+    };
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+}
+document.getElementById('add-topping-btn').addEventListener('click', function() {
+  const topping = document.getElementById('new-topping-name').value.trim();
+  if (topping && !newPizzaToppings.includes(topping)) {
+    newPizzaToppings.push(topping);
+    renderToppingsList();
+    document.getElementById('new-topping-name').value = '';
   }
 });
 
@@ -164,10 +196,98 @@ function renderPizzaSizesList() {
 }
 
 
+// --- Create Your Own Pizza Section Logic ---
+let customPizzaSizes = [];
+let customPizzaToppings = [];
+
+document.getElementById('add-custom-size-price-btn').addEventListener('click', function() {
+  const size = document.getElementById('custom-size-name').value.trim();
+  const price = parseFloat(document.getElementById('custom-size-price').value);
+  if (size && !isNaN(price)) {
+    customPizzaSizes.push({ size, price });
+    document.getElementById('custom-size-name').value = '';
+    document.getElementById('custom-size-price').value = '';
+    renderCustomPizzaSizes();
+  }
+});
+
+function renderCustomPizzaSizes() {
+  const list = document.getElementById('custom-pizza-sizes-list');
+  list.innerHTML = '';
+  customPizzaSizes.forEach((s, idx) => {
+    const div = document.createElement('div');
+    div.textContent = `${s.size} - £${s.price.toFixed(2)}`;
+    div.style.marginBottom = '0.2em';
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.type = 'button';
+    btn.onclick = () => {
+      customPizzaSizes.splice(idx, 1);
+      renderCustomPizzaSizes();
+    };
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('add-custom-topping-btn').addEventListener('click', function() {
+  const topping = document.getElementById('custom-topping-name').value.trim();
+  const price = parseFloat(document.getElementById('custom-topping-price').value);
+  if (topping && !isNaN(price)) {
+    customPizzaToppings.push({ name: topping, price });
+    document.getElementById('custom-topping-name').value = '';
+    document.getElementById('custom-topping-price').value = '';
+    renderCustomPizzaToppings();
+  }
+});
+
+function renderCustomPizzaToppings() {
+  const list = document.getElementById('custom-pizza-toppings-list');
+  list.innerHTML = '';
+  customPizzaToppings.forEach((t, idx) => {
+    const div = document.createElement('div');
+    div.textContent = `${t.name} - £${t.price.toFixed(2)}`;
+    div.style.marginBottom = '0.2em';
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.type = 'button';
+    btn.onclick = () => {
+      customPizzaToppings.splice(idx, 1);
+      renderCustomPizzaToppings();
+    };
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+}
+
+document.getElementById('create-your-own-form').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const name = document.getElementById('custom-pizza-name').value.trim();
+  if (!name || customPizzaSizes.length === 0) {
+    alert('Please add at least one size/price.');
+    return;
+  }
+  // Ensure toppings are array of {name, price}
+  const toppings = customPizzaToppings.map(t => ({ name: t.name, price: t.price }));
+  const item = {
+    name,
+    sizes: customPizzaSizes,
+    toppings,
+    category: 'PIZZAS'
+  };
+  addMenuItem('PIZZAS', item);
+  customPizzaSizes = [];
+  customPizzaToppings = [];
+  renderCustomPizzaSizes();
+  renderCustomPizzaToppings();
+  alert('Custom pizza added!');
+});
+
 // Initial render
 if (currentCategory === 'PIZZAS') {
   document.getElementById('pizza-sizes-section').style.display = 'flex';
   document.getElementById('new-item-price').classList.add('hide-price');
 }
 renderPizzaSizesList();
+renderToppingsList();
 loadMenuData();

@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -34,12 +33,46 @@
 																		<button type="button" id="add-size-price-btn">Add Size/Price</button>
 																	</div>
 																	<small style="color:#888;">Add as many size/price options as you need, then click 'Add New Item' to save the pizza.</small>
+																		<div id="pizza-toppings-section" style="margin-top:1em;">
+																			<label style="font-weight:bold;">Toppings (type and press Add):</label>
+																			<div class="pizza-toppings-flex">
+																				<input type="text" id="new-topping-name" placeholder="Topping name" autocomplete="off">
+																				<button type="button" id="add-topping-btn">Add Topping</button>
+																			</div>
+																			<div id="pizza-toppings-list"></div>
+																			<small style="color:#888;">All toppings will show on the live site and can be removed by customers.</small>
+																		</div>
 																</div>
 												<input type="number" id="new-item-price" placeholder="Price (£)" step="0.01" min="0" class="hide-price">
 								<button type="submit">Add New Item</button>
 						</form>
 			<ul id="menu-items-list" class="menu-items-list"></ul>
 		</div>
+		<h2 style="margin-top:2em;">Create Your Own Pizza Section</h2>
+<form id="create-your-own-form" class="add-item-form">
+    <input type="text" id="custom-pizza-name" value="Create Your Own Pizza" readonly style="font-weight:bold;">
+    <div id="custom-pizza-sizes-section">
+        <label style="font-weight:bold;">Add size and price options for this pizza:</label>
+        <div id="custom-pizza-sizes-list"></div>
+        <div class="pizza-sizes-flex">
+            <input type="text" id="custom-size-name" placeholder="Size (e.g. 12in)" autocomplete="off">
+            <input type="number" id="custom-size-price" placeholder="Price (£)" step="0.01" min="0" autocomplete="off">
+            <button type="button" id="add-custom-size-price-btn">Add Size/Price</button>
+        </div>
+        <small style="color:#888;">Add as many size/price options as you need, then click 'Add Custom Pizza' to save.</small>
+        <div id="custom-pizza-toppings-section" style="margin-top:1em;">
+            <label style="font-weight:bold;">Toppings (type, set price, and press Add):</label>
+            <div class="pizza-toppings-flex">
+                <input type="text" id="custom-topping-name" placeholder="Topping name" autocomplete="off">
+                <input type="number" id="custom-topping-price" placeholder="Price (£)" step="0.01" min="0" autocomplete="off">
+                <button type="button" id="add-custom-topping-btn">Add Topping</button>
+            </div>
+            <div id="custom-pizza-toppings-list"></div>
+            <small style="color:#888;">All toppings will show on the live site and can be removed by customers. Set price to 0 for free toppings.</small>
+        </div>
+    </div>
+    <button type="submit">Add Custom Pizza</button>
+</form>
 	</div>
 <script src="admin-menu.js"></script>
 </body>

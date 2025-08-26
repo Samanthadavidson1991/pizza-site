@@ -35,20 +35,114 @@ function renderMenuFromAPI(menu) {
 			header.className = 'section-heading';
 			header.textContent = cat.label;
 			menuDiv.appendChild(header);
-			grouped[cat.key].forEach(item => {
-				const div = document.createElement('div');
-				div.className = 'menu-item';
-				if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
-					div.innerHTML = `<strong>${item.name}</strong><ul style='margin:0; padding-left:1.2em;'>` +
-						item.sizes.map(s => `<li>${s.size} - £${s.price.toFixed(2)} <button onclick=\"addToCart('${item.name} (${s.size})',${s.price})\">Add</button></li>`).join('') +
-						'</ul>';
+					grouped[cat.key].forEach(item => {
+						const div = document.createElement('div');
+						div.className = 'menu-item';
+								let toppingsHtml = '';
+								if (cat.key === 'PIZZAS' && Array.isArray(item.toppings) && item.toppings.length > 0) {
+									let customFreeNote = '';
+									if (Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object') {
+										customFreeNote = `<div class='toppings-note' style='font-size:0.95em;color:#b36b00;margin-bottom:0.2em;'><strong>Choose up to 4 toppings for free. Extra toppings will be charged as shown.</strong></div>`;
+									}
+									toppingsHtml = `<div class='toppings-list'>`
+										+ customFreeNote
+										+ `<div class='toppings-note' style='font-size:0.85em;color:#666;margin-bottom:0.2em;'>Uncheck to remove</div>`
+										+ `<strong>Toppings:</strong> `
+										+ item.toppings.map((t, idx) => {
+											if (typeof t === 'object' && t !== null) {
+												// Custom pizza: show name and price, UNchecked by default, NO onchange handler
+												return `<span class='topping-item' data-idx='${idx}'><label style='font-weight:normal;'><input type='checkbox'> ${t.name}${t.price ? ` (£${t.price.toFixed(2)})` : ''}</label></span>`;
+											} else {
+												// Regular pizza: show string, checked by default, with backend update
+												return `<span class='topping-item' data-idx='${idx}'><label style='font-weight:normal;'><input type='checkbox' checked onchange=\"toggleTopping('${item._id || item.id}',${idx},this)\"> ${t}</label></span>`;
+											}
+										}).join('')
+										+ `</div>`;
+								}
+								if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
+									// Only use the top select box for size selection
+									const selectId = `pizza-size-select-${item._id || item.id}`;
+									div.innerHTML = `<strong>${item.name}</strong><br>` +
+										`<select id='${selectId}' style='margin:0.5em 0;'>` +
+										item.sizes.map((s, idx) => `<option value='${idx}'>${s.size} - £${s.price.toFixed(2)}</option>`).join('') +
+										`</select>` +
+										toppingsHtml +
+										`<div style='margin-top:0.7em;'><button onclick=\"addSelectedPizzaSize('${item.name.replace(/'/g, "\\'")}', '${selectId}', '${item._id || item.id}')\">Add</button></div>`;
+								} else {
+									div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
+										(item.description ? `<br><span>${item.description}</span>` : '') +
+										toppingsHtml +
+										`<div style='margin-top:0.7em;'><button onclick=\"addToCart('${item.name}',${item.price || 0})\">Add to Cart</button></div>`;
+								}
+// Add selected pizza size to cart
+window.addSelectedPizzaSize = function(name, selectId, pizzaId, isCustom) {
+	const select = document.getElementById(selectId);
+	if (!select) return;
+	const idx = select.value;
+	// Find pizza in menuData
+	fetch(`${API_BASE}/menu/${pizzaId}`)
+		.then(res => res.json())
+		.then(pizza => {
+			if (pizza && pizza.sizes && pizza.sizes[idx]) {
+				let toppings = [];
+				if (isCustom) {
+					// For custom pizza, get all checked toppings (by name)
+					const toppingInputs = select.parentElement.querySelectorAll('input[type="checkbox"]');
+					const selectedToppingNames = Array.from(toppingInputs).filter(cb => cb.checked).map(cb => cb.parentElement.textContent.trim());
+					// Find the topping objects from pizza.toppings (which is now an array of {name, price})
+					const toppingObjs = (pizza.toppings || []).filter(t => selectedToppingNames.includes(t.name));
+					// Sort toppings as selected by user
+					const sortedToppings = selectedToppingNames.map(name => toppingObjs.find(t => t && t.name === name)).filter(Boolean);
+					const includedToppings = 4;
+					let totalPrice = pizza.sizes[idx].price;
+					let extraToppingMsg = '';
+					if (sortedToppings.length > includedToppings) {
+						// First 4 are free, extras use their own price
+						const freeToppings = sortedToppings.slice(0, includedToppings);
+						const paidToppings = sortedToppings.slice(includedToppings);
+						const extraTotal = paidToppings.reduce((sum, t) => sum + (t.price || 0), 0);
+						totalPrice += extraTotal;
+						extraToppingMsg = `You have selected more than 4 toppings. Each extra topping costs its own price.`;
+					}
+					const toppingsText = sortedToppings.length ? sortedToppings.map(t => t.name).join(', ') : 'No extra toppings';
+					if (extraToppingMsg) {
+						alert(extraToppingMsg);
+					}
+					addToCart(`Custom Pizza (${pizza.sizes[idx].size}${toppingsText ? ', ' + toppingsText : ''})`, totalPrice);
 				} else {
-					div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
-						(item.description ? `<br><span>${item.description}</span>` : '') +
-						`<br><button onclick=\"addToCart('${item.name}',${item.price || 0})\">Add to Cart</button>`;
+					addToCart(`${name} (${pizza.sizes[idx].size})`, pizza.sizes[idx].price);
 				}
-				menuDiv.appendChild(div);
+			}
+		});
+}
+						menuDiv.appendChild(div);
+					});
+// Toggle topping (checkbox) from pizza (live site)
+window.toggleTopping = async function(pizzaId, toppingIdx, checkbox) {
+	try {
+		const res = await fetch(`${API_BASE}/menu/${pizzaId}`);
+		const pizza = await res.json();
+		if (!pizza.toppings) return;
+		if (!checkbox.checked) {
+			// Support both string and object toppings
+			if (typeof pizza.toppings[toppingIdx] === 'object' && pizza.toppings[toppingIdx] !== null) {
+				// Remove by index for object toppings
+				pizza.toppings.splice(toppingIdx, 1);
+			} else {
+				// Remove by index for string toppings
+				pizza.toppings.splice(toppingIdx, 1);
+			}
+			await fetch(`${API_BASE}/menu/${pizzaId}` , {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ toppings: pizza.toppings })
 			});
+			loadAndRenderMenu();
+		}
+	} catch (e) {
+		alert('Failed to update topping.');
+	}
+}
 		}
 	});
 }
@@ -109,43 +203,6 @@ function checkout() {
 		cart = [];
 		updateCart();
 	}
-}
-// Limit to 4 toppings
-const maxToppings = 30;
-const toppingCheckboxes = document.querySelectorAll('#custom-pizza-form input[type="checkbox"]');
-
-toppingCheckboxes.forEach(cb => {
-	cb.addEventListener('change', function() {
-		const checkedCount = document.querySelectorAll('#custom-pizza-form input[type="checkbox"]:checked').length;
-		if (checkedCount > maxToppings) {
-			this.checked = false;
-			alert(`You can select up to ${30} toppings.`);
-		}
-	});
-});
-function addCustomPizzaToCart() {
-	const form = document.getElementById('custom-pizza-form');
-	const selected = Array.from(form.querySelectorAll('input[name="topping"]:checked')).map(cb => cb.value);
-	const basePrice = 11.99;
-	const includedToppings = 4;
-	const extraToppingPrice = 1; // £1 for each extra topping
-	const extraCount = Math.max(0, selected.length - includedToppings);
-	const totalPrice = basePrice + (extraCount * extraToppingPrice);
-	const toppings = selected.length ? selected.join(', ') : 'No extra toppings';
-	addToCart(`Custom Pizza (${toppings})`, totalPrice);
-}
-function addCustomPizzaToCart() {
-	const form = document.getElementById('custom-pizza-form');
-	const selected = Array.from(form.querySelectorAll('input[name="topping"]:checked')).map(cb => cb.value);
-	const sizeSelect = form.querySelector('#pizza-size');
-	const size = sizeSelect.value;
-	const basePrice = parseFloat(sizeSelect.options[sizeSelect.selectedIndex].getAttribute('data-price'));
-	const includedToppings = 4;
-	const extraToppingPrice = 1;
-	const extraCount = Math.max(0, selected.length - includedToppings);
-	const totalPrice = basePrice + (extraCount * extraToppingPrice);
-	const toppings = selected.length ? selected.join(', ') : 'No extra toppings';
-	addToCart(`Custom Pizza (${size}, ${toppings})`, totalPrice);
 }
 function removeSaladToppings(saladName, basePrice, formId) {
 	const form = document.getElementById(formId);
