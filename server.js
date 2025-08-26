@@ -110,6 +110,17 @@ app.get('/menu', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch menu.' });
   }
 });
+  // GET single menu item by id
+  app.get('/menu/:id', async (req, res) => {
+    try {
+      const id = parseInt(req.params.id);
+      const item = await menuCollection.findOne({ id });
+      if (!item) return res.status(404).json({ error: 'Not found' });
+      res.json(item);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch menu item.' });
+    }
+  });
 
 // POST new menu item
 app.post('/menu', async (req, res) => {
