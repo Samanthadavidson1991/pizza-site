@@ -239,14 +239,112 @@ tr:nth-child(even) { background: #f4f4f4; }
 .note-input { width: 90%; }
 .save-note-btn { margin-left: 0.5em; }
 .filter-bar { margin-bottom: 1em; }
+
 @media print {
   body, html { background: #fff !important; color: #000 !important; }
   .container { box-shadow: none !important; border-radius: 0 !important; padding: 0.5em !important; }
-  @media print {
-    .filter-bar, #login-box, #logout-btn, .save-note-btn, .status-btn, .note-input, input[type="text"], input[type="password"], button { display: none !important; }
-  }
+  .filter-bar, #login-box, #logout-btn, .save-note-btn, .status-btn, .note-input, input[type="text"], input[type="password"], button { display: none !important; }
   table { width: 100%; font-size: 1.2em; }
   th, td { border: 1px solid #000 !important; padding: 0.3em !important; }
   th { background: #fff !important; color: #000 !important; }
   tr { page-break-inside: avoid; }
+}
+
+/* --- Responsive Design for Mobile Devices --- */
+@media (max-width: 700px) {
+  .container {
+    max-width: 100vw;
+    margin: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 1rem 0.3rem;
+  }
+  .admin-header-bar {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    text-align: left;
+    gap: 0.5em;
+    margin-bottom: 1em;
+  }
+  .admin-menu-link {
+    margin: 0 0 0.5em 0;
+    padding: 0.7em 1em;
+    font-size: 1em;
+    border-radius: 5px;
+    background: #e67e22;
+    color: #fff;
+    text-align: center;
+    display: block;
+  }
+  h1 {
+    font-size: 1.3em;
+    margin: 0.7em 0 1em 0;
+  }
+  .menu-category-bar {
+    flex-wrap: wrap;
+    gap: 0.5em;
+    margin-bottom: 1em;
+  }
+  .menu-category-btn {
+    width: 48%;
+    min-width: 120px;
+    font-size: 0.98em;
+    padding: 0.6em 0.5em;
+    margin-bottom: 0.3em;
+  }
+  .add-item-form {
+    flex-direction: column;
+    gap: 0.7em;
+  }
+  .add-item-form input[type="text"],
+  .add-item-form input[type="number"] {
+    width: 100%;
+    font-size: 1em;
+    padding: 0.7em;
+  }
+  .add-item-form button {
+    width: 100%;
+    font-size: 1em;
+    padding: 0.7em 0;
+  }
+  .menu-items-section {
+    max-width: 100vw;
+    padding: 0 0.2em;
+  }
+  .menu-items-list li {
+    font-size: 1em;
+    padding: 0.7em 0.5em;
+  }
+  table {
+    font-size: 0.95em;
+    display: block;
+    overflow-x: auto;
+    width: 100%;
+  }
+  th, td {
+    padding: 0.4em 0.3em;
+    font-size: 1em;
+    min-width: 80px;
+  }
+  .filter-bar {
+    flex-direction: column;
+    gap: 0.7em;
+    margin-bottom: 1em;
+  }
+  .admin-search-input {
+    width: 100%;
+    font-size: 1em;
+    padding: 0.7em;
+  }
+  .admin-print-btn {
+    width: 100%;
+    margin: 0.5em 0 0 0;
+    font-size: 1em;
+    padding: 0.7em 0;
+  }
+  #login-box {
+    max-width: 98vw;
+    padding: 1em 0.5em 0.5em 0.5em;
+  }
 }
