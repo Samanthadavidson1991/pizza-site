@@ -1,3 +1,6 @@
+body.allergens-page.app-body, body.allergens-page.app-body * {
+  color: #000 !important;
+}
 /* --- Larger pizza size dropdown for better proportion --- */
 /* --- Elegant divider and spacing for menu items --- */
 /* --- Menu item divider and heading --- */

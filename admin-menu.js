@@ -131,8 +131,8 @@ document.querySelectorAll('.menu-category-btn').forEach(btn => {
       // Show Create Your Own section
       const cyo = document.getElementById('create-your-own-section');
       if (cyo) cyo.style.display = 'block';
-      document.getElementById('salad-ingredients-section').style.display = 'none';
-      document.getElementById('side-types-section').style.display = 'none';
+  document.getElementById('salad-ingredients-section').classList.add('hidden');
+  document.getElementById('side-types-section').classList.add('hidden');
       document.getElementById('chicken-sizes-section').style.display = 'none';
     } else {
       document.getElementById('pizza-sizes-section').style.display = 'none';
@@ -146,16 +146,20 @@ document.querySelectorAll('.menu-category-btn').forEach(btn => {
       const cyo = document.getElementById('create-your-own-section');
       if (cyo) cyo.style.display = 'none';
       if (currentCategory === 'SALADS') {
-        document.getElementById('salad-ingredients-section').style.display = 'block';
-        document.getElementById('side-types-section').style.display = 'none';
+  document.getElementById('salad-ingredients-section').classList.remove('hidden');
+  document.getElementById('side-types-section').classList.add('hidden');
         document.getElementById('chicken-sizes-section').style.display = 'none';
       } else {
-        document.getElementById('salad-ingredients-section').style.display = 'none';
+  document.getElementById('salad-ingredients-section').classList.add('hidden');
         if (currentCategory === 'SIDES') {
-          document.getElementById('side-types-section').style.display = 'block';
+          document.getElementById('side-types-section').classList.remove('hidden');
+          document.getElementById('new-item-price').classList.add('hide-price');
+          document.getElementById('new-item-price').style.display = 'none';
           document.getElementById('chicken-sizes-section').style.display = 'none';
         } else {
-          document.getElementById('side-types-section').style.display = 'none';
+          document.getElementById('side-types-section').classList.add('hidden');
+          document.getElementById('new-item-price').classList.remove('hide-price');
+          document.getElementById('new-item-price').style.display = '';
           if (currentCategory === 'CHICKEN') {
             document.getElementById('chicken-sizes-section').style.display = 'block';
           } else {
@@ -183,14 +187,13 @@ document.getElementById('add-item-form').addEventListener('submit', function(e) 
       document.getElementById('new-item-name').value = '';
     }
   } else {
-    const price = parseFloat(document.getElementById('new-item-price').value);
-    if (name && !isNaN(price)) {
+    if (name) {
       if (currentCategory === 'SALADS') {
         addMenuItem('SALADS', { name, price, ingredients: [...newSaladIngredients] });
         newSaladIngredients = [];
         renderSaladIngredientsList();
       } else if (currentCategory === 'SIDES') {
-        addMenuItem('SIDES', { name, price, types: [...newSideTypes] });
+      addMenuItem('SIDES', { name, types: [...newSideTypes] });
         newSideTypes = [];
         renderSideTypesList();
       } else if (currentCategory === 'CHICKEN') {
@@ -448,50 +451,51 @@ document.getElementById('create-your-own-form').addEventListener('submit', funct
 
 // Initial render
 if (currentCategory === 'PIZZAS') {
-  document.getElementById('pizza-sizes-section').style.display = 'flex';
+  document.getElementById('pizza-sizes-section').classList.remove('hidden');
   document.getElementById('new-item-price').classList.add('hide-price');
   document.getElementById('new-item-price').style.display = '';
   const cyo = document.getElementById('create-your-own-section');
-  if (cyo) cyo.style.display = 'block';
-  document.getElementById('salad-ingredients-section').style.display = 'none';
-  document.getElementById('side-types-section').style.display = 'none';
-  document.getElementById('chicken-sizes-section').style.display = 'none';
+  if (cyo) cyo.classList.remove('hidden');
+  document.getElementById('salad-ingredients-section').classList.add('hidden');
+  document.getElementById('side-types-section').classList.add('hidden');
+  document.getElementById('chicken-sizes-section').classList.add('hidden');
 } else if (currentCategory === 'SALADS') {
-  document.getElementById('pizza-sizes-section').style.display = 'none';
+  document.getElementById('pizza-sizes-section').classList.add('hidden');
   document.getElementById('new-item-price').classList.remove('hide-price');
   document.getElementById('new-item-price').style.display = '';
   const cyo = document.getElementById('create-your-own-section');
-  if (cyo) cyo.style.display = 'none';
-  document.getElementById('salad-ingredients-section').style.display = 'block';
-  document.getElementById('side-types-section').style.display = 'none';
-  document.getElementById('chicken-sizes-section').style.display = 'none';
+  if (cyo) cyo.classList.add('hidden');
+  const saladSection = document.getElementById('salad-ingredients-section');
+  saladSection.classList.remove('hidden');
+  document.getElementById('side-types-section').classList.add('hidden');
+  document.getElementById('chicken-sizes-section').classList.add('hidden');
 } else if (currentCategory === 'SIDES') {
-  document.getElementById('pizza-sizes-section').style.display = 'none';
-  document.getElementById('new-item-price').classList.remove('hide-price');
-  document.getElementById('new-item-price').style.display = '';
+  document.getElementById('pizza-sizes-section').classList.add('hidden');
+  document.getElementById('new-item-price').classList.add('hide-price');
+  document.getElementById('new-item-price').style.display = 'none';
   const cyo = document.getElementById('create-your-own-section');
-  if (cyo) cyo.style.display = 'none';
-  document.getElementById('salad-ingredients-section').style.display = 'none';
-  document.getElementById('side-types-section').style.display = 'block';
-  document.getElementById('chicken-sizes-section').style.display = 'none';
+  if (cyo) cyo.classList.add('hidden');
+  document.getElementById('salad-ingredients-section').classList.add('hidden');
+  document.getElementById('side-types-section').classList.remove('hidden');
+  document.getElementById('chicken-sizes-section').classList.add('hidden');
 } else if (currentCategory === 'CHICKEN') {
-  document.getElementById('pizza-sizes-section').style.display = 'none';
+  document.getElementById('pizza-sizes-section').classList.add('hidden');
   document.getElementById('new-item-price').classList.remove('hide-price');
   document.getElementById('new-item-price').style.display = 'none';
   const cyo = document.getElementById('create-your-own-section');
-  if (cyo) cyo.style.display = 'none';
-  document.getElementById('salad-ingredients-section').style.display = 'none';
-  document.getElementById('side-types-section').style.display = 'none';
-  document.getElementById('chicken-sizes-section').style.display = 'block';
+  if (cyo) cyo.classList.add('hidden');
+  document.getElementById('salad-ingredients-section').classList.add('hidden');
+  document.getElementById('side-types-section').classList.add('hidden');
+  document.getElementById('chicken-sizes-section').classList.remove('hidden');
 } else {
-  document.getElementById('pizza-sizes-section').style.display = 'none';
+  document.getElementById('pizza-sizes-section').classList.add('hidden');
   document.getElementById('new-item-price').classList.remove('hide-price');
   document.getElementById('new-item-price').style.display = '';
   const cyo = document.getElementById('create-your-own-section');
-  if (cyo) cyo.style.display = 'none';
-  document.getElementById('salad-ingredients-section').style.display = 'none';
-  document.getElementById('side-types-section').style.display = 'none';
-  document.getElementById('chicken-sizes-section').style.display = 'none';
+  if (cyo) cyo.classList.add('hidden');
+  document.getElementById('salad-ingredients-section').classList.add('hidden');
+  document.getElementById('side-types-section').classList.add('hidden');
+  document.getElementById('chicken-sizes-section').classList.add('hidden');
 }
 renderPizzaSizesList();
 renderToppingsList();

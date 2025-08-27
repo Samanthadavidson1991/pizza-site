@@ -148,6 +148,15 @@ function renderOrders() {
     ) return;
     found = true;
     const tr = document.createElement('tr');
+    let placedAt = '';
+    if (order.placedAt) {
+      try {
+        const d = new Date(order.placedAt);
+        placedAt = d.toLocaleString();
+      } catch (e) {
+        placedAt = order.placedAt;
+      }
+    }
     tr.innerHTML = `
       <td>${idx + 1}</td>
       <td>${order.customerName || ''}</td>
@@ -156,6 +165,7 @@ function renderOrders() {
       <td>${order.cart ? order.cart.map(i => i.name + ' x' + (i.count || 1)).join('<br>') : ''}</td>
       <td>${order.total ? order.total.toFixed(2) : ''}</td>
       <td>${order.orderTimeSlot || ''}</td>
+      <td>${placedAt}</td>
       <td><span class="status-btn ${order.status || 'pending'}">${order.status || 'pending'}</span></td>
       <td>
         <input class="note-input" type="text" value="${order.adminNote || ''}" id="note-${idx}">

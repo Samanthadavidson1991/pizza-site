@@ -1,3 +1,25 @@
+#new-item-price.hide-price {
+  display: none;
+}
+#new-item-price.hide-price {
+  display: none !important;
+}
+/* Utility classes for admin menu page */
+.bold-label {
+  font-weight: bold;
+}
+.section-margin {
+  margin-top: 1em;
+}
+.section-margin-large {
+  margin-top: 2em;
+}
+.soft-text {
+  color: #888;
+}
+.hidden {
+  display: none !important;
+}
 /* Create Your Own Pizza section styles */
 #create-your-own-section {
   margin-top: 2em;

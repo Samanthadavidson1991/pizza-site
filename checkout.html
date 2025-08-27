@@ -82,7 +82,54 @@
 			cartTotalBottom.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
 		}
 	}
-	window.onload = loadCheckoutCart;
+	window.onload = function() {
+		loadCheckoutCart();
+			document.getElementById('pay-with-cash').addEventListener('click', async function() {
+				const cart = JSON.parse(localStorage.getItem('cart') || '[]');
+				const total = cart.reduce((sum, item) => sum + item.price, 0);
+				const orderType = document.querySelector('input[name="orderType"]:checked').value;
+				const customerName = document.getElementById('customer-name').value;
+				const customerPhone = document.getElementById('customer-phone').value;
+				const customerEmail = document.getElementById('customer-email').value;
+				const orderComments = document.getElementById('order-comments').value;
+				const customerAddress = document.getElementById('customer-address').value;
+				const customerPostcode = document.getElementById('customer-postcode').value;
+				const orderTimeSlot = document.getElementById('order-time-slot').value;
+				if (!cart.length || !customerName || !customerPhone || !orderTimeSlot) {
+					alert('Please fill in all required fields and add items to your cart.');
+					return;
+				}
+				const order = {
+					cart,
+					total,
+					orderType,
+					customerName,
+					customerPhone,
+					customerEmail,
+					orderComments,
+					customerAddress,
+					customerPostcode,
+					orderTimeSlot
+				};
+				try {
+					const res = await fetch('https://pizza-site-c8t6.onrender.com/cash-order', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify(order)
+					});
+					if (res.ok) {
+						alert('Thank you! Your order has been placed for cash payment. Please pay at the counter or on delivery.');
+						localStorage.removeItem('cart');
+						window.location.href = 'index.html';
+					} else {
+						const data = await res.json();
+						alert('Error placing order: ' + (data.error || 'Unknown error'));
+					}
+				} catch (e) {
+					alert('Network error. Please try again.');
+				}
+			});
+	};
 	</script>
 </body>
 </html>
