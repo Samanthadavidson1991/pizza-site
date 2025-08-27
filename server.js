@@ -1,3 +1,22 @@
+// ...existing code...
+// Move refund endpoint after app is defined (see below)
+// ...existing code...
+const { MongoClient, ObjectId } = require('mongodb');
+const express = require('express');
+const Stripe = require('stripe');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
+const { generateMenuHTML } = require('./generate-menu-html');
+
+
+
+
+
+const app = express();
+
 // Refund endpoint for Stripe card orders
 app.post('/refund-order', async (req, res) => {
   const { orderId, username } = req.body;
@@ -26,21 +45,6 @@ app.post('/refund-order', async (req, res) => {
     res.status(500).json({ error: err.message });
   }
 });
-const { MongoClient, ObjectId } = require('mongodb');
-const express = require('express');
-const Stripe = require('stripe');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcryptjs');
-const { generateMenuHTML } = require('./generate-menu-html');
-
-
-
-
-
-const app = express();
 
 // CORS middleware MUST be before express.json() and all routes
 app.use((req, res, next) => {
@@ -197,13 +201,14 @@ app.delete('/menu/:id', async (req, res) => {
 const stripe = Stripe('sk_test_REPLACE_WITH_YOUR_SECRET_KEY'); // Replace with your real secret key
 
 // Configure nodemailer (replace with your SMTP details)
+require('dotenv').config();
 const transporter = nodemailer.createTransport({
-  host: 'smtp.example.com', // e.g. smtp.gmail.com
-  port: 587,
-  secure: false,
+  host: process.env.SMTP_HOST,
+  port: parseInt(process.env.SMTP_PORT),
+  secure: false, // use STARTTLS
   auth: {
-    user: 'your@email.com',
-    pass: 'yourpassword'
+    user: process.env.SMTP_USER,
+    pass: process.env.SMTP_PASS
   }
 });
 
@@ -220,7 +225,7 @@ function sendReceiptEmail(order) {
     <p><strong>Total:</strong> £${order.total.toFixed(2)}</p>
     <p>If you have any questions, reply to this email.</p>`;
   transporter.sendMail({
-    from: 'your@email.com',
+    from: process.env.SMTP_USER,
     to: order.customerEmail,
     subject: 'Your Pizza Order Receipt',
     html
