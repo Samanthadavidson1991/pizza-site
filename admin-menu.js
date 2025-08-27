@@ -312,6 +312,8 @@ function renderMenuItems() {
         } else if (priceInput) {
           updated.price = parseFloat(priceInput.value);
         }
+  // Remove _id if present to avoid MongoDB update errors
+  if (updated._id) delete updated._id;
   await updateMenuItem(currentCategory, Number(item.id), updated);
         isEditing = false;
         await loadMenuData();
