@@ -312,7 +312,7 @@ function renderMenuItems() {
         } else if (priceInput) {
           updated.price = parseFloat(priceInput.value);
         }
-        await updateMenuItem(currentCategory, item.id || item._id, updated);
+  await updateMenuItem(currentCategory, Number(item.id), updated);
         isEditing = false;
         await loadMenuData();
       };
