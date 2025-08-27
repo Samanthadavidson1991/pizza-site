@@ -416,15 +416,34 @@ html {
 
 /* --- Menu select style --- */
 #dynamic-menu select {
-  background: #cbbac0 !important;
-  border: 1px solid #e0c97f !important;
+  background: #e7dacb !important;
+  border: none !important;
   color: #3a2a00 !important;
   font-size: 1.05em;
+  font-family: 'Segoe UI', Arial, sans-serif !important;
   padding: 0.22em 0.7em;
-  border-radius: 0.15em;
+  border-radius: 6px !important;
   margin-bottom: 0.08em;
+  box-shadow: none !important;
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  position: relative;
 }
-
+#dynamic-menu select::-ms-expand {
+  display: none;
+}
+#dynamic-menu .custom-select-arrow {
+  position: absolute;
+  right: 1em;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  width: 1em;
+  height: 1em;
+  background: url('data:image/svg+xml;utf8,<svg fill="%233a2a00" height="16" viewBox="0 0 24 24" width="16" xmlns="http://www.w3.org/2000/svg"><path d="M7 10l5 5 5-5z"/></svg>') no-repeat center center;
+  background-size: 1em 1em;
+}
 /* --- Custom Pizza Banner --- */
 /* --- Custom Pizza Section --- */
 .custom-pizza-section {
@@ -450,22 +469,25 @@ html {
 .custom-pizza-section .topping-item {
   display: inline-flex;
   align-items: center;
-  background: #fffbe6;
-  border: 1px solid #e0c97f;
-  border-radius: 4px;
-  padding: 0.18em 0.6em 0.18em 0.4em;
-  font-size: 0.98em;
-  margin-bottom: 0.2em;
-  margin-right: 0.2em;
-  min-width: 0;
-  box-sizing: border-box;
+  background: #e7dacb !important; /* Match new dropdown and checkbox color */
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 0.18em 0.6em 0.18em 0.4em !important;
+  font-size: 0.98em !important;
+  margin-bottom: 0.2em !important;
+  margin-right: 0.2em !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  color: #3a2a00 !important;
+  font-weight: bold !important;
+  text-shadow: none !important;
 }
 .custom-pizza-section .toppings-note {
   width: 100%;
   display: block;
   margin-bottom: 0.2em;
 }
-.custom-pizza-banner {
+.custom-pizza-banac0ner {
   background: #ff9800;
   color: #fff;
   font-weight: bold;
@@ -488,15 +510,18 @@ html {
 .topping-item {
   display: inline-flex;
   align-items: center;
-  background: #fffbe6;
-  border: 1px solid #e0c97f;
-  border-radius: 4px;
-  padding: 0.18em 0.6em 0.18em 0.4em;
-  font-size: 0.98em;
-  margin-bottom: 0.2em;
-  margin-right: 0.2em;
-  min-width: 0;
-  box-sizing: border-box;
+  background: #e7dacb !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 0.18em 0.6em 0.18em 0.4em !important;
+  font-size: 0.98em !important;
+  margin-bottom: 0.2em !important;
+  margin-right: 0.2em !important;
+  min-width: 0 !important;
+  box-sizing: border-box !important;
+  color: #3a2a00 !important;
+  font-weight: bold !important;
+  text-shadow: none !important;
 }
 .toppings-note {
   width: 100%;
@@ -506,17 +531,70 @@ html {
 /* --- Responsive: Mobile Menu Items --- */
 
 input[type="checkbox"] {
-  accent-color: #cbbac0 !important;
+  accent-color: #e7dacb !important;
   width: 1.3em;
   height: 1.3em;
   border-radius: 6px !important;
-  border: 2px solid #e0c97f !important;
-  box-shadow: 0 1px 4px #e0c97f33;
-  background: #cbbac0 !important;
+  border: 1px solid #e7dacb !important;
+  box-shadow: none !important;
+  background: #e7dacb !important;
   outline: none !important;
 }
 input[type="checkbox"]:checked {
-  accent-color: #cbbac0 !important;
-  background: #cbbac0 !important;
-  border-color: #a89a9e !important;
+  accent-color: #e7dacb !important;
+  background: #e7dacb !important;
+  border-color: #e0c97f !important;
+}
+
+/* --- Custom Checkbox Styling for Perfect Match with Dropdowns --- */
+.custom-checkbox {
+  position: relative;
+  display: inline-block;
+  width: 1.3em;
+  height: 1.3em;
+  vertical-align: middle;
+}
+.custom-checkbox input[type="checkbox"] {
+  opacity: 0;
+  width: 1.3em;
+  height: 1.3em;
+  margin: 0;
+  position: absolute;
+  left: 0;
+  top: 0;
+  z-index: 2;
+  cursor: pointer;
+}
+.custom-checkbox .checkbox-box {
+  width: 1.3em;
+  height: 1.3em;
+  background: #e7dacb !important;
+  border: 1px solid #e7dacb !important;
+  border-radius: 6px;
+  box-shadow: none;
+  display: inline-block;
+  position: relative;
+  z-index: 1;
+  transition: background 0.2s, border-color 0.2s;
+}
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-box {
+  background: #e7dacb !important;
+  border-color: #e0c97f !important;
+}
+.custom-checkbox .checkbox-box::after {
+  content: "";
+  display: block;
+  position: absolute;
+  left: 0.32em;
+  top: 0.12em;
+  width: 0.5em;
+  height: 0.8em;
+  border: solid #3a2a00;
+  border-width: 0 0.18em 0.18em 0;
+  opacity: 0;
+  transform: rotate(45deg);
+  transition: opacity 0.2s;
+}
+.custom-checkbox input[type="checkbox"]:checked + .checkbox-box::after {
+  opacity: 1;
 }
