@@ -51,6 +51,9 @@ async function deleteMenuItem(category, id) {
 let currentCategory = 'PIZZAS';
 let newPizzaSizes = [];
 let newPizzaToppings = [];
+let newSaladIngredients = [];
+let newSideTypes = [];
+let newChickenSizes = [];
 
 function renderMenuItems() {
   const list = document.getElementById('menu-items-list');
@@ -58,35 +61,54 @@ function renderMenuItems() {
   menuData[currentCategory].forEach((item) => {
     const li = document.createElement('li');
     if (currentCategory === 'PIZZAS') {
-      li.innerHTML = `<strong>${item.name}</strong><ul style='margin:0; padding-left:1.2em;'>` +
-        (item.sizes ? item.sizes.map(s => `<li>${s.size} - £${s.price.toFixed(2)}</li>`).join('') : '') + '</ul>';
+      // Simpler, smaller, inline display
+      let html = `<span style='font-weight:500;'>${item.name}</span>`;
+      if (item.sizes && item.sizes.length > 0) {
+        html += `<span style='margin-left:0.5em; color:#7a5a00; font-size:0.95em;'>` +
+          item.sizes.map(s => `${s.size} £${s.price.toFixed(2)}`).join(' | ') +
+          `</span>`;
+      }
+      if (item.toppings && item.toppings.length > 0) {
+        html += `<span style='margin-left:0.5em; color:#888; font-size:0.93em;'>Toppings: ` +
+          item.toppings.map(t => typeof t === 'object' && t !== null ? `${t.name}${t.price ? ` (£${t.price.toFixed(2)})` : ''}` : `${t}`).join(', ') +
+          `</span>`;
+      }
+      li.innerHTML = html;
+      // Smaller delete button
       const delBtn = document.createElement('button');
-      delBtn.textContent = 'Delete';
-      delBtn.style.marginLeft = '1em';
+      delBtn.textContent = '✕';
+      delBtn.title = 'Delete';
+      delBtn.style.marginLeft = '0.7em';
       delBtn.style.background = '#e74c3c';
       delBtn.style.color = '#fff';
       delBtn.style.border = 'none';
-      delBtn.style.borderRadius = '3px';
-      delBtn.style.padding = '0.2em 0.7em';
-      delBtn.style.fontSize = '0.95em';
+      delBtn.style.borderRadius = '50%';
+      delBtn.style.width = '1.5em';
+      delBtn.style.height = '1.5em';
+      delBtn.style.fontSize = '1em';
+      delBtn.style.lineHeight = '1.2em';
       delBtn.style.cursor = 'pointer';
-      // Always use backend-generated id for deletes
+      delBtn.style.verticalAlign = 'middle';
       delBtn.onclick = function() {
         deleteMenuItem('PIZZAS', item.id);
       };
       li.appendChild(delBtn);
     } else {
-      li.textContent = `${item.name} - £${item.price ? item.price.toFixed(2) : ''}`;
+      li.innerHTML = `<span style='font-weight:500;'>${item.name}</span><span style='margin-left:0.5em; color:#7a5a00;'>£${item.price ? item.price.toFixed(2) : ''}</span>`;
       const delBtn = document.createElement('button');
-      delBtn.textContent = 'Delete';
-      delBtn.style.marginLeft = '1em';
+      delBtn.textContent = '✕';
+      delBtn.title = 'Delete';
+      delBtn.style.marginLeft = '0.7em';
       delBtn.style.background = '#e74c3c';
       delBtn.style.color = '#fff';
       delBtn.style.border = 'none';
-      delBtn.style.borderRadius = '3px';
-      delBtn.style.padding = '0.2em 0.7em';
-      delBtn.style.fontSize = '0.95em';
+      delBtn.style.borderRadius = '50%';
+      delBtn.style.width = '1.5em';
+      delBtn.style.height = '1.5em';
+      delBtn.style.fontSize = '1em';
+      delBtn.style.lineHeight = '1.2em';
       delBtn.style.cursor = 'pointer';
+      delBtn.style.verticalAlign = 'middle';
       delBtn.onclick = function() {
         deleteMenuItem(currentCategory, item.id || item._id);
       };
@@ -105,9 +127,42 @@ document.querySelectorAll('.menu-category-btn').forEach(btn => {
     if (currentCategory === 'PIZZAS') {
       document.getElementById('pizza-sizes-section').style.display = 'flex';
       document.getElementById('new-item-price').classList.add('hide-price');
+      document.getElementById('new-item-price').style.display = '';
+      // Show Create Your Own section
+      const cyo = document.getElementById('create-your-own-section');
+      if (cyo) cyo.style.display = 'block';
+      document.getElementById('salad-ingredients-section').style.display = 'none';
+      document.getElementById('side-types-section').style.display = 'none';
+      document.getElementById('chicken-sizes-section').style.display = 'none';
     } else {
       document.getElementById('pizza-sizes-section').style.display = 'none';
       document.getElementById('new-item-price').classList.remove('hide-price');
+      if (currentCategory === 'CHICKEN') {
+        document.getElementById('new-item-price').style.display = 'none';
+      } else {
+        document.getElementById('new-item-price').style.display = '';
+      }
+      // Hide Create Your Own section
+      const cyo = document.getElementById('create-your-own-section');
+      if (cyo) cyo.style.display = 'none';
+      if (currentCategory === 'SALADS') {
+        document.getElementById('salad-ingredients-section').style.display = 'block';
+        document.getElementById('side-types-section').style.display = 'none';
+        document.getElementById('chicken-sizes-section').style.display = 'none';
+      } else {
+        document.getElementById('salad-ingredients-section').style.display = 'none';
+        if (currentCategory === 'SIDES') {
+          document.getElementById('side-types-section').style.display = 'block';
+          document.getElementById('chicken-sizes-section').style.display = 'none';
+        } else {
+          document.getElementById('side-types-section').style.display = 'none';
+          if (currentCategory === 'CHICKEN') {
+            document.getElementById('chicken-sizes-section').style.display = 'block';
+          } else {
+            document.getElementById('chicken-sizes-section').style.display = 'none';
+          }
+        }
+      }
     }
     renderMenuItems();
   });
@@ -130,9 +185,116 @@ document.getElementById('add-item-form').addEventListener('submit', function(e) 
   } else {
     const price = parseFloat(document.getElementById('new-item-price').value);
     if (name && !isNaN(price)) {
-      addMenuItem(currentCategory, { name, price });
+      if (currentCategory === 'SALADS') {
+        addMenuItem('SALADS', { name, price, ingredients: [...newSaladIngredients] });
+        newSaladIngredients = [];
+        renderSaladIngredientsList();
+      } else if (currentCategory === 'SIDES') {
+        addMenuItem('SIDES', { name, price, types: [...newSideTypes] });
+        newSideTypes = [];
+        renderSideTypesList();
+      } else if (currentCategory === 'CHICKEN') {
+        addMenuItem('CHICKEN', { name, sizes: [...newChickenSizes] });
+        newChickenSizes = [];
+        renderChickenSizesList();
+      } else {
+        addMenuItem(currentCategory, { name, price });
+      }
       this.reset();
     }
+  }
+});
+// Chicken sizes logic
+function renderChickenSizesList() {
+  const list = document.getElementById('chicken-sizes-list');
+  if (!list) return;
+  list.innerHTML = '';
+  newChickenSizes.forEach((sp, idx) => {
+    const div = document.createElement('div');
+    div.textContent = `${sp.size} - £${sp.price.toFixed(2)}`;
+    // Add remove button
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.type = 'button';
+    btn.style.marginLeft = '1em';
+    btn.onclick = function() {
+      newChickenSizes.splice(idx, 1);
+      renderChickenSizesList();
+    };
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+}
+document.getElementById('add-chicken-size-price-btn').addEventListener('click', function() {
+  const size = document.getElementById('new-chicken-size-name').value.trim();
+  const price = parseFloat(document.getElementById('new-chicken-size-price').value);
+  if (size && !isNaN(price)) {
+    newChickenSizes.push({ size, price });
+    renderChickenSizesList();
+    document.getElementById('new-chicken-size-name').value = '';
+    document.getElementById('new-chicken-size-price').value = '';
+  }
+});
+// Side types logic
+function renderSideTypesList() {
+  const list = document.getElementById('side-types-list');
+  if (!list) return;
+  list.innerHTML = '';
+  newSideTypes.forEach((typeObj, idx) => {
+    const div = document.createElement('div');
+    div.style.display = 'inline-block';
+    div.style.marginRight = '0.7em';
+    div.textContent = `${typeObj.name} - £${typeObj.price.toFixed(2)}`;
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.type = 'button';
+    btn.style.marginLeft = '0.5em';
+    btn.onclick = function() {
+      newSideTypes.splice(idx, 1);
+      renderSideTypesList();
+    };
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+}
+document.getElementById('add-side-type-btn').addEventListener('click', function() {
+  const name = document.getElementById('new-side-type-name').value.trim();
+  const price = parseFloat(document.getElementById('new-side-type-price').value);
+  if (name && !isNaN(price)) {
+    newSideTypes.push({ name, price });
+    renderSideTypesList();
+    document.getElementById('new-side-type-name').value = '';
+    document.getElementById('new-side-type-price').value = '';
+  }
+});
+// Salad ingredients logic
+function renderSaladIngredientsList() {
+  const list = document.getElementById('salad-ingredients-list');
+  if (!list) return;
+  list.innerHTML = '';
+  newSaladIngredients.forEach((ingredient, idx) => {
+    const div = document.createElement('div');
+    div.style.display = 'inline-block';
+    div.style.marginRight = '0.7em';
+    div.textContent = ingredient;
+    const btn = document.createElement('button');
+    btn.textContent = 'Remove';
+    btn.type = 'button';
+    btn.style.marginLeft = '0.5em';
+    btn.onclick = function() {
+      newSaladIngredients.splice(idx, 1);
+      renderSaladIngredientsList();
+    };
+    div.appendChild(btn);
+    list.appendChild(div);
+  });
+}
+document.getElementById('add-ingredient-btn').addEventListener('click', function() {
+  const ingredient = document.getElementById('new-ingredient-name').value.trim();
+  if (ingredient && !newSaladIngredients.includes(ingredient)) {
+    newSaladIngredients.push(ingredient);
+    renderSaladIngredientsList();
+    document.getElementById('new-ingredient-name').value = '';
   }
 });
 function renderToppingsList() {
@@ -288,7 +450,52 @@ document.getElementById('create-your-own-form').addEventListener('submit', funct
 if (currentCategory === 'PIZZAS') {
   document.getElementById('pizza-sizes-section').style.display = 'flex';
   document.getElementById('new-item-price').classList.add('hide-price');
+  document.getElementById('new-item-price').style.display = '';
+  const cyo = document.getElementById('create-your-own-section');
+  if (cyo) cyo.style.display = 'block';
+  document.getElementById('salad-ingredients-section').style.display = 'none';
+  document.getElementById('side-types-section').style.display = 'none';
+  document.getElementById('chicken-sizes-section').style.display = 'none';
+} else if (currentCategory === 'SALADS') {
+  document.getElementById('pizza-sizes-section').style.display = 'none';
+  document.getElementById('new-item-price').classList.remove('hide-price');
+  document.getElementById('new-item-price').style.display = '';
+  const cyo = document.getElementById('create-your-own-section');
+  if (cyo) cyo.style.display = 'none';
+  document.getElementById('salad-ingredients-section').style.display = 'block';
+  document.getElementById('side-types-section').style.display = 'none';
+  document.getElementById('chicken-sizes-section').style.display = 'none';
+} else if (currentCategory === 'SIDES') {
+  document.getElementById('pizza-sizes-section').style.display = 'none';
+  document.getElementById('new-item-price').classList.remove('hide-price');
+  document.getElementById('new-item-price').style.display = '';
+  const cyo = document.getElementById('create-your-own-section');
+  if (cyo) cyo.style.display = 'none';
+  document.getElementById('salad-ingredients-section').style.display = 'none';
+  document.getElementById('side-types-section').style.display = 'block';
+  document.getElementById('chicken-sizes-section').style.display = 'none';
+} else if (currentCategory === 'CHICKEN') {
+  document.getElementById('pizza-sizes-section').style.display = 'none';
+  document.getElementById('new-item-price').classList.remove('hide-price');
+  document.getElementById('new-item-price').style.display = 'none';
+  const cyo = document.getElementById('create-your-own-section');
+  if (cyo) cyo.style.display = 'none';
+  document.getElementById('salad-ingredients-section').style.display = 'none';
+  document.getElementById('side-types-section').style.display = 'none';
+  document.getElementById('chicken-sizes-section').style.display = 'block';
+} else {
+  document.getElementById('pizza-sizes-section').style.display = 'none';
+  document.getElementById('new-item-price').classList.remove('hide-price');
+  document.getElementById('new-item-price').style.display = '';
+  const cyo = document.getElementById('create-your-own-section');
+  if (cyo) cyo.style.display = 'none';
+  document.getElementById('salad-ingredients-section').style.display = 'none';
+  document.getElementById('side-types-section').style.display = 'none';
+  document.getElementById('chicken-sizes-section').style.display = 'none';
 }
 renderPizzaSizesList();
 renderToppingsList();
+renderSaladIngredientsList();
+renderSideTypesList();
+renderChickenSizesList();
 loadMenuData();

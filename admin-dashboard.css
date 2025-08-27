@@ -1,3 +1,21 @@
+/* Create Your Own Pizza section styles */
+#create-your-own-section {
+  margin-top: 2em;
+}
+#custom-pizza-name {
+  font-weight: bold;
+}
+#custom-pizza-sizes-section label,
+#custom-pizza-toppings-section label {
+  font-weight: bold;
+}
+#custom-pizza-sizes-section small,
+#custom-pizza-toppings-section small {
+  color: #888;
+}
+#custom-pizza-toppings-section {
+  margin-top: 1em;
+}
 #pizza-sizes-list {
   margin-bottom: 0.5em;
 }
@@ -78,12 +96,13 @@
   background: #fffbe6;
   border: 1px solid #e0c97f;
   border-radius: 4px;
-  margin-bottom: 0.5em;
-  padding: 0.7em 1em;
-  font-size: 1.1em;
+  margin-bottom: 0.3em;
+  padding: 0.3em 0.6em;
+  font-size: 0.98em;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.2em;
 }
 /* Admin menu category bar */
 .menu-category-bar {
