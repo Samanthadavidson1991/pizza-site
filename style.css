@@ -1,3 +1,80 @@
+/* Cart item row styling */
+.cart-item-row {
+  list-style: none;
+  margin-bottom: 0.5em;
+  font-size: 1.08em;
+  display: flex;
+  align-items: center;
+}
+.cart-item-name {
+  font-weight: bold;
+  letter-spacing: 0.01em;
+  font-size: 1.35em;
+  margin-right: 0.3em;
+}
+.cart-item-price {
+  color: #222;
+  font-size: 1.35em;
+  font-weight: bold;
+}
+/* Remove button with bin icon in cart */
+.remove-cart-item-btn {
+  background: none !important;
+  border: none !important;
+  padding: 0 !important;
+  margin-left: 1em !important;
+  cursor: pointer;
+  vertical-align: middle;
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+.remove-cart-item-btn:focus {
+  outline: 2px solid #b01111;
+}
+.bin-icon {
+  display: inline-block;
+  vertical-align: middle;
+  width: 20px;
+  height: 20px;
+  pointer-events: none;
+}
+.remove-cart-item-btn:hover .bin-icon {
+  background: none !important;
+  filter: none;
+}
+/* Style for Proceed to Checkout button on cart page */
+#proceed-to-checkout-btn {
+  background: #000 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 0 !important;
+  margin: 0.18em 0.08em !important;
+  font-weight: 500 !important;
+  background: #000 !important;
+  color: #fff !important;
+  border: none !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  padding: 0.38em 1.05em !important;
+  font-size: 1.05em !important;
+  cursor: pointer !important;
+  text-shadow: none !important;
+}
+#go-to-checkout-btn {
+  background: #000 !important;
+  color: #fff !important;
+  border: none !important;
+  border-radius: 4px !important;
+  padding: 0.7em 1.5em !important;
+  font-size: 1em !important;
+  cursor: pointer !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
+  margin-left: 1em !important;
+}
 body.allergens-page.app-body, body.allergens-page.app-body * {
   color: #000 !important;
 }
@@ -28,7 +105,7 @@ body.allergens-page.app-body, body.allergens-page.app-body * {
   color: #fff !important;
   border: 1px solid #bbb !important;
   box-shadow: none !important;
-  opacity: 0.92 !important;
+  opacity: 1 !important;
 }
 /* --- MENU PAGE TITLES PROPORTIONAL HIERARCHY --- */
 #menu .menu-heading {
@@ -179,22 +256,6 @@ section {
   letter-spacing: 0.01em;
   margin: 1.2em 0 1.2em 0;
 }
-#cart button {
-  font-size: 0.98em;
-  padding: 0.45em 1.2em;
-  margin: 0.3em 0.2em;
-  border-radius: 0.4em;
-  background: #b01111;
-  color: #fff;
-  border: none;
-  font-weight: 600;
-  box-shadow: 0 1px 4px #0001;
-  cursor: pointer;
-  transition: background 0.2s, color 0.2s;
-}
-#cart button:hover {
-  background: #d32f2f;
-}
 #voucher-section {
   margin-top: 1.2rem;
   margin-bottom: 0.5rem;
@@ -313,21 +374,18 @@ footer#contact {
 
 /* --- BUTTON STYLES: ALL BUTTONS BLACK WITH WHITE TEXT --- */
 button, .pay-card, .pay-cash {
+  border-radius: 0 !important;
+  margin: 0.18em 0.08em !important;
+  font-weight: 500 !important;
   background: #000 !important;
   color: #fff !important;
-  border: none !important;
-  border-radius: 0 !important;
+  border: 1px solid #bbb !important;
+  box-shadow: none !important;
+  opacity: 1 !important;
   padding: 0.38em 1.05em !important;
   font-size: 1.05em !important;
-  font-weight: 500 !important;
-  margin: 0.5em 0.2em !important;
   cursor: pointer !important;
-  box-shadow: 0 1px 2px #0001 !important;
-  letter-spacing: 0.01em !important;
-  transition: background 0.18s, color 0.18s !important;
-  outline: none !important;
-  opacity: 1 !important;
-  visibility: visible !important;
+  text-shadow: none !important;
 }
 /* --- Menu Item Styling --- */
 .menu-item {

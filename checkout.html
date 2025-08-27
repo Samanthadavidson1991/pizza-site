@@ -99,18 +99,19 @@
 					alert('Please fill in all required fields and add items to your cart.');
 					return;
 				}
-				const order = {
-					cart,
-					total,
-					orderType,
-					customerName,
-					customerPhone,
-					customerEmail,
-					orderComments,
-					customerAddress,
-					customerPostcode,
-					orderTimeSlot
-				};
+					const order = {
+						cart,
+						total,
+						orderType,
+						customerName,
+						customerPhone,
+						customerEmail,
+						orderComments,
+						customerAddress,
+						customerPostcode,
+						orderTimeSlot,
+						placedAt: new Date().toISOString()
+					};
 				try {
 					const res = await fetch('https://pizza-site-c8t6.onrender.com/cash-order', {
 						method: 'POST',

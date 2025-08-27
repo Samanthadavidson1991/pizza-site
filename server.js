@@ -1,3 +1,31 @@
+// Refund endpoint for Stripe card orders
+app.post('/refund-order', async (req, res) => {
+  const { orderId, username } = req.body;
+  if (!orderId) return res.status(400).json({ error: 'Missing orderId.' });
+  let orders = [];
+  if (fs.existsSync(ORDERS_FILE)) {
+    orders = JSON.parse(fs.readFileSync(ORDERS_FILE));
+  }
+  const order = orders.find(o => o.id === orderId || o._id === orderId);
+  if (!order || order.method !== 'card') {
+    return res.status(404).json({ error: 'Order not found or not a card payment.' });
+  }
+  if (!order.stripePaymentIntentId) {
+    return res.status(400).json({ error: 'No Stripe payment intent found for this order.' });
+  }
+  try {
+    const refund = await stripe.refunds.create({
+      payment_intent: order.stripePaymentIntentId,
+      amount: Math.round((order.total || 0) * 100)
+    });
+    // Mark order as refunded
+    order.status = 'refunded';
+    fs.writeFileSync(ORDERS_FILE, JSON.stringify(orders, null, 2));
+    res.json({ success: true, refund });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
 const { MongoClient, ObjectId } = require('mongodb');
 const express = require('express');
 const Stripe = require('stripe');

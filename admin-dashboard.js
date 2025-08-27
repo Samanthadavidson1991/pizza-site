@@ -149,12 +149,13 @@ function renderOrders() {
     found = true;
     const tr = document.createElement('tr');
     let placedAt = '';
-    if (order.placedAt) {
+    const dateStr = order.placedAt || order.time;
+    if (dateStr) {
       try {
-        const d = new Date(order.placedAt);
+        const d = new Date(dateStr);
         placedAt = d.toLocaleString();
       } catch (e) {
-        placedAt = order.placedAt;
+        placedAt = dateStr;
       }
     }
     tr.innerHTML = `
@@ -176,8 +177,34 @@ function renderOrders() {
         <button class="status-btn refunded" onclick="updateStatus(${idx}, 'refunded')">Refunded</button>
         <button class="status-btn cancelled" onclick="updateStatus(${idx}, 'cancelled')">Cancelled</button>
         <button class="status-btn" onclick="printSingleOrder(${idx})">Print</button>
+        <button class="status-btn refund" onclick="refundOrder(${idx})">Refund</button>
       </td>
     `;
+async function refundOrder(index) {
+  if (!currentUser) return alert('Please log in.');
+  const order = allOrders[index];
+  if (!order || order.method !== 'card') {
+    alert('Refunds are only available for card payments.');
+    return;
+  }
+  if (!confirm('Are you sure you want to refund this order?')) return;
+  try {
+    const res = await fetch(`${BACKEND}/refund-order`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ orderId: order.id, username: currentUser })
+    });
+    const data = await res.json();
+    if (res.ok && data.success) {
+      alert('Order refunded successfully.');
+      await loadOrders();
+    } else {
+      alert('Refund failed: ' + (data.error || 'Unknown error'));
+    }
+  } catch (e) {
+    alert('Network error. Please try again.');
+  }
+}
     tbody.appendChild(tr);
   });
   if (!found) {
