@@ -76,6 +76,12 @@ function renderMenuItems() {
             `</span>`;
         }
         li.innerHTML = html;
+      } else if (currentCategory === 'SALADS') {
+        let html = `<span style='font-weight:500;'>${item.name}</span><span style='margin-left:0.5em; color:#7a5a00;'>£${item.price ? item.price.toFixed(2) : ''}</span>`;
+        if (Array.isArray(item.ingredients) && item.ingredients.length > 0) {
+          html += `<div style='margin-top:0.3em; color:#555; font-size:0.97em;'><strong>Ingredients:</strong> ${item.ingredients.map(ing => `<span style='margin-right:0.5em;'>${ing}</span>`).join('')}</div>`;
+        }
+        li.innerHTML = html;
       } else {
         li.innerHTML = `<span style='font-weight:500;'>${item.name}</span><span style='margin-left:0.5em; color:#7a5a00;'>£${item.price ? item.price.toFixed(2) : ''}</span>`;
       }
@@ -125,8 +131,8 @@ function renderMenuItems() {
       nameInput.style.fontWeight = 'bold';
       nameInput.style.marginRight = '0.5em';
       li.appendChild(nameInput);
-      let priceInput;
-      if (currentCategory === 'PIZZAS') {
+  let priceInput;
+  if (currentCategory === 'PIZZAS') {
         // Sizes
         const sizesDiv = document.createElement('div');
         sizesDiv.style.display = 'flex';
@@ -280,6 +286,79 @@ function renderMenuItems() {
         addToppingRow.appendChild(addToppingBtn);
         toppingsDiv.appendChild(addToppingRow);
         li.appendChild(toppingsDiv);
+      } else if (currentCategory === 'SALADS') {
+        priceInput = document.createElement('input');
+        priceInput.type = 'number';
+        priceInput.value = item.price || 0;
+        priceInput.step = '0.01';
+        priceInput.min = '0';
+        priceInput.style.marginLeft = '0.5em';
+        priceInput.style.width = '5em';
+        li.appendChild(priceInput);
+        // Ingredients list
+        const ingredientsDiv = document.createElement('div');
+        ingredientsDiv.style.margin = '0.5em 0';
+        ingredientsDiv.innerHTML = '<strong>Ingredients:</strong>';
+        let ingredientsArr = Array.isArray(item.ingredients) ? [...item.ingredients] : [];
+        ingredientsArr.forEach((ing, idx) => {
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          const ingInput = document.createElement('input');
+          ingInput.type = 'text';
+          ingInput.value = ing;
+          ingInput.style.width = '10em';
+          ingInput.style.marginRight = '0.5em';
+          ingInput.oninput = function() {
+            ingredientsArr[idx] = ingInput.value;
+          };
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '✕';
+          removeBtn.title = 'Remove Ingredient';
+          removeBtn.style.background = '#e74c3c';
+          removeBtn.style.color = '#fff';
+          removeBtn.style.border = 'none';
+          removeBtn.style.borderRadius = '50%';
+          removeBtn.style.width = '1.5em';
+          removeBtn.style.height = '1.5em';
+          removeBtn.style.fontSize = '1em';
+          removeBtn.style.cursor = 'pointer';
+          removeBtn.onclick = function() {
+            ingredientsArr.splice(idx, 1);
+            renderEdit();
+          };
+          row.appendChild(ingInput);
+          row.appendChild(removeBtn);
+          ingredientsDiv.appendChild(row);
+        });
+        // Add ingredient
+        const addIngRow = document.createElement('div');
+        addIngRow.style.display = 'flex';
+        addIngRow.style.alignItems = 'center';
+        const newIngInput = document.createElement('input');
+        newIngInput.type = 'text';
+        newIngInput.placeholder = 'Ingredient';
+        newIngInput.style.width = '10em';
+        newIngInput.style.marginRight = '0.5em';
+        const addIngBtn = document.createElement('button');
+        addIngBtn.textContent = 'Add Ingredient';
+        addIngBtn.style.background = '#27ae60';
+        addIngBtn.style.color = '#fff';
+        addIngBtn.style.border = 'none';
+        addIngBtn.style.borderRadius = '3px';
+        addIngBtn.style.padding = '0.2em 0.7em';
+        addIngBtn.style.fontSize = '0.95em';
+        addIngBtn.style.cursor = 'pointer';
+        addIngBtn.onclick = function() {
+          if (newIngInput.value) {
+            ingredientsArr.push(newIngInput.value);
+            renderEdit();
+          }
+        };
+        addIngRow.appendChild(newIngInput);
+        addIngRow.appendChild(addIngBtn);
+        ingredientsDiv.appendChild(addIngRow);
+        li.appendChild(ingredientsDiv);
       } else {
         priceInput = document.createElement('input');
         priceInput.type = 'number';
@@ -309,6 +388,9 @@ function renderMenuItems() {
             price: sz.price !== undefined ? parseFloat(sz.price) : 0
           }));
           updated.toppings = toppingsArr.map(tp => (typeof tp === 'object' && tp !== null && tp.name ? tp.name : tp));
+        } else if (currentCategory === 'SALADS') {
+          updated.price = parseFloat(priceInput.value);
+          updated.ingredients = ingredientsArr;
         } else if (priceInput) {
           updated.price = parseFloat(priceInput.value);
         }

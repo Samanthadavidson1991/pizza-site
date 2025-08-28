@@ -77,25 +77,59 @@ function renderMenuFromAPI(menu) {
 			grouped[cat.key].forEach(item => {
 				const div = document.createElement('div');
 				div.className = 'menu-item soft-box';
-				let toppingsHtml = '';
-				if (cat.key === 'PIZZAS' && Array.isArray(item.toppings) && item.toppings.length > 0) {
-					let customFreeNote = '';
-					if (Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object') {
-						customFreeNote = `<div class='toppings-note soft-box' style='font-size:0.95em;color:#b36b00;margin-bottom:0.2em;'><strong>Choose up to 4 toppings for free. Extra toppings will be charged as shown.</strong></div>`;
-					}
-					toppingsHtml = `<div class='toppings-list'>`
-						+ customFreeNote
-						+ `<div class='toppings-note soft-box' style='font-size:0.85em;color:#666;margin-bottom:0.2em;'>Uncheck to remove</div>`
-						+ `<strong>Toppings:</strong> `
-						+ item.toppings.map((t, idx) => {
-							if (typeof t === 'object' && t !== null) {
-								return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><span class='custom-checkbox'><input type='checkbox'><span class='checkbox-box'></span></span> ${t.name}${t.price ? ` (£${t.price.toFixed(2)})` : ''}</label></span>`;
-							} else {
-								return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><input type='checkbox' checked onchange=\"toggleTopping('${item.id}',${idx},this)\"> ${t}</label></span>`;
+						let toppingsHtml = '';
+						// PIZZAS: Toppings as checkboxes
+						if (cat.key === 'PIZZAS' && Array.isArray(item.toppings) && item.toppings.length > 0) {
+							let customFreeNote = '';
+							if (Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object') {
+								customFreeNote = `<div class='toppings-note soft-box' style='font-size:0.95em;color:#b36b00;margin-bottom:0.2em;'><strong>Choose up to 4 toppings for free. Extra toppings will be charged as shown.</strong></div>`;
 							}
-						}).join('')
-						+ `</div>`;
-				}
+							toppingsHtml = `<div class='toppings-list'>`
+								+ customFreeNote
+								+ `<div class='toppings-note soft-box' style='font-size:0.85em;color:#666;margin-bottom:0.2em;'>Uncheck to remove</div>`
+								+ `<strong>Toppings:</strong> `
+								+ item.toppings.map((t, idx) => {
+									if (typeof t === 'object' && t !== null) {
+										return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><span class='custom-checkbox'><input type='checkbox'><span class='checkbox-box'></span></span> ${t.name}${t.price ? ` (£${t.price.toFixed(2)})` : ''}</label></span>`;
+									} else {
+										return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><input type='checkbox' checked onchange=\"toggleTopping('${item.id}',${idx},this)\"> ${t}</label></span>`;
+									}
+								}).join('')
+								+ `</div>`;
+						}
+						// SALADS: Ingredients as checkboxes
+						if (cat.key === 'SALADS' && Array.isArray(item.ingredients) && item.ingredients.length > 0) {
+							toppingsHtml = `<div class='toppings-list'>`
+								+ `<div class='toppings-note soft-box' style='font-size:0.85em;color:#666;margin-bottom:0.2em;'>Uncheck to remove</div>`
+								+ `<strong>Ingredients:</strong> `
+								+ item.ingredients.map((ing, idx) =>
+										`<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><input type='checkbox' checked onchange=\"toggleSaladIngredient('${item.id}',${idx},this)\"> ${ing}</label></span>`
+									).join('')
+								+ `</div>`;
+						}
+// Toggle ingredient (checkbox) from salad (live site)
+window.toggleSaladIngredient = async function(saladId, ingredientIdx, checkbox) {
+	try {
+		const res = await fetch(`${API_BASE}/menu/${saladId}`);
+		if (!res.ok) {
+			showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+			return;
+		}
+		const salad = await res.json();
+		if (!salad.ingredients) return;
+		if (!checkbox.checked) {
+			salad.ingredients.splice(ingredientIdx, 1);
+			await fetch(`${API_BASE}/menu/${saladId}` , {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ ingredients: salad.ingredients })
+			});
+			loadAndRenderMenu();
+		}
+	} catch (e) {
+		showFriendlyMenuError('Failed to update ingredient. Please try again or contact staff.');
+	}
+}
 				// --- SIDES with types dropdown ---
 				if (cat.key === 'SIDES' && Array.isArray(item.types) && item.types.length > 0) {
 					const selectId = `side-type-select-${item.id}`;
