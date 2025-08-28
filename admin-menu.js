@@ -76,10 +76,19 @@ function renderMenuItems() {
             `</span>`;
         }
         li.innerHTML = html;
-      } else if (currentCategory === 'SALADS') {
+  } else if (currentCategory === 'SALADS') {
         let html = `<span style='font-weight:500;'>${item.name}</span><span style='margin-left:0.5em; color:#7a5a00;'>£${item.price ? item.price.toFixed(2) : ''}</span>`;
         if (Array.isArray(item.ingredients) && item.ingredients.length > 0) {
           html += `<div style='margin-top:0.3em; color:#555; font-size:0.97em;'><strong>Ingredients:</strong> ${item.ingredients.map(ing => `<span style='margin-right:0.5em;'>${ing}</span>`).join('')}</div>`;
+        }
+        li.innerHTML = html;
+      } else if (currentCategory === 'SIDES') {
+        let html = `<span style='font-weight:500;'>${item.name}</span>`;
+        if (Array.isArray(item.types) && item.types.length > 0) {
+          html += `<div style='margin-top:0.3em; color:#555; font-size:0.97em;'><strong>Types:</strong> ` +
+            item.types.map(typeObj => `<span style='margin-right:0.5em;'>${typeObj.name} (£${typeObj.price.toFixed(2)})</span>`).join('') + `</div>`;
+        } else if (item.price) {
+          html += `<span style='margin-left:0.5em; color:#7a5a00;'>£${item.price.toFixed(2)}</span>`;
         }
         li.innerHTML = html;
       } else {
@@ -286,7 +295,7 @@ function renderMenuItems() {
         addToppingRow.appendChild(addToppingBtn);
         toppingsDiv.appendChild(addToppingRow);
         li.appendChild(toppingsDiv);
-      } else if (currentCategory === 'SALADS') {
+  } else if (currentCategory === 'SALADS') {
         priceInput = document.createElement('input');
         priceInput.type = 'number';
         priceInput.value = item.price || 0;
@@ -359,6 +368,90 @@ function renderMenuItems() {
         addIngRow.appendChild(addIngBtn);
         ingredientsDiv.appendChild(addIngRow);
         li.appendChild(ingredientsDiv);
+      } else if (currentCategory === 'SIDES') {
+        // Types list
+        let typesArr = Array.isArray(item.types) ? [...item.types] : [];
+        const typesDiv = document.createElement('div');
+        typesDiv.style.margin = '0.5em 0';
+        typesDiv.innerHTML = '<strong>Types:</strong>';
+        typesArr.forEach((typeObj, idx) => {
+          const row = document.createElement('div');
+          row.style.display = 'flex';
+          row.style.alignItems = 'center';
+          const nameInput = document.createElement('input');
+          nameInput.type = 'text';
+          nameInput.value = typeObj.name;
+          nameInput.style.width = '8em';
+          nameInput.style.marginRight = '0.5em';
+          nameInput.oninput = function() {
+            typesArr[idx].name = nameInput.value;
+          };
+          const priceInputType = document.createElement('input');
+          priceInputType.type = 'number';
+          priceInputType.value = typeObj.price;
+          priceInputType.step = '0.01';
+          priceInputType.min = '0';
+          priceInputType.style.width = '5em';
+          priceInputType.style.marginRight = '0.5em';
+          priceInputType.oninput = function() {
+            typesArr[idx].price = parseFloat(priceInputType.value) || 0;
+          };
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '✕';
+          removeBtn.title = 'Remove Type';
+          removeBtn.style.background = '#e74c3c';
+          removeBtn.style.color = '#fff';
+          removeBtn.style.border = 'none';
+          removeBtn.style.borderRadius = '50%';
+          removeBtn.style.width = '1.5em';
+          removeBtn.style.height = '1.5em';
+          removeBtn.style.fontSize = '1em';
+          removeBtn.style.cursor = 'pointer';
+          removeBtn.onclick = function() {
+            typesArr.splice(idx, 1);
+            renderEdit();
+          };
+          row.appendChild(nameInput);
+          row.appendChild(priceInputType);
+          row.appendChild(removeBtn);
+          typesDiv.appendChild(row);
+        });
+        // Add type
+        const addTypeRow = document.createElement('div');
+        addTypeRow.style.display = 'flex';
+        addTypeRow.style.alignItems = 'center';
+        const newTypeInput = document.createElement('input');
+        newTypeInput.type = 'text';
+        newTypeInput.placeholder = 'Type name';
+        newTypeInput.style.width = '8em';
+        newTypeInput.style.marginRight = '0.5em';
+        const newPriceInput = document.createElement('input');
+        newPriceInput.type = 'number';
+        newPriceInput.placeholder = 'Price';
+        newPriceInput.step = '0.01';
+        newPriceInput.min = '0';
+        newPriceInput.style.width = '5em';
+        newPriceInput.style.marginRight = '0.5em';
+        const addBtn = document.createElement('button');
+        addBtn.textContent = 'Add Type';
+        addBtn.style.background = '#27ae60';
+        addBtn.style.color = '#fff';
+        addBtn.style.border = 'none';
+        addBtn.style.borderRadius = '3px';
+        addBtn.style.padding = '0.2em 0.7em';
+        addBtn.style.fontSize = '0.95em';
+        addBtn.style.cursor = 'pointer';
+        addBtn.onclick = function() {
+          if (newTypeInput.value && newPriceInput.value) {
+            typesArr.push({ name: newTypeInput.value, price: parseFloat(newPriceInput.value) });
+            renderEdit();
+          }
+        };
+        addTypeRow.appendChild(newTypeInput);
+        addTypeRow.appendChild(newPriceInput);
+        addTypeRow.appendChild(addBtn);
+        typesDiv.appendChild(addTypeRow);
+        li.appendChild(typesDiv);
       } else {
         priceInput = document.createElement('input');
         priceInput.type = 'number';
@@ -391,6 +484,8 @@ function renderMenuItems() {
         } else if (currentCategory === 'SALADS') {
           updated.price = parseFloat(priceInput.value);
           updated.ingredients = ingredientsArr;
+        } else if (currentCategory === 'SIDES') {
+          updated.types = typesArr;
         } else if (priceInput) {
           updated.price = parseFloat(priceInput.value);
         }
