@@ -414,8 +414,14 @@ document.querySelectorAll('.menu-category-btn').forEach(btn => {
 document.getElementById('add-item-form').addEventListener('submit', function(e) {
   e.preventDefault();
   const name = document.getElementById('new-item-name').value.trim();
+  let price = 0;
+  const priceInput = document.getElementById('new-item-price');
+  if (priceInput && priceInput.value) price = parseFloat(priceInput.value);
+
+  if (!name) return;
+
   if (currentCategory === 'PIZZAS') {
-    if (name && newPizzaSizes.length > 0) {
+    if (newPizzaSizes.length > 0) {
       addMenuItem('PIZZAS', { name, sizes: [...newPizzaSizes], toppings: [...newPizzaToppings] });
       newPizzaSizes = [];
       newPizzaToppings = [];
@@ -425,25 +431,24 @@ document.getElementById('add-item-form').addEventListener('submit', function(e) 
       document.getElementById('pizza-sizes-list').innerHTML = '';
       document.getElementById('new-item-name').value = '';
     }
-  } else {
-    if (name) {
-      if (currentCategory === 'SALADS') {
-        addMenuItem('SALADS', { name, price, ingredients: [...newSaladIngredients] });
-        newSaladIngredients = [];
-        renderSaladIngredientsList();
-      } else if (currentCategory === 'SIDES') {
-      addMenuItem('SIDES', { name, types: [...newSideTypes] });
-        newSideTypes = [];
-        renderSideTypesList();
-      } else if (currentCategory === 'CHICKEN') {
-        addMenuItem('CHICKEN', { name, sizes: [...newChickenSizes] });
-        newChickenSizes = [];
-        renderChickenSizesList();
-      } else {
-        addMenuItem(currentCategory, { name, price });
-      }
-      this.reset();
-    }
+  } else if (currentCategory === 'SALADS') {
+    addMenuItem('SALADS', { name, price, ingredients: [...newSaladIngredients] });
+    newSaladIngredients = [];
+    renderSaladIngredientsList();
+    this.reset();
+  } else if (currentCategory === 'SIDES') {
+    addMenuItem('SIDES', { name, price, types: [...newSideTypes] });
+    newSideTypes = [];
+    renderSideTypesList();
+    this.reset();
+  } else if (currentCategory === 'CHICKEN') {
+    addMenuItem('CHICKEN', { name, sizes: [...newChickenSizes] });
+    newChickenSizes = [];
+    renderChickenSizesList();
+    this.reset();
+  } else if (currentCategory === 'DRINKS' || currentCategory === 'DESSERTS') {
+    addMenuItem(currentCategory, { name, price });
+    this.reset();
   }
 });
 // Chicken sizes logic
