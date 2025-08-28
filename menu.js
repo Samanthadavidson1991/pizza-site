@@ -74,46 +74,78 @@ function renderMenuFromAPI(menu) {
       header.className = 'section-heading soft-box';
       header.textContent = cat.label;
       menuDiv.appendChild(header);
-      grouped[cat.key].forEach(item => {
-        const div = document.createElement('div');
-        div.className = 'menu-item soft-box';
-        let toppingsHtml = '';
-        if (cat.key === 'PIZZAS' && Array.isArray(item.toppings) && item.toppings.length > 0) {
-          let customFreeNote = '';
-          if (Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object') {
-            customFreeNote = `<div class='toppings-note soft-box' style='font-size:0.95em;color:#b36b00;margin-bottom:0.2em;'><strong>Choose up to 4 toppings for free. Extra toppings will be charged as shown.</strong></div>`;
-          }
-          toppingsHtml = `<div class='toppings-list'>`
-            + customFreeNote
-            + `<div class='toppings-note soft-box' style='font-size:0.85em;color:#666;margin-bottom:0.2em;'>Uncheck to remove</div>`
-            + `<strong>Toppings:</strong> `
-            + item.toppings.map((t, idx) => {
-              if (typeof t === 'object' && t !== null) {
-                return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><span class='custom-checkbox'><input type='checkbox'><span class='checkbox-box'></span></span> ${t.name}${t.price ? ` (£${t.price.toFixed(2)})` : ''}</label></span>`;
-              } else {
-                return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><input type='checkbox' checked onchange=\"toggleTopping('${item.id}',${idx},this)\"> ${t}</label></span>`;
-              }
-            }).join('')
-            + `</div>`;
-        }
-        if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
-          const selectId = `pizza-size-select-${item.id}`;
-          // Detect custom pizza by checking if toppings are objects
-          const isCustom = Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object';
-          div.innerHTML = `<strong>${item.name}</strong><br>` +
-            `<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
-            + item.sizes.map((s, idx) => `<option value='${idx}'>${s.size} - £${s.price.toFixed(2)}</option>`).join('')
-            + `</select>`
-            + toppingsHtml
-            + `<div style='margin-top:0.7em;'><button onclick="addSelectedPizzaSize('${item.name.replace(/'/g, '\'')}', '${selectId}', '${item.id}', ${isCustom})">Add</button></div>`;
-        } else {
-          div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
-            (item.description ? `<br><span>${item.description}</span>` : '') +
-            toppingsHtml +
-            `<div style='margin-top:0.7em;'><button onclick="addToCart('${item.name}',${item.price || 0})">Add to Cart</button></div>`;
-        }
-        menuDiv.appendChild(div);
-      });
+			grouped[cat.key].forEach(item => {
+				const div = document.createElement('div');
+				div.className = 'menu-item soft-box';
+				let toppingsHtml = '';
+				if (cat.key === 'PIZZAS' && Array.isArray(item.toppings) && item.toppings.length > 0) {
+					let customFreeNote = '';
+					if (Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object') {
+						customFreeNote = `<div class='toppings-note soft-box' style='font-size:0.95em;color:#b36b00;margin-bottom:0.2em;'><strong>Choose up to 4 toppings for free. Extra toppings will be charged as shown.</strong></div>`;
+					}
+					toppingsHtml = `<div class='toppings-list'>`
+						+ customFreeNote
+						+ `<div class='toppings-note soft-box' style='font-size:0.85em;color:#666;margin-bottom:0.2em;'>Uncheck to remove</div>`
+						+ `<strong>Toppings:</strong> `
+						+ item.toppings.map((t, idx) => {
+							if (typeof t === 'object' && t !== null) {
+								return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><span class='custom-checkbox'><input type='checkbox'><span class='checkbox-box'></span></span> ${t.name}${t.price ? ` (£${t.price.toFixed(2)})` : ''}</label></span>`;
+							} else {
+								return `<span class='topping-item soft-box' data-idx='${idx}'><label style='font-weight:normal;'><input type='checkbox' checked onchange=\"toggleTopping('${item.id}',${idx},this)\"> ${t}</label></span>`;
+							}
+						}).join('')
+						+ `</div>`;
+				}
+				// --- SIDES with types dropdown ---
+				if (cat.key === 'SIDES' && Array.isArray(item.types) && item.types.length > 0) {
+					const selectId = `side-type-select-${item.id}`;
+					div.innerHTML = `<strong>${item.name}</strong><br>` +
+						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
+						+ item.types.map((t, idx) => `<option value='${idx}'>${t.name} - £${t.price.toFixed(2)}</option>`).join('')
+						+ `</select>`
+						+ `<div style='margin-top:0.7em;'><button onclick="addSelectedSideType('${item.name.replace(/'/g, '\'')}', '${selectId}', '${item.id}')">Add</button></div>`;
+				}
+				else if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
+					const selectId = `pizza-size-select-${item.id}`;
+					// Detect custom pizza by checking if toppings are objects
+					const isCustom = Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object';
+					div.innerHTML = `<strong>${item.name}</strong><br>` +
+						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
+						+ item.sizes.map((s, idx) => `<option value='${idx}'>${s.size} - £${s.price.toFixed(2)}</option>`).join('')
+						+ `</select>`
+						+ toppingsHtml
+						+ `<div style='margin-top:0.7em;'><button onclick=\"addSelectedPizzaSize('${item.name.replace(/'/g, '\'')}', '${selectId}', '${item.id}', ${isCustom})\">Add</button></div>`;
+				} else {
+					div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
+						(item.description ? `<br><span>${item.description}</span>` : '') +
+						toppingsHtml +
+						`<div style='margin-top:0.7em;'><button onclick=\"addToCart('${item.name}',${item.price || 0})\">Add to Cart</button></div>`;
+				}
+				menuDiv.appendChild(div);
+			});
+// Add selected side type to cart
+window.addSelectedSideType = function(name, selectId, sideId) {
+	const select = document.getElementById(selectId);
+	if (!select) return;
+	const idx = select.value;
+	fetch(`${API_BASE}/menu/${sideId}`)
+		.then(async res => {
+			if (!res.ok) {
+				showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+				return null;
+			}
+			try {
+				return await res.json();
+			} catch (e) {
+				showFriendlyMenuError('Menu data is invalid. Please refresh the page or contact staff.');
+				return null;
+			}
+		})
+		.then(side => {
+			if (!side || !side.types || !side.types[idx]) return;
+			addToCart(`${name} (${side.types[idx].name})`, side.types[idx].price);
+		});
+}
     }
   });
 }
