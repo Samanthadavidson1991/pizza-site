@@ -521,7 +521,7 @@ function renderMenuItems() {
     }
     list.appendChild(li);
   });
-}
+} // <-- fix: close renderMenuItems function
 
 async function updateMenuItem(category, id, updatedItem) {
   try {
