@@ -1,3 +1,45 @@
+// --- SECTION DESCRIPTIONS ENDPOINTS ---
+let sectionDescriptionsCollection;
+async function connectSectionDescriptions() {
+  try {
+    const db = client.db('pizza_shop');
+    sectionDescriptionsCollection = db.collection('section_descriptions');
+    // Ensure there is always one document (singleton pattern)
+    const doc = await sectionDescriptionsCollection.findOne({ _id: 'main' });
+    if (!doc) {
+      await sectionDescriptionsCollection.insertOne({ _id: 'main', PIZZAS: '', SALADS: '', SIDES: '', DRINKS: '', DESSERTS: '', CHICKEN: '' });
+    }
+  } catch (err) {
+    console.error('MongoDB sectionDescriptions connection error:', err);
+  }
+}
+connectSectionDescriptions();
+
+// GET section descriptions
+app.get('/section-descriptions', async (req, res) => {
+  try {
+    const doc = await sectionDescriptionsCollection.findOne({ _id: 'main' });
+    if (!doc) return res.json({});
+    res.json(doc);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch section descriptions.' });
+  }
+});
+
+// PUT section descriptions (admin only)
+app.put('/section-descriptions', async (req, res) => {
+  try {
+    const update = req.body;
+    await sectionDescriptionsCollection.updateOne(
+      { _id: 'main' },
+      { $set: update },
+      { upsert: true }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update section descriptions.' });
+  }
+});
 // ...existing code...
 // Move refund endpoint after app is defined (see below)
 // ...existing code...
@@ -173,10 +215,13 @@ app.put('/menu/:id', async (req, res) => {
   try {
     const id = parseInt(req.params.id);
     const updated = req.body;
+    console.log('PUT /menu/:id', { id, updated });
     const result = await menuCollection.updateOne({ id }, { $set: updated });
+    console.log('Update result:', result);
     if (result.matchedCount === 0) return res.status(404).json({ error: 'Not found' });
     res.json({ success: true });
   } catch (err) {
+    console.error('Failed to update menu item:', err);
     res.status(500).json({ error: 'Failed to update menu item.' });
   }
 });

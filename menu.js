@@ -59,22 +59,38 @@ function renderMenuFromAPI(menu) {
     { key: 'DESSERTS', label: 'DESSERTS' },
     { key: 'CHICKEN', label: 'CHICKEN' }
   ];
-  const grouped = {};
-  menu.forEach(item => {
-    let cat = item.category || item.section || 'OTHER';
-    // Normalize category for PIZZAS
-    if (cat.toUpperCase() === "PIZZA'S" || cat.toUpperCase() === "PIZZAS") cat = "PIZZAS";
-    if (!grouped[cat]) grouped[cat] = [];
-    grouped[cat].push(item);
-  });
-  console.log('Grouped categories:', grouped);
-  categories.forEach(cat => {
-    if (grouped[cat.key] && grouped[cat.key].length > 0) {
-      const header = document.createElement('h2');
-      header.className = 'section-heading soft-box';
-      header.textContent = cat.label;
-      menuDiv.appendChild(header);
-			grouped[cat.key].forEach(item => {
+	const grouped = {};
+	menu.forEach(item => {
+		let cat = item.category || item.section || 'OTHER';
+		if (cat.toUpperCase() === "PIZZA'S" || cat.toUpperCase() === "PIZZAS") cat = "PIZZAS";
+		if (!grouped[cat]) grouped[cat] = [];
+		grouped[cat].push(item);
+	});
+	console.log('Grouped categories:', grouped);
+	// Fetch section descriptions from backend and render menu after
+	fetch(`${API_BASE}/section-descriptions`).then(res => res.json()).then(sectionDescs => {
+		categories.forEach(cat => {
+			if (grouped[cat.key] && grouped[cat.key].length > 0) {
+				const header = document.createElement('h2');
+				header.className = 'section-heading soft-box';
+				header.textContent = cat.label;
+				menuDiv.appendChild(header);
+				// Show description only if present
+				const desc = sectionDescs && sectionDescs[cat.key] ? sectionDescs[cat.key].trim() : '';
+				if (desc) {
+					const sub = document.createElement('div');
+					sub.className = 'section-subheading';
+					sub.style.fontSize = '1.05em';
+					sub.style.color = '#7a5a00';
+					sub.style.marginBottom = '0.7em';
+					sub.style.background = '#fffbe7';
+					sub.style.border = '1px dashed #e1c97a';
+					sub.style.borderRadius = '4px';
+					sub.style.padding = '0.5em 0.8em';
+					sub.textContent = desc;
+					menuDiv.appendChild(sub);
+				}
+				grouped[cat.key].forEach(item => {
 				const div = document.createElement('div');
 				div.className = 'menu-item soft-box';
 						let toppingsHtml = '';

@@ -1,3 +1,45 @@
+// --- SECTION DESCRIPTIONS ADMIN LOGIC ---
+window.addEventListener('DOMContentLoaded', () => {
+  const form = document.getElementById('section-descriptions-form');
+  if (!form) return;
+  const statusDiv = document.getElementById('section-desc-save-status');
+  // Load existing descriptions from backend
+  fetch(`${API_BASE}/section-descriptions`)
+    .then(res => res.json())
+    .then(data => {
+      if (data) {
+        form.PIZZAS.value = data.PIZZAS || '';
+        form.SALADS.value = data.SALADS || '';
+        form.SIDES.value = data.SIDES || '';
+        form.DRINKS.value = data.DRINKS || '';
+        form.DESSERTS.value = data.DESSERTS || '';
+        form.CHICKEN.value = data.CHICKEN || '';
+      }
+    });
+  // Save on submit
+  form.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    const body = {
+      PIZZAS: form.PIZZAS.value,
+      SALADS: form.SALADS.value,
+      SIDES: form.SIDES.value,
+      DRINKS: form.DRINKS.value,
+      DESSERTS: form.DESSERTS.value,
+      CHICKEN: form.CHICKEN.value
+    };
+    const res = await fetch(`${API_BASE}/section-descriptions`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+    if (res.ok) {
+      statusDiv.textContent = 'Descriptions saved!';
+      setTimeout(() => { statusDiv.textContent = ''; }, 2000);
+    } else {
+      statusDiv.textContent = 'Failed to save. Try again.';
+    }
+  });
+});
 // Menu data loaded from backend
 let menuData = {
   PIZZAS: [],
@@ -15,12 +57,24 @@ async function loadMenuData() {
     const items = await res.json();
     // Reset
     menuData = { PIZZAS: [], SALADS: [], SIDES: [], DRINKS: [], DESSERTS: [], CHICKEN: [] };
-    items.forEach(item => {
-      if (menuData[item.category]) {
-        menuData[item.category].push(item);
-      }
+    // Assign sortOrder if missing and update backend if needed
+    const updateSortOrderPromises = [];
+    const catKeys = Object.keys(menuData);
+    catKeys.forEach(cat => {
+      let catItems = items.filter(i => i.category === cat);
+      catItems.forEach((item, idx) => {
+        if (item.sortOrder === undefined) {
+          item.sortOrder = idx + 1;
+          // Update backend with new sortOrder
+          updateSortOrderPromises.push(updateMenuItem(cat, item.id || item._id, { ...item, sortOrder: item.sortOrder }));
+        }
+        menuData[cat].push(item);
+      });
     });
-    renderMenuItems();
+    // Wait for all sortOrder updates before rendering
+    Promise.all(updateSortOrderPromises).then(() => {
+      renderMenuItems();
+    });
   } catch (err) {
     alert('Failed to load menu from server.');
   }
@@ -32,6 +86,15 @@ async function addMenuItem(category, item) {
     if (item.sortOrder === undefined) {
       const arr = menuData[category] || [];
       item.sortOrder = arr.length > 0 ? Math.max(...arr.map(i => i.sortOrder || 0)) + 1 : 1;
+    }
+    // Assign a unique numeric id if not present
+    if (!item.id) {
+      // Find max id in all categories
+      let maxId = 0;
+      Object.values(menuData).forEach(arr => {
+        arr.forEach(i => { if (i.id && i.id > maxId) maxId = i.id; });
+      });
+      item.id = maxId + 1;
     }
     await fetch(`${API_BASE}/menu`, {
       method: 'POST',
@@ -75,7 +138,12 @@ function renderMenuItems() {
       return (a.name || '').localeCompare(b.name || '');
     }
   });
+  // Persist typesArr for each SIDES item being edited
+  let persistentTypesArrMap = {};
   menuData[currentCategory].forEach((item, idx) => {
+    if (currentCategory === 'SIDES') {
+      console.log('Rendering SIDES item:', item);
+    }
     const li = document.createElement('li');
     let isEditing = false;
     function renderView() {
@@ -103,9 +171,11 @@ function renderMenuItems() {
         let html = `<span style='font-weight:500;'>${item.name}</span>`;
         if (Array.isArray(item.types) && item.types.length > 0) {
           html += `<div style='margin-top:0.3em; color:#555; font-size:0.97em;'><strong>Types:</strong> ` +
-            item.types.map(typeObj => `<span style='margin-right:0.5em;'>${typeObj.name} (£${typeObj.price.toFixed(2)})</span>`).join('') + `</div>`;
-        } else if (item.price) {
-          html += `<span style='margin-left:0.5em; color:#7a5a00;'>£${item.price.toFixed(2)}</span>`;
+            item.types.map(typeObj => `<span style='margin-right:0.5em;'>${typeObj.name} (£${Number(typeObj.price).toFixed(2)})</span>`).join('') + `</div>`;
+        }
+        // Always show price if present, even if 0
+        if (typeof item.price !== 'undefined') {
+          html += `<span style='margin-left:0.5em; color:#7a5a00;'>£${Number(item.price).toFixed(2)}</span>`;
         }
         li.innerHTML = html;
       } else {
@@ -184,6 +254,9 @@ async function moveMenuItem(category, idx, direction) {
   if (!arr || arr.length < 2) return;
   const newIdx = idx + direction;
   if (newIdx < 0 || newIdx >= arr.length) return;
+  // Ensure both items have sortOrder
+  if (arr[idx].sortOrder === undefined) arr[idx].sortOrder = idx + 1;
+  if (arr[newIdx].sortOrder === undefined) arr[newIdx].sortOrder = newIdx + 1;
   // Swap sortOrder values
   const a = arr[idx];
   const b = arr[newIdx];
@@ -193,16 +266,17 @@ async function moveMenuItem(category, idx, direction) {
   // Swap in array
   arr[idx] = b;
   arr[newIdx] = a;
-  // Save both to backend
-  await updateMenuItem(category, Number(a.id || a._id), a);
-  await updateMenuItem(category, Number(b.id || b._id), b);
+  // Always send sortOrder in update
+  await updateMenuItem(category, Number(a.id || a._id), { ...a, sortOrder: a.sortOrder });
+  await updateMenuItem(category, Number(b.id || b._id), { ...b, sortOrder: b.sortOrder });
   await loadMenuData();
 }
     }
     // Persist these during editing
-    let sizesArr = Array.isArray(item.sizes) ? [...item.sizes] : [];
-    let toppingsArr = Array.isArray(item.toppings) ? [...item.toppings] : [];
-    function renderEdit() {
+  let sizesArr = Array.isArray(item.sizes) ? [...item.sizes] : [];
+  let toppingsArr = Array.isArray(item.toppings) ? [...item.toppings] : [];
+  // For SIDES, persist typesArr across renders
+  function renderEdit() {
       li.innerHTML = '';
       // Name field
       const nameInput = document.createElement('input');
@@ -451,12 +525,16 @@ async function moveMenuItem(category, idx, direction) {
         priceInput.style.width = '5em';
         li.appendChild(priceInput);
 
-        // Types list
-        let typesArr = Array.isArray(item.types) ? [...item.types] : [];
+        // Use persistent typesArr for this item
+        let key = item.id || item._id || idx;
+        if (!persistentTypesArrMap[key]) {
+          persistentTypesArrMap[key] = Array.isArray(item.types) ? [...item.types] : [];
+        }
+        let typesArr = persistentTypesArrMap[key];
         const typesDiv = document.createElement('div');
         typesDiv.style.margin = '0.5em 0';
         typesDiv.innerHTML = '<strong>Types:</strong>';
-        typesArr.forEach((typeObj, idx) => {
+        typesArr.forEach((typeObj, tIdx) => {
           const row = document.createElement('div');
           row.style.display = 'flex';
           row.style.alignItems = 'center';
@@ -466,7 +544,7 @@ async function moveMenuItem(category, idx, direction) {
           nameInput.style.width = '8em';
           nameInput.style.marginRight = '0.5em';
           nameInput.oninput = function() {
-            typesArr[idx].name = nameInput.value;
+            typesArr[tIdx].name = nameInput.value;
           };
           const priceInputType = document.createElement('input');
           priceInputType.type = 'number';
@@ -476,7 +554,7 @@ async function moveMenuItem(category, idx, direction) {
           priceInputType.style.width = '5em';
           priceInputType.style.marginRight = '0.5em';
           priceInputType.oninput = function() {
-            typesArr[idx].price = parseFloat(priceInputType.value) || 0;
+            typesArr[tIdx].price = parseFloat(priceInputType.value) || 0;
           };
           const removeBtn = document.createElement('button');
           removeBtn.textContent = '✕';
@@ -490,7 +568,7 @@ async function moveMenuItem(category, idx, direction) {
           removeBtn.style.fontSize = '1em';
           removeBtn.style.cursor = 'pointer';
           removeBtn.onclick = function() {
-            typesArr.splice(idx, 1);
+            typesArr.splice(tIdx, 1);
             renderEdit();
           };
           row.appendChild(nameInput);
@@ -524,8 +602,11 @@ async function moveMenuItem(category, idx, direction) {
         addBtn.style.fontSize = '0.95em';
         addBtn.style.cursor = 'pointer';
         addBtn.onclick = function() {
+          alert('Add Type button clicked');
+          console.log('Add Type button clicked', newTypeInput.value, newPriceInput.value);
           if (newTypeInput.value && newPriceInput.value) {
             typesArr.push({ name: newTypeInput.value, price: parseFloat(newPriceInput.value) });
+            console.log('typesArr after push:', typesArr);
             renderEdit();
           }
         };
@@ -544,46 +625,78 @@ async function moveMenuItem(category, idx, direction) {
         priceInput.style.width = '5em';
         li.appendChild(priceInput);
       }
-      // Save button
-      const saveBtn = document.createElement('button');
-      saveBtn.textContent = 'Save';
-      saveBtn.style.marginLeft = '0.7em';
-      saveBtn.style.background = '#27ae60';
-      saveBtn.style.color = '#fff';
-      saveBtn.style.border = 'none';
-      saveBtn.style.borderRadius = '3px';
-      saveBtn.style.padding = '0.2em 0.7em';
-      saveBtn.style.fontSize = '0.95em';
-      saveBtn.style.cursor = 'pointer';
-      saveBtn.onclick = async function() {
-        const updated = { ...item, name: nameInput.value };
-        if (currentCategory === 'PIZZAS') {
-          updated.sizes = sizesArr.map(sz => ({
-            size: sz.size || (sz["size"] !== undefined ? sz["size"] : ""),
-            price: sz.price !== undefined ? parseFloat(sz.price) : 0
-          }));
-          updated.toppings = toppingsArr.map(tp => (typeof tp === 'object' && tp !== null && tp.name ? tp.name : tp));
-        } else if (currentCategory === 'SALADS') {
-          updated.price = parseFloat(priceInput.value);
-          updated.ingredients = ingredientsArr;
-        } else if (currentCategory === 'SIDES') {
-          updated.types = typesArr;
-          // Save price if set (not required)
-          if (priceInput && priceInput.value !== '') {
+      // Save button (create and attach handler at the end)
+      setTimeout(() => {
+        const saveBtn = document.createElement('button');
+        saveBtn.textContent = 'Save';
+        saveBtn.style.marginLeft = '0.7em';
+        saveBtn.style.background = '#27ae60';
+        saveBtn.style.color = '#fff';
+        saveBtn.style.border = 'none';
+        saveBtn.style.borderRadius = '3px';
+        saveBtn.style.padding = '0.2em 0.7em';
+        saveBtn.style.fontSize = '0.95em';
+        saveBtn.style.cursor = 'pointer';
+        saveBtn.onclick = async function() {
+          alert('Save button clicked for ' + currentCategory + ': ' + (item && item.name));
+          console.log('Save button clicked for', currentCategory, item);
+          const updated = { ...item, name: nameInput.value };
+          if (currentCategory === 'PIZZAS') {
+            updated.sizes = sizesArr.map(sz => ({
+              size: sz.size || (sz["size"] !== undefined ? sz["size"] : ""),
+              price: sz.price !== undefined ? parseFloat(sz.price) : 0
+            }));
+            updated.toppings = toppingsArr.map(tp => (typeof tp === 'object' && tp !== null && tp.name ? tp.name : tp));
+          } else if (currentCategory === 'SALADS') {
             updated.price = parseFloat(priceInput.value);
-          } else {
-            delete updated.price;
+            updated.ingredients = ingredientsArr;
+          } else if (currentCategory === 'SIDES') {
+            // Use persistent typesArr for this item
+            let key = item.id || item._id || idx;
+            updated.types = persistentTypesArrMap[key];
+            // Save price if set (not required)
+            if (priceInput && priceInput.value !== '') {
+              updated.price = parseFloat(priceInput.value);
+            } else {
+              delete updated.price;
+            }
+          } else if (priceInput) {
+            updated.price = parseFloat(priceInput.value);
           }
-        } else if (priceInput) {
-          updated.price = parseFloat(priceInput.value);
-        }
-        // Remove _id if present to avoid MongoDB update errors
-        if (updated._id) delete updated._id;
-        await updateMenuItem(currentCategory, Number(item.id), updated);
-        isEditing = false;
-        await loadMenuData();
-      };
-      li.appendChild(saveBtn);
+          // Remove _id if present to avoid MongoDB update errors
+          if (updated._id) delete updated._id;
+          // Always ensure id is present and numeric in update body
+          let updateId = item.id;
+          if (!updateId && item._id) updateId = item._id;
+          updateId = Number(updateId);
+          if (!updateId || isNaN(updateId)) {
+            alert('Menu item is missing a valid id and cannot be updated.');
+            return;
+          }
+          updated.id = updateId;
+          // Debug: log update payload
+          console.log('Updating menu item:', updated);
+          await updateMenuItem(currentCategory, updateId, updated);
+          isEditing = false;
+          // Reset persistent typesArr for this item
+          if (currentCategory === 'SIDES') {
+            let key = item.id || item._id || idx;
+            delete persistentTypesArrMap[key];
+          }
+          await loadMenuData();
+        };
+        li.appendChild(saveBtn);
+      }, 0);
+      // Add a visible test button for SIDES
+      if (currentCategory === 'SIDES') {
+        const testBtn = document.createElement('button');
+        testBtn.textContent = 'TEST SIDES BUTTON';
+        testBtn.style.background = '#e67e22';
+        testBtn.style.color = '#fff';
+        testBtn.style.marginLeft = '0.7em';
+        testBtn.onclick = function() { alert('TEST SIDES BUTTON CLICKED'); };
+        li.appendChild(testBtn);
+      }
       // Cancel button
       const cancelBtn = document.createElement('button');
       cancelBtn.textContent = 'Cancel';
@@ -597,6 +710,11 @@ async function moveMenuItem(category, idx, direction) {
       cancelBtn.style.cursor = 'pointer';
       cancelBtn.onclick = function() {
         isEditing = false;
+        // Reset persistent typesArr for this item if SIDES
+        if (currentCategory === 'SIDES') {
+          let key = item.id || item._id || idx;
+          delete persistentTypesArrMap[key];
+        }
         renderView();
       };
       li.appendChild(cancelBtn);
@@ -612,12 +730,15 @@ async function moveMenuItem(category, idx, direction) {
 
 async function updateMenuItem(category, id, updatedItem) {
   try {
+    console.log('Calling updateMenuItem:', { category, id, updatedItem });
     await fetch(`${API_BASE}/menu/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...updatedItem, category })
     });
+    console.log('UpdateMenuItem success:', id);
   } catch (err) {
+    console.error('Failed to update menu item:', err);
     alert('Failed to update menu item.');
   }
 }
@@ -672,7 +793,15 @@ document.querySelectorAll('.menu-category-btn').forEach(btn => {
         }
       }
     }
-    renderMenuItems();
+  renderMenuItems();
+  // Debug: log menuData after every load
+  console.log('menuData after load:', menuData);
+  // Extra debug: log all items and highlight SIDES
+  let allItems = [];
+  Object.keys(menuData).forEach(cat => menuData[cat].forEach(i => allItems.push({cat, ...i})));
+  console.log('All menu items:', allItems);
+  const sides = allItems.filter(i => i.cat === 'SIDES');
+  console.log('SIDES items after load:', sides);
   });
 });
 
