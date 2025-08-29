@@ -1,10 +1,36 @@
 
-// --- SECTION DESCRIPTIONS ENDPOINTS ---
-// (MUST be after app and client are initialized)
-
 // ...existing code...
+// All require statements should be here (as in your file)
+const { MongoClient, ObjectId } = require('mongodb');
+const express = require('express');
+const Stripe = require('stripe');
+const cors = require('cors');
+const fs = require('fs');
+const path = require('path');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcryptjs');
+const { generateMenuHTML } = require('./generate-menu-html');
+require('dotenv').config();
 
-// Place this after app and client are initialized:
+// App and DB initialization
+// const app = express(); // Duplicate, remove
+const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://thecrustngb:1FulWR9u2F7ii0Ef@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const client = new MongoClient(mongoUri);
+let menuCollection;
+
+async function connectMongo() {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    menuCollection = db.collection('menu');
+    console.log('Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+  }
+}
+connectMongo();
+
+// --- SECTION DESCRIPTIONS ENDPOINTS ---
 let sectionDescriptionsCollection;
 async function connectSectionDescriptions() {
   try {
@@ -19,9 +45,7 @@ async function connectSectionDescriptions() {
     console.error('MongoDB sectionDescriptions connection error:', err);
   }
 }
-
 setTimeout(connectSectionDescriptions, 0);
-
 app.get('/section-descriptions', async (req, res) => {
   try {
     const doc = await sectionDescriptionsCollection.findOne({ _id: 'main' });
@@ -31,7 +55,6 @@ app.get('/section-descriptions', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch section descriptions.' });
   }
 });
-
 app.put('/section-descriptions', async (req, res) => {
   try {
     const update = req.body;
@@ -45,21 +68,6 @@ app.put('/section-descriptions', async (req, res) => {
     res.status(500).json({ error: 'Failed to update section descriptions.' });
   }
 });
-// ...existing code...
-// Move refund endpoint after app is defined (see below)
-// ...existing code...
-const { MongoClient, ObjectId } = require('mongodb');
-const express = require('express');
-const Stripe = require('stripe');
-const cors = require('cors');
-const fs = require('fs');
-const path = require('path');
-const nodemailer = require('nodemailer');
-const bcrypt = require('bcryptjs');
-const { generateMenuHTML } = require('./generate-menu-html');
-
-
-
 
 
 const app = express();
@@ -104,22 +112,7 @@ app.use((req, res, next) => {
   next();
 });
 
-// MongoDB connection setup
-const mongoUri = 'mongodb+srv://thecrustngb:1FulWR9u2F7ii0Ef@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const client = new MongoClient(mongoUri);
-let menuCollection;
-
-async function connectMongo() {
-  try {
-    await client.connect();
-    const db = client.db('pizza_shop');
-    menuCollection = db.collection('menu');
-    console.log('Connected to MongoDB Atlas');
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
-  }
-}
-connectMongo();
+// Duplicate MongoDB connection setup removed
 app.use(express.static(__dirname));
 app.disable('x-powered-by');
 
