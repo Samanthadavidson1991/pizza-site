@@ -28,6 +28,11 @@ async function loadMenuData() {
 
 async function addMenuItem(category, item) {
   try {
+    // Set sortOrder to end of list if not set
+    if (item.sortOrder === undefined) {
+      const arr = menuData[category] || [];
+      item.sortOrder = arr.length > 0 ? Math.max(...arr.map(i => i.sortOrder || 0)) + 1 : 1;
+    }
     await fetch(`${API_BASE}/menu`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -58,7 +63,19 @@ let newChickenSizes = [];
 function renderMenuItems() {
   const list = document.getElementById('menu-items-list');
   list.innerHTML = '';
-  menuData[currentCategory].forEach((item) => {
+  // Sort by sortOrder if present, else fallback to name
+  menuData[currentCategory].sort((a, b) => {
+    if (a.sortOrder !== undefined && b.sortOrder !== undefined) {
+      return a.sortOrder - b.sortOrder;
+    } else if (a.sortOrder !== undefined) {
+      return -1;
+    } else if (b.sortOrder !== undefined) {
+      return 1;
+    } else {
+      return (a.name || '').localeCompare(b.name || '');
+    }
+  });
+  menuData[currentCategory].forEach((item, idx) => {
     const li = document.createElement('li');
     let isEditing = false;
     function renderView() {
@@ -94,6 +111,40 @@ function renderMenuItems() {
       } else {
         li.innerHTML = `<span style='font-weight:500;'>${item.name}</span><span style='margin-left:0.5em; color:#7a5a00;'>£${item.price ? item.price.toFixed(2) : ''}</span>`;
       }
+      // Move Up button
+      const moveUpBtn = document.createElement('button');
+      moveUpBtn.textContent = '↑';
+      moveUpBtn.title = 'Move Up';
+      moveUpBtn.style.marginLeft = '0.7em';
+      moveUpBtn.style.background = '#bbb';
+      moveUpBtn.style.color = '#222';
+      moveUpBtn.style.border = 'none';
+      moveUpBtn.style.borderRadius = '3px';
+      moveUpBtn.style.padding = '0.2em 0.7em';
+      moveUpBtn.style.fontSize = '0.95em';
+      moveUpBtn.style.cursor = 'pointer';
+      moveUpBtn.disabled = idx === 0;
+      moveUpBtn.onclick = function() {
+        moveMenuItem(currentCategory, idx, -1);
+      };
+      li.appendChild(moveUpBtn);
+      // Move Down button
+      const moveDownBtn = document.createElement('button');
+      moveDownBtn.textContent = '↓';
+      moveDownBtn.title = 'Move Down';
+      moveDownBtn.style.marginLeft = '0.3em';
+      moveDownBtn.style.background = '#bbb';
+      moveDownBtn.style.color = '#222';
+      moveDownBtn.style.border = 'none';
+      moveDownBtn.style.borderRadius = '3px';
+      moveDownBtn.style.padding = '0.2em 0.7em';
+      moveDownBtn.style.fontSize = '0.95em';
+      moveDownBtn.style.cursor = 'pointer';
+      moveDownBtn.disabled = idx === menuData[currentCategory].length - 1;
+      moveDownBtn.onclick = function() {
+        moveMenuItem(currentCategory, idx, 1);
+      };
+      li.appendChild(moveDownBtn);
       // Edit button
       const editBtn = document.createElement('button');
       editBtn.textContent = 'Edit';
@@ -127,6 +178,26 @@ function renderMenuItems() {
         await deleteMenuItem(currentCategory, item.id || item._id);
       };
       li.appendChild(delBtn);
+// Move menu item up or down in the list (UI only for now)
+async function moveMenuItem(category, idx, direction) {
+  const arr = menuData[category];
+  if (!arr || arr.length < 2) return;
+  const newIdx = idx + direction;
+  if (newIdx < 0 || newIdx >= arr.length) return;
+  // Swap sortOrder values
+  const a = arr[idx];
+  const b = arr[newIdx];
+  const tempOrder = a.sortOrder;
+  a.sortOrder = b.sortOrder;
+  b.sortOrder = tempOrder;
+  // Swap in array
+  arr[idx] = b;
+  arr[newIdx] = a;
+  // Save both to backend
+  await updateMenuItem(category, Number(a.id || a._id), a);
+  await updateMenuItem(category, Number(b.id || b._id), b);
+  await loadMenuData();
+}
     }
     // Persist these during editing
     let sizesArr = Array.isArray(item.sizes) ? [...item.sizes] : [];
