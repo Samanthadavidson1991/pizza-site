@@ -1,5 +1,10 @@
 
 // --- SECTION DESCRIPTIONS ENDPOINTS ---
+// (MUST be after app and client are initialized)
+
+// ...existing code...
+
+// Place this after app and client are initialized:
 let sectionDescriptionsCollection;
 async function connectSectionDescriptions() {
   try {
@@ -15,10 +20,8 @@ async function connectSectionDescriptions() {
   }
 }
 
-// Call after client and app are initialized
 setTimeout(connectSectionDescriptions, 0);
 
-// GET section descriptions
 app.get('/section-descriptions', async (req, res) => {
   try {
     const doc = await sectionDescriptionsCollection.findOne({ _id: 'main' });
@@ -29,7 +32,6 @@ app.get('/section-descriptions', async (req, res) => {
   }
 });
 
-// PUT section descriptions (admin only)
 app.put('/section-descriptions', async (req, res) => {
   try {
     const update = req.body;
