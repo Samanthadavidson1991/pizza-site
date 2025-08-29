@@ -138,12 +138,13 @@ function renderMenuFromAPI(menu) {
 					const selectId = `pizza-size-select-${item.id}`;
 					// Detect custom pizza by checking if toppings are objects
 					const isCustom = Array.isArray(item.toppings) && item.toppings.length > 0 && typeof item.toppings[0] === 'object';
+					const encodedName = encodeURIComponent(item.name);
 					div.innerHTML = `<strong>${item.name}</strong><br>` +
 						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
 						+ item.sizes.map((s, idx) => `<option value='${idx}'>${s.size} - £${s.price.toFixed(2)}</option>`).join('')
 						+ `</select>`
 						+ toppingsHtml
-						+ `<div style='margin-top:0.7em;'><button onclick=\"addSelectedPizzaSize('${item.name.replace(/'/g, '\'')}', '${selectId}', '${item.id}', ${isCustom})\">Add</button></div>`;
+						+ `<div style='margin-top:0.7em;'><button onclick='addSelectedPizzaSize(decodeURIComponent("${encodedName}"), "${selectId}", "${item.id}", ${isCustom})'>Add</button></div>`;
 				} else {
 					div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
 						(item.description ? `<br><span>${item.description}</span>` : '') +
