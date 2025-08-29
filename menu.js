@@ -148,12 +148,9 @@ function renderMenuFromAPI(menu) {
 					const btn = document.createElement('button');
 					btn.textContent = 'Add';
 					btn.className = 'add-pizza-btn';
-					btn.dataset.pizzaId = item.id;
-					btn.dataset.selectId = selectId;
-					btn.dataset.isCustom = isCustom;
 					btn.style.marginTop = '0.7em';
 					btn.addEventListener('click', function() {
-						window.addSelectedPizzaSizeById(this.dataset.pizzaId, this.dataset.selectId, this.dataset.isCustom === 'true');
+						window.addSelectedPizzaSize(item.name, selectId, item.id, isCustom);
 					});
 					div.appendChild(btn);
 // Helper to lookup pizza name by id and call addSelectedPizzaSize
