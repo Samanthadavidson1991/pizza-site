@@ -35,6 +35,14 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 	updateCart();
 	loadAndRenderMenu();
+
+	// Add event listener for Go to Checkout button
+	const checkoutBtn = document.getElementById('go-to-checkout-btn');
+	if (checkoutBtn) {
+		checkoutBtn.addEventListener('click', function() {
+			window.location.href = 'cart.html';
+		});
+	}
 });
 
 function loadAndRenderMenu() {
@@ -127,13 +135,18 @@ function renderMenuFromAPI(menu) {
 				// --- SIDES with types dropdown ---
 				if (cat.key === 'SIDES' && Array.isArray(item.types) && item.types.length > 0) {
 					const selectId = `side-type-select-${item.id}`;
-					// Escape single quotes for HTML attribute
-					const safeName = item.name.replace(/'/g, "\\'");
 					div.innerHTML = `<strong>${item.name}</strong><br>` +
 						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
 						+ item.types.map((t, idx) => `<option value='${idx}'>${t.name} - £${t.price.toFixed(2)}</option>`).join('')
-						+ `</select>`
-						+ `<div style='margin-top:0.7em;'><button onclick=\"addSelectedSideType('${safeName}', '${selectId}', '${item.id}')\">Add</button></div>`;
+						+ `</select>`;
+					const btn = document.createElement('button');
+					btn.textContent = 'Add';
+					btn.className = 'add-side-btn';
+					btn.style.marginTop = '0.7em';
+					btn.addEventListener('click', function() {
+						window.addSelectedSideType(item.name, selectId, item.id);
+					});
+					div.appendChild(btn);
 				}
 				else if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
 					const selectId = `pizza-size-select-${item.id}`;
@@ -144,33 +157,44 @@ function renderMenuFromAPI(menu) {
 						+ item.sizes.map((s, idx) => `<option value='${idx}'>${s.size} - £${s.price.toFixed(2)}</option>`).join('')
 						+ `</select>`
 						+ toppingsHtml;
-					// Add button using JS, not inline HTML
-					const btn = document.createElement('button');
-					btn.textContent = 'Add';
-					btn.className = 'add-pizza-btn';
-					btn.style.marginTop = '0.7em';
-					btn.addEventListener('click', function() {
-						window.addSelectedPizzaSize(item.name, selectId, item.id, isCustom);
-					});
-					div.appendChild(btn);
-// Helper to lookup pizza name by id and call addSelectedPizzaSize
-window.addSelectedPizzaSizeById = function(id, selectId, isCustom) {
-	const item = (window.menuData || []).find(i => String(i.id) === String(id));
-	if (!item) return;
-	addSelectedPizzaSize(item.name, selectId, id, isCustom);
-}
+					// Add button using JS only
+											const btn = document.createElement('button');
+											btn.textContent = 'Add';
+											btn.className = 'add-pizza-btn';
+											btn.style.marginTop = '0.7em';
+											btn.addEventListener('click', function() {
+												window.addSelectedPizzaSize(item.name, selectId, item.id, isCustom);
+											});
+											div.appendChild(btn);
 				} else {
 					div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
 						(item.description ? `<br><span>${item.description}</span>` : '') +
-						toppingsHtml +
-						`<div style='margin-top:0.7em;'><button onclick=\"addToCart('${item.name}',${item.price || 0})\">Add to Cart</button></div>`;
+						toppingsHtml;
+					const btn = document.createElement('button');
+					btn.textContent = 'Add to Cart';
+					btn.className = 'add-generic-btn';
+					btn.style.marginTop = '0.7em';
+					btn.addEventListener('click', function() {
+						addToCart(item.name, item.price || 0);
+					});
+					div.appendChild(btn);
 				}
 				menuDiv.appendChild(div);
 			});
 			}
 		});
+// End of renderMenuFromAPI
+}
+		});
 	}
 // End of renderMenuFromAPI
+}
+
+// Helper to lookup pizza name by id and call addSelectedPizzaSize
+window.addSelectedPizzaSizeById = function(id, selectId, isCustom) {
+	const item = (window.menuData || []).find(i => String(i.id) === String(id));
+	if (!item) return;
+	addSelectedPizzaSize(item.name, selectId, id, isCustom);
 }
 
 // Toggle ingredient (checkbox) from salad (live site)
