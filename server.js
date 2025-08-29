@@ -1,3 +1,4 @@
+
 // --- SECTION DESCRIPTIONS ENDPOINTS ---
 let sectionDescriptionsCollection;
 async function connectSectionDescriptions() {
@@ -13,7 +14,9 @@ async function connectSectionDescriptions() {
     console.error('MongoDB sectionDescriptions connection error:', err);
   }
 }
-connectSectionDescriptions();
+
+// Call after client and app are initialized
+setTimeout(connectSectionDescriptions, 0);
 
 // GET section descriptions
 app.get('/section-descriptions', async (req, res) => {
