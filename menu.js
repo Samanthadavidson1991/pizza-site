@@ -143,8 +143,19 @@ function renderMenuFromAPI(menu) {
 						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
 						+ item.sizes.map((s, idx) => `<option value='${idx}'>${s.size} - £${s.price.toFixed(2)}</option>`).join('')
 						+ `</select>`
-						+ toppingsHtml
-						+ `<div style='margin-top:0.7em;'><button onclick='addSelectedPizzaSizeById("${item.id}", "${selectId}", ${isCustom})'>Add</button></div>`;
+						+ toppingsHtml;
+					// Add button using JS, not inline HTML
+					const btn = document.createElement('button');
+					btn.textContent = 'Add';
+					btn.className = 'add-pizza-btn';
+					btn.dataset.pizzaId = item.id;
+					btn.dataset.selectId = selectId;
+					btn.dataset.isCustom = isCustom;
+					btn.style.marginTop = '0.7em';
+					btn.addEventListener('click', function() {
+						window.addSelectedPizzaSizeById(this.dataset.pizzaId, this.dataset.selectId, this.dataset.isCustom === 'true');
+					});
+					div.appendChild(btn);
 // Helper to lookup pizza name by id and call addSelectedPizzaSize
 window.addSelectedPizzaSizeById = function(id, selectId, isCustom) {
 	const item = (window.menuData || []).find(i => String(i.id) === String(id));
