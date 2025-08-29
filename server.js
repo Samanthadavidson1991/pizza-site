@@ -107,7 +107,9 @@ app.use(cors({
   origin: [
     'https://pizza-site-c8t6.onrender.com',
     'http://thecrustatngb.co.uk',
-    'https://thecrustatngb.co.uk'
+    'https://thecrustatngb.co.uk',
+    'http://127.0.0.1:5500',
+    'http://localhost:5500'
   ],
   credentials: true
 }));
