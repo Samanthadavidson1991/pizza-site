@@ -123,37 +123,16 @@ function renderMenuFromAPI(menu) {
 									).join('')
 								+ `</div>`;
 						}
-// Toggle ingredient (checkbox) from salad (live site)
-window.toggleSaladIngredient = async function(saladId, ingredientIdx, checkbox) {
-	try {
-		const res = await fetch(`${API_BASE}/menu/${saladId}`);
-		if (!res.ok) {
-			showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
-			return;
-		}
-		const salad = await res.json();
-		if (!salad.ingredients) return;
-		if (!checkbox.checked) {
-			salad.ingredients.splice(ingredientIdx, 1);
-			await fetch(`${API_BASE}/menu/${saladId}` , {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ ingredients: salad.ingredients })
-			});
-			loadAndRenderMenu();
-		}
-	} catch (e) {
-		showFriendlyMenuError('Failed to update ingredient. Please try again or contact staff.');
-	}
-}
 				// --- SIDES with types dropdown ---
 				if (cat.key === 'SIDES' && Array.isArray(item.types) && item.types.length > 0) {
 					const selectId = `side-type-select-${item.id}`;
+					// Escape single quotes for HTML attribute
+					const safeName = item.name.replace(/'/g, "\\'");
 					div.innerHTML = `<strong>${item.name}</strong><br>` +
 						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
 						+ item.types.map((t, idx) => `<option value='${idx}'>${t.name} - £${t.price.toFixed(2)}</option>`).join('')
 						+ `</select>`
-						+ `<div style='margin-top:0.7em;'><button onclick="addSelectedSideType('${item.name.replace(/'/g, '\'')}', '${selectId}', '${item.id}')">Add</button></div>`;
+						+ `<div style='margin-top:0.7em;'><button onclick=\"addSelectedSideType('${safeName}', '${selectId}', '${item.id}')\">Add</button></div>`;
 				}
 				else if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
 					const selectId = `pizza-size-select-${item.id}`;
@@ -173,12 +152,66 @@ window.toggleSaladIngredient = async function(saladId, ingredientIdx, checkbox) 
 				}
 				menuDiv.appendChild(div);
 			});
+			}
+		});
+	}
+// End of renderMenuFromAPI
+}
+
+// Toggle ingredient (checkbox) from salad (live site)
+window.toggleSaladIngredient = async function(saladId, ingredientIdx, checkbox) {
+		try {
+				const res = await fetch(`${API_BASE}/menu/${saladId}`);
+				if (!res.ok) {
+						showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+						return;
+				}
+				const salad = await res.json();
+				if (!salad.ingredients) return;
+				if (!checkbox.checked) {
+						salad.ingredients.splice(ingredientIdx, 1);
+						await fetch(`${API_BASE}/menu/${saladId}` , {
+								method: 'PUT',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ ingredients: salad.ingredients })
+						});
+						loadAndRenderMenu();
+				}
+		} catch (e) {
+				showFriendlyMenuError('Failed to update ingredient. Please try again or contact staff.');
+		}
+}
+
 // Add selected side type to cart
 window.addSelectedSideType = function(name, selectId, sideId) {
+		const select = document.getElementById(selectId);
+		if (!select) return;
+		const idx = select.value;
+		fetch(`${API_BASE}/menu/${sideId}`)
+				.then(async res => {
+						if (!res.ok) {
+								showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+								return null;
+						}
+						try {
+								return await res.json();
+						} catch (e) {
+								showFriendlyMenuError('Menu data is invalid. Please refresh the page or contact staff.');
+								return null;
+						}
+				})
+				.then(side => {
+						if (!side || !side.types || !side.types[idx]) return;
+						addToCart(`${name} (${side.types[idx].name})`, side.types[idx].price);
+				});
+}
+
+// Add selected pizza size to cart
+window.addSelectedPizzaSize = function(name, selectId, pizzaId, isCustom) {
 	const select = document.getElementById(selectId);
 	if (!select) return;
 	const idx = select.value;
-	fetch(`${API_BASE}/menu/${sideId}`)
+	fetch(`${API_BASE}/menu/${pizzaId}`)
 		.then(async res => {
 			if (!res.ok) {
 				showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
@@ -191,98 +224,73 @@ window.addSelectedSideType = function(name, selectId, sideId) {
 				return null;
 			}
 		})
-		.then(side => {
-			if (!side || !side.types || !side.types[idx]) return;
-			addToCart(`${name} (${side.types[idx].name})`, side.types[idx].price);
+		.then(pizza => {
+			if (!pizza || !pizza.sizes || !pizza.sizes[idx]) return;
+			if (isCustom) {
+				// For custom pizza, get all checked toppings by data-idx
+				const toppingSpans = select.parentElement.querySelectorAll('.topping-item');
+				const selectedToppingIndexes = Array.from(toppingSpans)
+					.map(span => {
+						const cb = span.querySelector('input[type="checkbox"]');
+						return cb && cb.checked ? parseInt(span.getAttribute('data-idx')) : -1;
+					})
+					.filter(i => i !== -1);
+				// Get topping objects by index
+				const sortedToppings = selectedToppingIndexes.map(i => pizza.toppings[i]).filter(Boolean);
+				const includedToppings = 4;
+				let totalPrice = pizza.sizes[idx].price;
+				let paidToppings = [];
+				let freeToppings = [];
+				if (sortedToppings.length > includedToppings) {
+					freeToppings = sortedToppings.slice(0, includedToppings);
+					paidToppings = sortedToppings.slice(includedToppings);
+				} else {
+					freeToppings = sortedToppings;
+				}
+				// Add up paid topping prices
+				const extraTotal = paidToppings.reduce((sum, t) => {
+					console.log('Paid topping:', t.name, 'Price:', t.price);
+					return sum + (t.price || 0);
+				}, 0);
+				totalPrice += extraTotal;
+				console.log('Base price:', pizza.sizes[idx].price, 'Extra topping total:', extraTotal, 'Final total:', totalPrice);
+				const toppingsText = sortedToppings.length ? sortedToppings.map((t, i) => i < includedToppings ? t.name + ' (free)' : t.name + (t.price ? ` (+£${t.price.toFixed(2)})` : '')).join(', ') : 'No extra toppings';
+				addToCart(`Custom Pizza (${pizza.sizes[idx].size}${toppingsText ? ', ' + toppingsText : ''})`, totalPrice);
+			} else {
+				addToCart(`${name} (${pizza.sizes[idx].size})`, pizza.sizes[idx].price);
+			}
 		});
 }
-    }
-  });
-}
-// Add selected pizza size to cart
-window.addSelectedPizzaSize = function(name, selectId, pizzaId, isCustom) {
-  const select = document.getElementById(selectId);
-  if (!select) return;
-  const idx = select.value;
-  fetch(`${API_BASE}/menu/${pizzaId}`)
-    .then(async res => {
-      if (!res.ok) {
-        showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
-        return null;
-      }
-      try {
-        return await res.json();
-      } catch (e) {
-        showFriendlyMenuError('Menu data is invalid. Please refresh the page or contact staff.');
-        return null;
-      }
-    })
-    .then(pizza => {
-      if (!pizza || !pizza.sizes || !pizza.sizes[idx]) return;
-      if (isCustom) {
-        // For custom pizza, get all checked toppings by data-idx
-        const toppingSpans = select.parentElement.querySelectorAll('.topping-item');
-        const selectedToppingIndexes = Array.from(toppingSpans)
-          .map(span => {
-            const cb = span.querySelector('input[type="checkbox"]');
-            return cb && cb.checked ? parseInt(span.getAttribute('data-idx')) : -1;
-          })
-          .filter(i => i !== -1);
-        // Get topping objects by index
-        const sortedToppings = selectedToppingIndexes.map(i => pizza.toppings[i]).filter(Boolean);
-        const includedToppings = 4;
-        let totalPrice = pizza.sizes[idx].price;
-        let paidToppings = [];
-        let freeToppings = [];
-        if (sortedToppings.length > includedToppings) {
-          freeToppings = sortedToppings.slice(0, includedToppings);
-          paidToppings = sortedToppings.slice(includedToppings);
-        } else {
-          freeToppings = sortedToppings;
-        }
-        // Add up paid topping prices
-        const extraTotal = paidToppings.reduce((sum, t) => {
-          console.log('Paid topping:', t.name, 'Price:', t.price);
-          return sum + (t.price || 0);
-        }, 0);
-        totalPrice += extraTotal;
-        console.log('Base price:', pizza.sizes[idx].price, 'Extra topping total:', extraTotal, 'Final total:', totalPrice);
-        const toppingsText = sortedToppings.length ? sortedToppings.map((t, i) => i < includedToppings ? t.name + ' (free)' : t.name + (t.price ? ` (+£${t.price.toFixed(2)})` : '')).join(', ') : 'No extra toppings';
-        addToCart(`Custom Pizza (${pizza.sizes[idx].size}${toppingsText ? ', ' + toppingsText : ''})`, totalPrice);
-      } else {
-        addToCart(`${name} (${pizza.sizes[idx].size})`, pizza.sizes[idx].price);
-      }
-    });
-}
-						// Toggle topping (checkbox) from pizza (live site)
+
+// Toggle topping (checkbox) from pizza (live site)
 window.toggleTopping = async function(pizzaId, toppingIdx, checkbox) {
-	try {
-		const res = await fetch(`${API_BASE}/menu/${pizzaId}`);
-		if (!res.ok) {
-			showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
-			return;
+		try {
+				const res = await fetch(`${API_BASE}/menu/${pizzaId}`);
+				if (!res.ok) {
+						showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+						return;
+				}
+				const pizza = await res.json();
+				if (!pizza.toppings) return;
+				if (!checkbox.checked) {
+						// Support both string and object toppings
+						if (typeof pizza.toppings[toppingIdx] === 'object' && pizza.toppings[toppingIdx] !== null) {
+								// Remove by index for object toppings
+								pizza.toppings.splice(toppingIdx, 1);
+						} else {
+								// Remove by index for string toppings
+								pizza.toppings.splice(toppingIdx, 1);
+						}
+						await fetch(`${API_BASE}/menu/${pizzaId}` , {
+								method: 'PUT',
+								headers: { 'Content-Type': 'application/json' },
+								body: JSON.stringify({ toppings: pizza.toppings })
+						});
+						loadAndRenderMenu();
+				}
+		} catch (e) {
+		showFriendlyMenuError('Failed to update topping. Please try again or contact staff.');
 		}
-		const pizza = await res.json();
-		if (!pizza.toppings) return;
-		if (!checkbox.checked) {
-			// Support both string and object toppings
-			if (typeof pizza.toppings[toppingIdx] === 'object' && pizza.toppings[toppingIdx] !== null) {
-				// Remove by index for object toppings
-				pizza.toppings.splice(toppingIdx, 1);
-			} else {
-				// Remove by index for string toppings
-				pizza.toppings.splice(toppingIdx, 1);
-			}
-			await fetch(`${API_BASE}/menu/${pizzaId}` , {
-				method: 'PUT',
-				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ toppings: pizza.toppings })
-			});
-			loadAndRenderMenu();
-		}
-	} catch (e) {
-	showFriendlyMenuError('Failed to update topping. Please try again or contact staff.');
-	}
 }
 let cart = [];
 
