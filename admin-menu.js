@@ -586,8 +586,8 @@ document.querySelectorAll('.menu-category-btn').forEach(btn => {
   document.getElementById('salad-ingredients-section').classList.add('hidden');
         if (currentCategory === 'SIDES') {
           document.getElementById('side-types-section').classList.remove('hidden');
-          document.getElementById('new-item-price').classList.add('hide-price');
-          document.getElementById('new-item-price').style.display = 'none';
+          document.getElementById('new-item-price').classList.remove('hide-price');
+          document.getElementById('new-item-price').style.display = '';
           document.getElementById('chicken-sizes-section').style.display = 'none';
         } else {
           document.getElementById('side-types-section').classList.add('hidden');
@@ -608,9 +608,9 @@ document.querySelectorAll('.menu-category-btn').forEach(btn => {
 document.getElementById('add-item-form').addEventListener('submit', function(e) {
   e.preventDefault();
   const name = document.getElementById('new-item-name').value.trim();
-  let price = 0;
   const priceInput = document.getElementById('new-item-price');
-  if (priceInput && priceInput.value) price = parseFloat(priceInput.value);
+  let price = null;
+  if (priceInput && priceInput.value !== '') price = parseFloat(priceInput.value);
 
   if (!name) return;
 
@@ -631,9 +631,9 @@ document.getElementById('add-item-form').addEventListener('submit', function(e) 
     renderSaladIngredientsList();
     this.reset();
   } else if (currentCategory === 'SIDES') {
-    // Allow price without types, and types without price
+    // Allow price without types, types without price, or both
     const item = { name };
-    if (price) item.price = price;
+    if (price !== null && !isNaN(price)) item.price = price;
     if (newSideTypes.length > 0) item.types = [...newSideTypes];
     addMenuItem('SIDES', item);
     newSideTypes = [];
@@ -911,8 +911,8 @@ document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('salad-ingredients-section').classList.remove('hidden');
   } else if (currentCategory === 'SIDES') {
     document.getElementById('side-types-section').classList.remove('hidden');
-    document.getElementById('new-item-price').classList.add('hide-price');
-    document.getElementById('new-item-price').style.display = 'none';
+    document.getElementById('new-item-price').classList.remove('hide-price');
+    document.getElementById('new-item-price').style.display = '';
   } else if (currentCategory === 'CHICKEN') {
     document.getElementById('chicken-sizes-section').style.display = 'block';
     document.getElementById('new-item-price').style.display = 'none';
