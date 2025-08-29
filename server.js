@@ -30,6 +30,9 @@ async function connectMongo() {
 }
 connectMongo();
 
+
+const app = express();
+
 // --- SECTION DESCRIPTIONS ENDPOINTS ---
 let sectionDescriptionsCollection;
 async function connectSectionDescriptions() {
@@ -68,9 +71,6 @@ app.put('/section-descriptions', async (req, res) => {
     res.status(500).json({ error: 'Failed to update section descriptions.' });
   }
 });
-
-
-const app = express();
 
 // Refund endpoint for Stripe card orders
 app.post('/refund-order', async (req, res) => {
