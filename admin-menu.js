@@ -369,6 +369,17 @@ function renderMenuItems() {
         ingredientsDiv.appendChild(addIngRow);
         li.appendChild(ingredientsDiv);
       } else if (currentCategory === 'SIDES') {
+        // Price input for sides (not required)
+        priceInput = document.createElement('input');
+        priceInput.type = 'number';
+        priceInput.value = item.price || '';
+        priceInput.step = '0.01';
+        priceInput.min = '0';
+        priceInput.placeholder = 'Price (£)';
+        priceInput.style.marginLeft = '0.5em';
+        priceInput.style.width = '5em';
+        li.appendChild(priceInput);
+
         // Types list
         let typesArr = Array.isArray(item.types) ? [...item.types] : [];
         const typesDiv = document.createElement('div');
@@ -486,12 +497,18 @@ function renderMenuItems() {
           updated.ingredients = ingredientsArr;
         } else if (currentCategory === 'SIDES') {
           updated.types = typesArr;
+          // Save price if set (not required)
+          if (priceInput && priceInput.value !== '') {
+            updated.price = parseFloat(priceInput.value);
+          } else {
+            delete updated.price;
+          }
         } else if (priceInput) {
           updated.price = parseFloat(priceInput.value);
         }
-  // Remove _id if present to avoid MongoDB update errors
-  if (updated._id) delete updated._id;
-  await updateMenuItem(currentCategory, Number(item.id), updated);
+        // Remove _id if present to avoid MongoDB update errors
+        if (updated._id) delete updated._id;
+        await updateMenuItem(currentCategory, Number(item.id), updated);
         isEditing = false;
         await loadMenuData();
       };
@@ -614,7 +631,11 @@ document.getElementById('add-item-form').addEventListener('submit', function(e) 
     renderSaladIngredientsList();
     this.reset();
   } else if (currentCategory === 'SIDES') {
-    addMenuItem('SIDES', { name, price, types: [...newSideTypes] });
+    // Allow price without types, and types without price
+    const item = { name };
+    if (price) item.price = price;
+    if (newSideTypes.length > 0) item.types = [...newSideTypes];
+    addMenuItem('SIDES', item);
     newSideTypes = [];
     renderSideTypesList();
     this.reset();
