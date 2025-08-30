@@ -1,145 +1,40 @@
-// Ensure file ends with a closing brace if needed
-// Fetch and render menu from backend
-// Show a friendly error message at the top of the page
-function showFriendlyMenuError(msg) {
-	let errDiv = document.getElementById('friendly-menu-error');
-	if (!errDiv) {
-		errDiv = document.createElement('div');
-		errDiv.id = 'friendly-menu-error';
-		errDiv.style.position = 'fixed';
-		errDiv.style.top = '0';
-		errDiv.style.left = '0';
-		errDiv.style.width = '100%';
-		errDiv.style.background = '#ffdddd';
-		errDiv.style.color = '#b30000';
-		errDiv.style.fontWeight = 'bold';
-		errDiv.style.fontSize = '1.1em';
-		errDiv.style.padding = '1em';
-		errDiv.style.zIndex = '10000';
-		errDiv.style.textAlign = 'center';
-		document.body.appendChild(errDiv);
-	}
-	errDiv.textContent = msg;
-	errDiv.style.display = 'block';
-	setTimeout(() => { errDiv.style.display = 'none'; }, 4000);
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-const API_BASE = 'https://pizza-site-c8t6.onrender.com';
-let cart = [];
-window.addEventListener('DOMContentLoaded', () => {
-	// Load cart from localStorage if present
-	const savedCart = localStorage.getItem('cart');
-	if (savedCart) {
-		try {
-			cart = JSON.parse(savedCart);
-		} catch (e) {
-			cart = [];
-		}
-	}
-	updateCart();
-	loadAndRenderMenu();
-});
-
-function loadAndRenderMenu() {
-	fetch(`${API_BASE}/menu`)
-		.then(res => res.json())
-		.then(renderMenuFromAPI)
-		.catch(() => {
-			document.getElementById('dynamic-menu').innerHTML = '<p style="color:red">Failed to load menu from server.</p>';
+// Fetch and render menu
+async function renderMenuFromAPI() {
+	try {
+		const response = await fetch('/api/menu'); // Change this URL if your API is different
+		const menuData = await response.json();
+		const menuDiv = document.getElementById('dynamic-menu');
+		menuDiv.innerHTML = '';
+		menuData.forEach(item => {
+			let price = item.price;
+			let label = item.name;
+			// Handle pizzas and items with sizes
+			if (Array.isArray(item.sizes) && item.sizes.length > 0) {
+				price = parseFloat(item.sizes[0].price);
+				label = `${item.name} (${item.sizes[0].size})`;
+			} else if (Array.isArray(item.types) && item.types.length > 0) {
+				price = parseFloat(item.types[0].price);
+				label = `${item.name} (${item.types[0].name})`;
+			}
+			const div = document.createElement('div');
+			div.className = 'menu-item';
+			div.textContent = `${label} - £${price.toFixed(2)}`;
+			// Add to cart button
+			const btn = document.createElement('button');
+			btn.textContent = 'Add to Cart';
+			btn.onclick = () => addToCart(label, price);
+			div.appendChild(btn);
+			menuDiv.appendChild(div);
 		});
-
-function renderMenuFromAPI(menu) {
-	window.menuData = menu;
-	console.log('Menu data from API:', menu);
-	const menuDiv = document.getElementById('dynamic-menu');
-	if (!menuDiv) return;
-	menuDiv.innerHTML = '';
-	// Group menu items by category
-	const categories = ["PIZZAS", "SALADS", "SIDES", "DRINKS", "DESSERTS"];
-	const grouped = {};
-	menu.forEach(item => {
-		const cat = item.category || 'OTHER';
-		if (!grouped[cat]) grouped[cat] = [];
-		grouped[cat].push(item);
-	});
-	categories.forEach(cat => {
-		if (grouped[cat] && grouped[cat].length > 0) {
-			const header = document.createElement('h2');
-			header.className = 'section-heading';
-			header.textContent = cat;
-			menuDiv.appendChild(header);
-			grouped[cat].forEach(item => {
-				const div = document.createElement('div');
-				div.className = 'menu-item';
-				let optionsHtml = '';
-				// Handle pizzas and items with sizes
-				if (Array.isArray(item.sizes) && item.sizes.length > 0) {
-					optionsHtml = `<label for='${item.name}-size'><b>Size:</b></label> <select id='${item.name}-size'>` +
-						item.sizes.map((opt, idx) =>
-							`<option value='${idx}' data-price='${opt.price}'>${opt.size} (£${parseFloat(opt.price).toFixed(2)})</option>`
-						).join('') +
-						`</select><br>`;
-				} else if (Array.isArray(item.types) && item.types.length > 0) {
-					optionsHtml = `<label for='${item.name}-type'><b>Type:</b></label> <select id='${item.name}-type'>` +
-						item.types.map((opt, idx) =>
-							`<option value='${idx}' data-price='${opt.price}'>${opt.name} (£${parseFloat(opt.price).toFixed(2)})</option>`
-						).join('') +
-						`</select><br>`;
-				}
-				let toppingsHtml = '';
-				if (Array.isArray(item.toppings) && item.toppings.length > 0) {
-					const isPizza = item.category === "PIZZAS";
-					toppingsHtml = `<div><b>Ingredients (click to remove):</b><br>` +
-						item.toppings.map((topping, idx) =>
-							`<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${typeof topping === 'string' ? topping : topping.name}' checked>${typeof topping === 'string' ? topping : topping.name}</label>`
-						).join('') +
-						(isPizza ? `<br><label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Cheese'>No Cheese</label>` : '') +
-						(isPizza ? `<label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Sauce'>No Sauce</label>` : '') +
-						`</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
-				} else if (Array.isArray(item.ingredients) && item.ingredients.length > 0) {
-					toppingsHtml = `<div><b>Ingredients:</b> ${item.ingredients.join(', ')}</div>`;
-				}
-				let priceDisplay = '';
-				if (typeof item.price === 'number' && !optionsHtml) {
-					priceDisplay = `– £${item.price.toFixed(2)}`;
-				}
-				div.innerHTML = `
-					<p><strong>${item.name}</strong> ${priceDisplay}</p>
-					<p>${item.description || ''}</p>
-					${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
-					${optionsHtml}
-					${toppingsHtml}
-					<button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
-				`;
-				menuDiv.appendChild(div);
-			});
-		}
-	});
-	// Optionally, fetch and display subheadings if needed
-// Add function to handle Add to Cart from dynamic menu
-}
-function addDynamicToCart(name, id) {
-		const item = window.menuData.find(i => i.id === id);
-		let price = item.price;
-		let label = name;
-		// Handle pizzas and items with sizes
-		if (Array.isArray(item.sizes) && item.sizes.length > 0) {
-			const select = document.getElementById(`${item.name}-size`);
-			const selectedIdx = select ? select.value : 0;
-			const selectedOpt = item.sizes[selectedIdx];
-			price = parseFloat(selectedOpt.price);
-			label = `${item.name} (${selectedOpt.size})`;
-		} else if (Array.isArray(item.types) && item.types.length > 0) {
-			const select = document.getElementById(`${item.name}-type`);
-			const selectedIdx = select ? select.value : 0;
-			const selectedOpt = item.types[selectedIdx];
-			price = parseFloat(selectedOpt.price);
-			label = `${item.name} (${selectedOpt.name})`;
-		}
-		cart.push({ name: label, price });
-		updateCart();
-		showAddToCartTicket(label);
-		localStorage.setItem('cart', JSON.stringify(cart));
+	} catch (err) {
+		document.getElementById('dynamic-menu').textContent = 'Failed to load menu.';
+		console.error(err);
 	}
+}
+// Run on page load
+window.addEventListener('DOMContentLoaded', renderMenuFromAPI);
 
 function addToCart(item, price) {
 	// Always use {name, price} for cart items
@@ -218,5 +113,4 @@ function updateCartDisplay() {
 		total += item.price;
 	});
 	document.getElementById('cart-total').innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
-}
 }
