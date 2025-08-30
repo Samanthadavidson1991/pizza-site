@@ -69,7 +69,7 @@ function renderMenuFromAPI(menu) {
   });
   console.log('Grouped categories:', grouped);
 		// Fetch section subheadings from backend and render them if present
-		fetch('/menu-section-subheadings')
+		fetch(`${API_BASE}/menu-section-subheadings`)
 			.then(res => res.json())
 			.then(sectionSubheadings => {
 				categories.forEach(cat => {
