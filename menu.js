@@ -43,7 +43,6 @@ function loadAndRenderMenu() {
 		.catch(() => {
 			document.getElementById('dynamic-menu').innerHTML = '<p style="color:red">Failed to load menu from server.</p>';
 		});
-}
 
 function renderMenuFromAPI(menu) {
 	window.menuData = menu;
@@ -51,53 +50,57 @@ function renderMenuFromAPI(menu) {
 	const menuDiv = document.getElementById('dynamic-menu');
 	if (!menuDiv) return;
 	menuDiv.innerHTML = '';
-	const sections = [
-		{ key: "PIZZAS", label: "PIZZAS" },
-		{ key: "SALADS", label: "SALADS" },
-		{ key: "DRINKS", label: "DRINKS" },
-		{ key: "SIDES", label: "SIDES" },
-		{ key: "DESSERTS", label: "DESSERTS" }
-	];
+	// Group menu items by category
+	const categories = ["PIZZAS", "SALADS", "SIDES", "DRINKS", "DESSERTS"];
 	const grouped = {};
 	menu.forEach(item => {
-		const section = item.section || 'OTHER';
-		if (!grouped[section]) grouped[section] = [];
-		grouped[section].push(item);
+		const cat = item.category || 'OTHER';
+		if (!grouped[cat]) grouped[cat] = [];
+		grouped[cat].push(item);
 	});
-	sections.forEach(sec => {
-		if (grouped[sec.key] && grouped[sec.key].length > 0) {
+	categories.forEach(cat => {
+		if (grouped[cat] && grouped[cat].length > 0) {
 			const header = document.createElement('h2');
 			header.className = 'section-heading';
-			header.textContent = sec.label;
+			header.textContent = cat;
 			menuDiv.appendChild(header);
-			grouped[sec.key].forEach(item => {
+			grouped[cat].forEach(item => {
 				const div = document.createElement('div');
 				div.className = 'menu-item';
 				let optionsHtml = '';
-				if (Array.isArray(item.options) && item.options.length > 0) {
-					optionsHtml = `<label for='${item.name}-option'><b>Options:</b></label> <select id='${item.name}-option'>` +
-						item.options.map((opt, idx) => {
-							if (typeof opt === 'object') {
-								return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
-							} else {
-								return `<option value='${idx}'>${opt}</option>`;
-							}
-						}).join('') +
+				// Handle pizzas and items with sizes
+				if (Array.isArray(item.sizes) && item.sizes.length > 0) {
+					optionsHtml = `<label for='${item.name}-size'><b>Size:</b></label> <select id='${item.name}-size'>` +
+						item.sizes.map((opt, idx) =>
+							`<option value='${idx}' data-price='${opt.price}'>${opt.size} (£${parseFloat(opt.price).toFixed(2)})</option>`
+						).join('') +
+						`</select><br>`;
+				} else if (Array.isArray(item.types) && item.types.length > 0) {
+					optionsHtml = `<label for='${item.name}-type'><b>Type:</b></label> <select id='${item.name}-type'>` +
+						item.types.map((opt, idx) =>
+							`<option value='${idx}' data-price='${opt.price}'>${opt.name} (£${parseFloat(opt.price).toFixed(2)})</option>`
+						).join('') +
 						`</select><br>`;
 				}
 				let toppingsHtml = '';
 				if (Array.isArray(item.toppings) && item.toppings.length > 0) {
-					const isPizza = item.section === "PIZZAS";
+					const isPizza = item.category === "PIZZAS";
 					toppingsHtml = `<div><b>Ingredients (click to remove):</b><br>` +
 						item.toppings.map((topping, idx) =>
-							`<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}' checked>${topping}</label>`
+							`<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${typeof topping === 'string' ? topping : topping.name}' checked>${typeof topping === 'string' ? topping : topping.name}</label>`
 						).join('') +
 						(isPizza ? `<br><label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Cheese'>No Cheese</label>` : '') +
 						(isPizza ? `<label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Sauce'>No Sauce</label>` : '') +
 						`</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
+				} else if (Array.isArray(item.ingredients) && item.ingredients.length > 0) {
+					toppingsHtml = `<div><b>Ingredients:</b> ${item.ingredients.join(', ')}</div>`;
+				}
+				let priceDisplay = '';
+				if (typeof item.price === 'number' && !optionsHtml) {
+					priceDisplay = `– £${item.price.toFixed(2)}`;
 				}
 				div.innerHTML = `
-					<p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
+					<p><strong>${item.name}</strong> ${priceDisplay}</p>
 					<p>${item.description || ''}</p>
 					${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
 					${optionsHtml}
@@ -111,27 +114,28 @@ function renderMenuFromAPI(menu) {
 	// Optionally, fetch and display subheadings if needed
 // Add function to handle Add to Cart from dynamic menu
 function addDynamicToCart(name, id) {
-	const item = window.menuData.find(i => i.id === id);
-	let price = item.price;
-	let label = name;
-	if (Array.isArray(item.options) && item.options.length > 0 && (item.name.match(/pizza|garlic bread/i))) {
-		const select = document.getElementById(`${item.name}-option`);
-		const selectedIdx = select ? select.value : 0;
-		const selectedOpt = item.options[selectedIdx];
-		if (typeof selectedOpt === 'object') {
+		const item = window.menuData.find(i => i.id === id);
+		let price = item.price;
+		let label = name;
+		// Handle pizzas and items with sizes
+		if (Array.isArray(item.sizes) && item.sizes.length > 0) {
+			const select = document.getElementById(`${item.name}-size`);
+			const selectedIdx = select ? select.value : 0;
+			const selectedOpt = item.sizes[selectedIdx];
 			price = parseFloat(selectedOpt.price);
-			label = `${item.name} (${selectedOpt.label})`;
-		} else {
-			label = `${item.name} (${selectedOpt})`;
+			label = `${item.name} (${selectedOpt.size})`;
+		} else if (Array.isArray(item.types) && item.types.length > 0) {
+			const select = document.getElementById(`${item.name}-type`);
+			const selectedIdx = select ? select.value : 0;
+			const selectedOpt = item.types[selectedIdx];
+			price = parseFloat(selectedOpt.price);
+			label = `${item.name} (${selectedOpt.name})`;
 		}
+		cart.push({ name: label, price });
+		updateCart();
+		showAddToCartTicket(label);
+		localStorage.setItem('cart', JSON.stringify(cart));
 	}
-	cart.push({ name: label, price });
-	updateCart();
-	showAddToCartTicket(label);
-	localStorage.setItem('cart', JSON.stringify(cart));
-}
-}
-}
 let cart = [];
 
 function addToCart(item, price) {
@@ -141,7 +145,6 @@ function addToCart(item, price) {
 	showAddToCartTicket(item);
 	// Save cart to localStorage for checkout page
 	localStorage.setItem('cart', JSON.stringify(cart));
-}
 
 function showAddToCartTicket(itemName) {
 	let ticket = document.getElementById('add-to-cart-ticket');
@@ -166,7 +169,6 @@ function showAddToCartTicket(itemName) {
 	ticket.textContent = `✔️ "${itemName}" added to checkout!`;
 	ticket.style.display = 'block';
 	setTimeout(() => { ticket.style.display = 'none'; }, 1800);
-}
 
 function updateCart() {
 				const cartTotal = document.getElementById('cart-total');
