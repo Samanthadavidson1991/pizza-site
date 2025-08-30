@@ -1,3 +1,4 @@
+// Ensure file ends with a closing brace if needed
 // Fetch and render menu from backend
 // Show a friendly error message at the top of the page
 function showFriendlyMenuError(msg) {
@@ -21,7 +22,9 @@ function showFriendlyMenuError(msg) {
 	errDiv.textContent = msg;
 	errDiv.style.display = 'block';
 	setTimeout(() => { errDiv.style.display = 'none'; }, 4000);
+
 const API_BASE = 'https://pizza-site-c8t6.onrender.com';
+let cart = [];
 window.addEventListener('DOMContentLoaded', () => {
 	// Load cart from localStorage if present
 	const savedCart = localStorage.getItem('cart');
@@ -113,6 +116,7 @@ function renderMenuFromAPI(menu) {
 	});
 	// Optionally, fetch and display subheadings if needed
 // Add function to handle Add to Cart from dynamic menu
+}
 function addDynamicToCart(name, id) {
 		const item = window.menuData.find(i => i.id === id);
 		let price = item.price;
@@ -136,7 +140,6 @@ function addDynamicToCart(name, id) {
 		showAddToCartTicket(label);
 		localStorage.setItem('cart', JSON.stringify(cart));
 	}
-let cart = [];
 
 function addToCart(item, price) {
 	// Always use {name, price} for cart items
