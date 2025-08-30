@@ -46,6 +46,7 @@ function loadAndRenderMenu() {
 }
 
 function renderMenuFromAPI(menu) {
+	window.menuData = menu;
 	console.log('Menu data from API:', menu);
 	const menuDiv = document.getElementById('dynamic-menu');
 	if (!menuDiv) return;
@@ -108,6 +109,27 @@ function renderMenuFromAPI(menu) {
 		}
 	});
 	// Optionally, fetch and display subheadings if needed
+// Add function to handle Add to Cart from dynamic menu
+function addDynamicToCart(name, id) {
+	const item = window.menuData.find(i => i.id === id);
+	let price = item.price;
+	let label = name;
+	if (Array.isArray(item.options) && item.options.length > 0 && (item.name.match(/pizza|garlic bread/i))) {
+		const select = document.getElementById(`${item.name}-option`);
+		const selectedIdx = select ? select.value : 0;
+		const selectedOpt = item.options[selectedIdx];
+		if (typeof selectedOpt === 'object') {
+			price = parseFloat(selectedOpt.price);
+			label = `${item.name} (${selectedOpt.label})`;
+		} else {
+			label = `${item.name} (${selectedOpt})`;
+		}
+	}
+	cart.push({ name: label, price });
+	updateCart();
+	showAddToCartTicket(label);
+	localStorage.setItem('cart', JSON.stringify(cart));
+}
 }
 }
 let cart = [];
