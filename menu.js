@@ -171,16 +171,16 @@ function showAddToCartTicket(itemName) {
 	setTimeout(() => { ticket.style.display = 'none'; }, 1800);
 
 function updateCart() {
-				const cartTotal = document.getElementById('cart-total');
-				if (!cartTotal) return;
-				let total = 0;
-				// Hide individual cart items, only show total
-				const cartItems = document.getElementById('cart-items');
-				if (cartItems) {
-					cartItems.style.display = 'none';
-				}
-				cart.forEach(entry => { total += entry.price; });
-				cartTotal.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+	const cartTotal = document.getElementById('cart-total');
+	if (!cartTotal) return;
+	let total = 0;
+	// Hide individual cart items, only show total
+	const cartItems = document.getElementById('cart-items');
+	if (cartItems) {
+		cartItems.style.display = 'none';
+	}
+	cart.forEach(entry => { total += entry.price; });
+	cartTotal.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
 }
 
 function checkout() {
@@ -193,12 +193,14 @@ function checkout() {
 	updateCart();
 	localStorage.removeItem('cart'); // Clear cart from localStorage after checkout
 }
+
 function removeSaladToppings(saladName, basePrice, formId) {
 	const form = document.getElementById(formId);
 	const selected = Array.from(form.querySelectorAll('input[name="topping"]:checked')).map(cb => cb.value);
 	const toppings = selected.length ? selected.join(', ') : 'No toppings';
 	addToCart(`${saladName} (No: ${toppings})`, basePrice);
 }
+
 function updateCartDisplay() {
 	const cartItems = document.getElementById('cart-items');
 	cartItems.innerHTML = '';
