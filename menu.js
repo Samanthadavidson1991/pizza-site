@@ -219,3 +219,4 @@ function updateCartDisplay() {
 	});
 	document.getElementById('cart-total').innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
 }
+}
