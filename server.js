@@ -1,5 +1,5 @@
-// --- MENU SECTION SUBHEADINGS ---
-// Store subheadings in a separate collection
+// ...existing code...
+// Place this after app and client are initialized
 let subheadingCollection;
 async function connectSubheadingMongo() {
   try {
@@ -11,35 +11,39 @@ async function connectSubheadingMongo() {
     console.error('MongoDB subheading collection error:', err);
   }
 }
-connectSubheadingMongo();
 
-// GET all section subheadings
-app.get('/menu-section-subheadings', async (req, res) => {
-  try {
-    const subs = await subheadingCollection.find({}).toArray();
-    // Return as { category: subheading }
-    const result = {};
-    subs.forEach(s => { result[s.category] = s.text; });
-    res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch subheadings.' });
-  }
-});
+// After app and client are initialized:
+connectMongo().then(() => {
+  connectSubheadingMongo();
 
-// PUT set subheading for a section
-app.put('/menu-section-subheadings/:category', async (req, res) => {
-  try {
-    const category = req.params.category;
-    const text = req.body.text || '';
-    await subheadingCollection.updateOne(
-      { category },
-      { $set: { category, text } },
-      { upsert: true }
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to save subheading.' });
-  }
+  // GET all section subheadings
+  app.get('/menu-section-subheadings', async (req, res) => {
+    try {
+      const subs = await subheadingCollection.find({}).toArray();
+      // Return as { category: subheading }
+      const result = {};
+      subs.forEach(s => { result[s.category] = s.text; });
+      res.json(result);
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to fetch subheadings.' });
+    }
+  });
+
+  // PUT set subheading for a section
+  app.put('/menu-section-subheadings/:category', async (req, res) => {
+    try {
+      const category = req.params.category;
+      const text = req.body.text || '';
+      await subheadingCollection.updateOne(
+        { category },
+        { $set: { category, text } },
+        { upsert: true }
+      );
+      res.json({ success: true });
+    } catch (err) {
+      res.status(500).json({ error: 'Failed to save subheading.' });
+    }
+  });
 });
 // ...existing code...
 // Move refund endpoint after app is defined (see below)
