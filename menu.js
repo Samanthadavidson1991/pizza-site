@@ -21,7 +21,6 @@ function showFriendlyMenuError(msg) {
 	errDiv.textContent = msg;
 	errDiv.style.display = 'block';
 	setTimeout(() => { errDiv.style.display = 'none'; }, 4000);
-}
 const API_BASE = 'https://pizza-site-c8t6.onrender.com';
 window.addEventListener('DOMContentLoaded', () => {
 	// Load cart from localStorage if present
@@ -47,23 +46,69 @@ function loadAndRenderMenu() {
 }
 
 function renderMenuFromAPI(menu) {
-  console.log('Menu data from API:', menu);
-  const menuDiv = document.getElementById('dynamic-menu');
-  if (!menuDiv) return;
-  menuDiv.innerHTML = '';
-	const categories = [
-		{ key: 'PIZZAS', label: 'PIZZAS' },
-		{ key: 'SALADS', label: 'SALADS' },
-		{ key: 'SIDES', label: 'SIDES' },
-		{ key: 'CHICKEN', label: 'CHICKEN' },
-		{ key: 'DRINKS', label: 'DRINKS' },
-		{ key: 'DESSERTS', label: 'DESSERTS' }
+	console.log('Menu data from API:', menu);
+	const menuDiv = document.getElementById('dynamic-menu');
+	if (!menuDiv) return;
+	menuDiv.innerHTML = '';
+	const sections = [
+		{ key: "PIZZAS", label: "PIZZAS" },
+		{ key: "SALADS", label: "SALADS" },
+		{ key: "DRINKS", label: "DRINKS" },
+		{ key: "SIDES", label: "SIDES" },
+		{ key: "DESSERTS", label: "DESSERTS" }
 	];
-	console.log('Grouped categories:', grouped);
-	// Fetch section subheadings from backend and render them if present
-	fetch(`${API_BASE}/menu-section-subheadings`)
-	// End of renderMenuFromAPI
-// ...existing code...
+	const grouped = {};
+	menu.forEach(item => {
+		const section = item.section || 'OTHER';
+		if (!grouped[section]) grouped[section] = [];
+		grouped[section].push(item);
+	});
+	sections.forEach(sec => {
+		if (grouped[sec.key] && grouped[sec.key].length > 0) {
+			const header = document.createElement('h2');
+			header.className = 'section-heading';
+			header.textContent = sec.label;
+			menuDiv.appendChild(header);
+			grouped[sec.key].forEach(item => {
+				const div = document.createElement('div');
+				div.className = 'menu-item';
+				let optionsHtml = '';
+				if (Array.isArray(item.options) && item.options.length > 0) {
+					optionsHtml = `<label for='${item.name}-option'><b>Options:</b></label> <select id='${item.name}-option'>` +
+						item.options.map((opt, idx) => {
+							if (typeof opt === 'object') {
+								return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
+							} else {
+								return `<option value='${idx}'>${opt}</option>`;
+							}
+						}).join('') +
+						`</select><br>`;
+				}
+				let toppingsHtml = '';
+				if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+					const isPizza = item.section === "PIZZAS";
+					toppingsHtml = `<div><b>Ingredients (click to remove):</b><br>` +
+						item.toppings.map((topping, idx) =>
+							`<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}' checked>${topping}</label>`
+						).join('') +
+						(isPizza ? `<br><label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Cheese'>No Cheese</label>` : '') +
+						(isPizza ? `<label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Sauce'>No Sauce</label>` : '') +
+						`</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
+				}
+				div.innerHTML = `
+					<p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
+					<p>${item.description || ''}</p>
+					${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
+					${optionsHtml}
+					${toppingsHtml}
+					<button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
+				`;
+				menuDiv.appendChild(div);
+			});
+		}
+	});
+	// Optionally, fetch and display subheadings if needed
+}
 }
 let cart = [];
 
