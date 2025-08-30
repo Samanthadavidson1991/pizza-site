@@ -1,3 +1,34 @@
+/* Section subheading styles moved from inline */
+.section-subheading {
+  margin: 1em 0;
+  padding: 0.7em 1em;
+  background: #f8f6e7;
+  border-left: 4px solid #e1c97a;
+  color: #6a5a1b;
+  font-size: 1.08em;
+  border-radius: 4px;
+}
+.section-subheading-edit-box {
+  margin: 1em 0;
+  display: none;
+}
+.section-subheading-edit-box.active {
+  display: block;
+}
+.section-subheading-input {
+  width: 100%;
+  max-width: 600px;
+  min-height: 2.5em;
+  resize: vertical;
+}
+.save-subheading-btn {
+  margin-top: 0.5em;
+}
+.subheading-saved-msg {
+  color: green;
+  display: none;
+  margin-left: 1em;
+}
 #new-item-price.hide-price {
   display: none;
 }

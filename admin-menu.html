@@ -9,7 +9,7 @@
 </head>
 <body>
 		<div class="container">
-			<div id="section-subheading" class="section-subheading" style="margin: 1em 0; padding: 0.7em 1em; background: #f8f6e7; border-left: 4px solid #e1c97a; color: #6a5a1b; font-size: 1.08em; border-radius: 4px;">
+			<div id="section-subheading" class="section-subheading">
 				Welcome to the menu admin! Select a section above to manage pizzas, salads, sides, drinks, desserts, or chicken. Each section has its own options and tips.
 			</div>
 		<div class="admin-header-bar">
@@ -28,11 +28,11 @@
 					<button class="menu-category-btn" data-category="DRINKS">DRINKS</button>
 					<button class="menu-category-btn" data-category="DESSERTS">DESSERTS</button>
 				</div>
-				<div id="section-subheading-edit-box" style="margin:1em 0;display:none;">
-					<label for="section-subheading-input" style="font-weight:bold;">Section Subheading (optional):</label>
-					<textarea id="section-subheading-input" rows="2" style="width:100%;max-width:600px;min-height:2.5em;resize:vertical;"></textarea>
-					<button id="save-subheading-btn" style="margin-top:0.5em;">Save Subheading</button>
-					<span id="subheading-saved-msg" style="color:green;display:none;margin-left:1em;">Saved!</span>
+				<div id="section-subheading-edit-box" class="section-subheading-edit-box">
+					<label for="section-subheading-input" class="bold-label">Section Subheading (optional):</label>
+					<textarea id="section-subheading-input" rows="2" class="section-subheading-input"></textarea>
+					<button id="save-subheading-btn" class="save-subheading-btn">Save Subheading</button>
+					<span id="subheading-saved-msg" class="subheading-saved-msg">Saved!</span>
 				</div>
 		</div>
 		<div class="menu-items-section">
@@ -86,7 +86,7 @@
 								</div>
 								<small class="soft-text">Add as many size/price options as you need, then click 'Add New Item' to save.</small>
 							</div>
-							<input type="number" id="new-item-price" placeholder="Price (£)" step="0.01" min="0" class="hide-price" style="display:none;">
+							<input type="number" id="new-item-price" placeholder="Price (£)" step="0.01" min="0" class="hide-price">
 							<button type="submit">Add New Item</button>
 						</form>
 			<ul id="menu-items-list" class="menu-items-list"></ul>
@@ -94,7 +94,7 @@
 		<div id="create-your-own-section">
 			<h2 class="section-margin-large">Create Your Own Pizza Section</h2>
 			<form id="create-your-own-form" class="add-item-form">
-					<input type="text" id="custom-pizza-name" value="Create Your Own Pizza" readonly class="bold-label">
+					<input type="text" id="custom-pizza-name" value="Create Your Own Pizza" readonly class="bold-label" placeholder="Custom pizza section name">
 					<div id="custom-pizza-sizes-section">
 							<label class="bold-label">Add size and price options for this pizza:</label>
 				  <div id="custom-pizza-sizes-list"></div>
