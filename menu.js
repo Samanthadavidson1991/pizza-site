@@ -145,6 +145,7 @@ function addToCart(item, price) {
 	showAddToCartTicket(item);
 	// Save cart to localStorage for checkout page
 	localStorage.setItem('cart', JSON.stringify(cart));
+}
 
 function showAddToCartTicket(itemName) {
 	let ticket = document.getElementById('add-to-cart-ticket');
@@ -169,6 +170,7 @@ function showAddToCartTicket(itemName) {
 	ticket.textContent = `✔️ "${itemName}" added to checkout!`;
 	ticket.style.display = 'block';
 	setTimeout(() => { ticket.style.display = 'none'; }, 1800);
+}
 
 function updateCart() {
 	const cartTotal = document.getElementById('cart-total');
