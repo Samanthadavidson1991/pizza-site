@@ -1,6 +1,49 @@
+// --- MENU SECTION SUBHEADINGS ---
+// Store subheadings in a separate collection
+let subheadingCollection;
+async function connectSubheadingMongo() {
+  try {
+    const db = client.db('pizza_shop');
+    subheadingCollection = db.collection('menu_section_subheadings');
+    // Create index on category for fast lookup
+    await subheadingCollection.createIndex({ category: 1 }, { unique: true });
+  } catch (err) {
+    console.error('MongoDB subheading collection error:', err);
+  }
+}
+connectSubheadingMongo();
 
+// GET all section subheadings
+app.get('/menu-section-subheadings', async (req, res) => {
+  try {
+    const subs = await subheadingCollection.find({}).toArray();
+    // Return as { category: subheading }
+    const result = {};
+    subs.forEach(s => { result[s.category] = s.text; });
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch subheadings.' });
+  }
+});
+
+// PUT set subheading for a section
+app.put('/menu-section-subheadings/:category', async (req, res) => {
+  try {
+    const category = req.params.category;
+    const text = req.body.text || '';
+    await subheadingCollection.updateOne(
+      { category },
+      { $set: { category, text } },
+      { upsert: true }
+    );
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save subheading.' });
+  }
+});
 // ...existing code...
-// All require statements should be here (as in your file)
+// Move refund endpoint after app is defined (see below)
+// ...existing code...
 const { MongoClient, ObjectId } = require('mongodb');
 const express = require('express');
 const Stripe = require('stripe');
@@ -10,67 +53,12 @@ const path = require('path');
 const nodemailer = require('nodemailer');
 const bcrypt = require('bcryptjs');
 const { generateMenuHTML } = require('./generate-menu-html');
-require('dotenv').config();
 
-// App and DB initialization
-// const app = express(); // Duplicate, remove
-const mongoUri = process.env.MONGODB_URI || 'mongodb+srv://thecrustngb:1FulWR9u2F7ii0Ef@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const client = new MongoClient(mongoUri);
-let menuCollection;
 
-async function connectMongo() {
-  try {
-    await client.connect();
-    const db = client.db('pizza_shop');
-    menuCollection = db.collection('menu');
-    console.log('Connected to MongoDB Atlas');
-  } catch (err) {
-    console.error('MongoDB connection error:', err);
-  }
-}
-connectMongo();
+
 
 
 const app = express();
-
-// --- SECTION DESCRIPTIONS ENDPOINTS ---
-let sectionDescriptionsCollection;
-async function connectSectionDescriptions() {
-  try {
-    const db = client.db('pizza_shop');
-    sectionDescriptionsCollection = db.collection('section_descriptions');
-    // Ensure there is always one document (singleton pattern)
-    const doc = await sectionDescriptionsCollection.findOne({ _id: 'main' });
-    if (!doc) {
-      await sectionDescriptionsCollection.insertOne({ _id: 'main', PIZZAS: '', SALADS: '', SIDES: '', DRINKS: '', DESSERTS: '', CHICKEN: '' });
-    }
-  } catch (err) {
-    console.error('MongoDB sectionDescriptions connection error:', err);
-  }
-}
-setTimeout(connectSectionDescriptions, 0);
-app.get('/section-descriptions', async (req, res) => {
-  try {
-    const doc = await sectionDescriptionsCollection.findOne({ _id: 'main' });
-    if (!doc) return res.json({});
-    res.json(doc);
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to fetch section descriptions.' });
-  }
-});
-app.put('/section-descriptions', async (req, res) => {
-  try {
-    const update = req.body;
-    await sectionDescriptionsCollection.updateOne(
-      { _id: 'main' },
-      { $set: update },
-      { upsert: true }
-    );
-    res.json({ success: true });
-  } catch (err) {
-    res.status(500).json({ error: 'Failed to update section descriptions.' });
-  }
-});
 
 // Refund endpoint for Stripe card orders
 app.post('/refund-order', async (req, res) => {
@@ -101,20 +89,33 @@ app.post('/refund-order', async (req, res) => {
   }
 });
 
-
 // CORS middleware MUST be before express.json() and all routes
-app.use(cors({
-  origin: [
-    'https://pizza-site-c8t6.onrender.com',
-    'http://thecrustatngb.co.uk',
-    'https://thecrustatngb.co.uk',
-    'http://127.0.0.1:5500',
-    'http://localhost:5500'
-  ],
-  credentials: true
-}));
+app.use((req, res, next) => {
+  res.header('Access-Control-Allow-Origin', '*');
+  res.header('Access-Control-Allow-Methods', 'GET,POST,PUT,DELETE,OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(204);
+  }
+  next();
+});
 
-// Duplicate MongoDB connection setup removed
+// MongoDB connection setup
+const mongoUri = 'mongodb+srv://thecrustngb:1FulWR9u2F7ii0Ef@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const client = new MongoClient(mongoUri);
+let menuCollection;
+
+async function connectMongo() {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    menuCollection = db.collection('menu');
+    console.log('Connected to MongoDB Atlas');
+  } catch (err) {
+    console.error('MongoDB connection error:', err);
+  }
+}
+connectMongo();
 app.use(express.static(__dirname));
 app.disable('x-powered-by');
 

@@ -35,14 +35,6 @@ window.addEventListener('DOMContentLoaded', () => {
 	}
 	updateCart();
 	loadAndRenderMenu();
-
-	// Add event listener for Go to Checkout button
-	const checkoutBtn = document.getElementById('go-to-checkout-btn');
-	if (checkoutBtn) {
-		checkoutBtn.addEventListener('click', function() {
-			window.location.href = 'cart.html';
-		});
-	}
 });
 
 function loadAndRenderMenu() {
@@ -55,51 +47,58 @@ function loadAndRenderMenu() {
 }
 
 function renderMenuFromAPI(menu) {
-	console.log('Menu data from API:', menu);
-	window.menuData = menu;
-	const menuDiv = document.getElementById('dynamic-menu');
-	if (!menuDiv) return;
-	menuDiv.innerHTML = '';
+  console.log('Menu data from API:', menu);
+  const menuDiv = document.getElementById('dynamic-menu');
+  if (!menuDiv) return;
+  menuDiv.innerHTML = '';
 	const categories = [
-    { key: 'PIZZAS', label: 'PIZZAS' },
-    { key: 'SALADS', label: 'SALADS' },
-    { key: 'DRINKS', label: 'DRINKS' },
-    { key: 'SIDES', label: 'SIDES' },
-    { key: 'DESSERTS', label: 'DESSERTS' },
-    { key: 'CHICKEN', label: 'CHICKEN' }
-  ];
-	const grouped = {};
-	menu.forEach(item => {
-		let cat = item.category || item.section || 'OTHER';
-		if (cat.toUpperCase() === "PIZZA'S" || cat.toUpperCase() === "PIZZAS") cat = "PIZZAS";
-		if (!grouped[cat]) grouped[cat] = [];
-		grouped[cat].push(item);
-	});
-	console.log('Grouped categories:', grouped);
-	// Fetch section descriptions from backend and render menu after
-	fetch(`${API_BASE}/section-descriptions`).then(res => res.json()).then(sectionDescs => {
-		categories.forEach(cat => {
-			if (grouped[cat.key] && grouped[cat.key].length > 0) {
-				const header = document.createElement('h2');
-				header.className = 'section-heading soft-box';
-				header.textContent = cat.label;
-				menuDiv.appendChild(header);
-				// Show description only if present
-				const desc = sectionDescs && sectionDescs[cat.key] ? sectionDescs[cat.key].trim() : '';
-				if (desc) {
-					const sub = document.createElement('div');
-					sub.className = 'section-subheading';
-					sub.style.fontSize = '1.05em';
-					sub.style.color = '#7a5a00';
-					sub.style.marginBottom = '0.7em';
-					sub.style.background = '#fffbe7';
-					sub.style.border = '1px dashed #e1c97a';
-					sub.style.borderRadius = '4px';
-					sub.style.padding = '0.5em 0.8em';
-					sub.textContent = desc;
-					menuDiv.appendChild(sub);
-				}
-				grouped[cat.key].forEach(item => {
+		{ key: 'PIZZAS', label: 'PIZZAS' },
+		{ key: 'SALADS', label: 'SALADS' },
+		{ key: 'SIDES', label: 'SIDES' },
+		{ key: 'CHICKEN', label: 'CHICKEN' },
+		{ key: 'DRINKS', label: 'DRINKS' },
+		{ key: 'DESSERTS', label: 'DESSERTS' }
+	];
+  const grouped = {};
+  menu.forEach(item => {
+    let cat = item.category || item.section || 'OTHER';
+    // Normalize category for PIZZAS
+    if (cat.toUpperCase() === "PIZZA'S" || cat.toUpperCase() === "PIZZAS") cat = "PIZZAS";
+    if (!grouped[cat]) grouped[cat] = [];
+    grouped[cat].push(item);
+  });
+  console.log('Grouped categories:', grouped);
+		// Fetch section subheadings from backend and render them if present
+		fetch('/menu-section-subheadings')
+			.then(res => res.json())
+			.then(sectionSubheadings => {
+				categories.forEach(cat => {
+					if (grouped[cat.key] && grouped[cat.key].length > 0) {
+						// Section heading
+						const header = document.createElement('h2');
+						header.className = 'section-heading soft-box';
+						header.textContent = cat.label;
+						menuDiv.appendChild(header);
+						// Subheading box (only if text is present)
+						const subText = sectionSubheadings[cat.key];
+						if (subText && subText.trim()) {
+							const subBox = document.createElement('div');
+							subBox.className = 'section-subheading-box';
+							subBox.style.background = '#f8f6e7';
+							subBox.style.borderLeft = '4px solid #e1c97a';
+							subBox.style.color = '#6a5a1b';
+							subBox.style.fontSize = '1.08em';
+							subBox.style.margin = '0 0 1em 0';
+							subBox.style.padding = '0.7em 1em';
+							subBox.style.borderRadius = '4px';
+							subBox.textContent = subText;
+							menuDiv.appendChild(subBox);
+						}
+						// ...existing code for rendering items...
+					}
+				});
+			});
+			grouped[cat.key].forEach(item => {
 				const div = document.createElement('div');
 				div.className = 'menu-item soft-box';
 						let toppingsHtml = '';
@@ -132,21 +131,37 @@ function renderMenuFromAPI(menu) {
 									).join('')
 								+ `</div>`;
 						}
+// Toggle ingredient (checkbox) from salad (live site)
+window.toggleSaladIngredient = async function(saladId, ingredientIdx, checkbox) {
+	try {
+		const res = await fetch(`${API_BASE}/menu/${saladId}`);
+		if (!res.ok) {
+			showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+			return;
+		}
+		const salad = await res.json();
+		if (!salad.ingredients) return;
+		if (!checkbox.checked) {
+			salad.ingredients.splice(ingredientIdx, 1);
+			await fetch(`${API_BASE}/menu/${saladId}` , {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ ingredients: salad.ingredients })
+			});
+			loadAndRenderMenu();
+		}
+	} catch (e) {
+		showFriendlyMenuError('Failed to update ingredient. Please try again or contact staff.');
+	}
+}
 				// --- SIDES with types dropdown ---
 				if (cat.key === 'SIDES' && Array.isArray(item.types) && item.types.length > 0) {
 					const selectId = `side-type-select-${item.id}`;
 					div.innerHTML = `<strong>${item.name}</strong><br>` +
 						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
 						+ item.types.map((t, idx) => `<option value='${idx}'>${t.name} - £${t.price.toFixed(2)}</option>`).join('')
-						+ `</select>`;
-					const btn = document.createElement('button');
-					btn.textContent = 'Add';
-					btn.className = 'add-side-btn';
-					btn.style.marginTop = '0.7em';
-					btn.addEventListener('click', function() {
-						window.addSelectedSideType(item.name, selectId, item.id);
-					});
-					div.appendChild(btn);
+						+ `</select>`
+						+ `<div style='margin-top:0.7em;'><button onclick="addSelectedSideType('${item.name.replace(/'/g, '\'')}', '${selectId}', '${item.id}')">Add</button></div>`;
 				}
 				else if (cat.key === 'PIZZAS' && Array.isArray(item.sizes) && item.sizes.length > 0) {
 					const selectId = `pizza-size-select-${item.id}`;
@@ -156,101 +171,22 @@ function renderMenuFromAPI(menu) {
 						`<select id='${selectId}' class='soft-box' style='margin:0.5em 0;'>`
 						+ item.sizes.map((s, idx) => `<option value='${idx}'>${s.size} - £${s.price.toFixed(2)}</option>`).join('')
 						+ `</select>`
-						+ toppingsHtml;
-					// Add button using JS only
-											const btn = document.createElement('button');
-											btn.textContent = 'Add';
-											btn.className = 'add-pizza-btn';
-											btn.style.marginTop = '0.7em';
-											btn.addEventListener('click', function() {
-												window.addSelectedPizzaSize(item.name, selectId, item.id, isCustom);
-											});
-											div.appendChild(btn);
+						+ toppingsHtml
+						+ `<div style='margin-top:0.7em;'><button onclick=\"addSelectedPizzaSize('${item.name.replace(/'/g, '\'')}', '${selectId}', '${item.id}', ${isCustom})\">Add</button></div>`;
 				} else {
 					div.innerHTML = `<strong>${item.name}</strong> – £${item.price ? item.price.toFixed(2) : ''}` +
 						(item.description ? `<br><span>${item.description}</span>` : '') +
-						toppingsHtml;
-					const btn = document.createElement('button');
-					btn.textContent = 'Add to Cart';
-					btn.className = 'add-generic-btn';
-					btn.style.marginTop = '0.7em';
-					btn.addEventListener('click', function() {
-						addToCart(item.name, item.price || 0);
-					});
-					div.appendChild(btn);
+						toppingsHtml +
+						`<div style='margin-top:0.7em;'><button onclick=\"addToCart('${item.name}',${item.price || 0})\">Add to Cart</button></div>`;
 				}
 				menuDiv.appendChild(div);
 			});
-			}
-		});
-// End of renderMenuFromAPI
-}
-		});
-	}
-// End of renderMenuFromAPI
-}
-
-// Helper to lookup pizza name by id and call addSelectedPizzaSize
-window.addSelectedPizzaSizeById = function(id, selectId, isCustom) {
-	const item = (window.menuData || []).find(i => String(i.id) === String(id));
-	if (!item) return;
-	addSelectedPizzaSize(item.name, selectId, id, isCustom);
-}
-
-// Toggle ingredient (checkbox) from salad (live site)
-window.toggleSaladIngredient = async function(saladId, ingredientIdx, checkbox) {
-		try {
-				const res = await fetch(`${API_BASE}/menu/${saladId}`);
-				if (!res.ok) {
-						showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
-						return;
-				}
-				const salad = await res.json();
-				if (!salad.ingredients) return;
-				if (!checkbox.checked) {
-						salad.ingredients.splice(ingredientIdx, 1);
-						await fetch(`${API_BASE}/menu/${saladId}` , {
-								method: 'PUT',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ ingredients: salad.ingredients })
-						});
-						loadAndRenderMenu();
-				}
-		} catch (e) {
-				showFriendlyMenuError('Failed to update ingredient. Please try again or contact staff.');
-		}
-}
-
 // Add selected side type to cart
 window.addSelectedSideType = function(name, selectId, sideId) {
-		const select = document.getElementById(selectId);
-		if (!select) return;
-		const idx = select.value;
-		fetch(`${API_BASE}/menu/${sideId}`)
-				.then(async res => {
-						if (!res.ok) {
-								showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
-								return null;
-						}
-						try {
-								return await res.json();
-						} catch (e) {
-								showFriendlyMenuError('Menu data is invalid. Please refresh the page or contact staff.');
-								return null;
-						}
-				})
-				.then(side => {
-						if (!side || !side.types || !side.types[idx]) return;
-						addToCart(`${name} (${side.types[idx].name})`, side.types[idx].price);
-				});
-}
-
-// Add selected pizza size to cart
-window.addSelectedPizzaSize = function(name, selectId, pizzaId, isCustom) {
 	const select = document.getElementById(selectId);
 	if (!select) return;
 	const idx = select.value;
-	fetch(`${API_BASE}/menu/${pizzaId}`)
+	fetch(`${API_BASE}/menu/${sideId}`)
 		.then(async res => {
 			if (!res.ok) {
 				showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
@@ -263,73 +199,98 @@ window.addSelectedPizzaSize = function(name, selectId, pizzaId, isCustom) {
 				return null;
 			}
 		})
-		.then(pizza => {
-			if (!pizza || !pizza.sizes || !pizza.sizes[idx]) return;
-			if (isCustom) {
-				// For custom pizza, get all checked toppings by data-idx
-				const toppingSpans = select.parentElement.querySelectorAll('.topping-item');
-				const selectedToppingIndexes = Array.from(toppingSpans)
-					.map(span => {
-						const cb = span.querySelector('input[type="checkbox"]');
-						return cb && cb.checked ? parseInt(span.getAttribute('data-idx')) : -1;
-					})
-					.filter(i => i !== -1);
-				// Get topping objects by index
-				const sortedToppings = selectedToppingIndexes.map(i => pizza.toppings[i]).filter(Boolean);
-				const includedToppings = 4;
-				let totalPrice = pizza.sizes[idx].price;
-				let paidToppings = [];
-				let freeToppings = [];
-				if (sortedToppings.length > includedToppings) {
-					freeToppings = sortedToppings.slice(0, includedToppings);
-					paidToppings = sortedToppings.slice(includedToppings);
-				} else {
-					freeToppings = sortedToppings;
-				}
-				// Add up paid topping prices
-				const extraTotal = paidToppings.reduce((sum, t) => {
-					console.log('Paid topping:', t.name, 'Price:', t.price);
-					return sum + (t.price || 0);
-				}, 0);
-				totalPrice += extraTotal;
-				console.log('Base price:', pizza.sizes[idx].price, 'Extra topping total:', extraTotal, 'Final total:', totalPrice);
-				const toppingsText = sortedToppings.length ? sortedToppings.map((t, i) => i < includedToppings ? t.name + ' (free)' : t.name + (t.price ? ` (+£${t.price.toFixed(2)})` : '')).join(', ') : 'No extra toppings';
-				addToCart(`Custom Pizza (${pizza.sizes[idx].size}${toppingsText ? ', ' + toppingsText : ''})`, totalPrice);
-			} else {
-				addToCart(`${name} (${pizza.sizes[idx].size})`, pizza.sizes[idx].price);
-			}
+		.then(side => {
+			if (!side || !side.types || !side.types[idx]) return;
+			addToCart(`${name} (${side.types[idx].name})`, side.types[idx].price);
 		});
 }
-
-// Toggle topping (checkbox) from pizza (live site)
+    }
+  });
+}
+// Add selected pizza size to cart
+window.addSelectedPizzaSize = function(name, selectId, pizzaId, isCustom) {
+  const select = document.getElementById(selectId);
+  if (!select) return;
+  const idx = select.value;
+  fetch(`${API_BASE}/menu/${pizzaId}`)
+    .then(async res => {
+      if (!res.ok) {
+        showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+        return null;
+      }
+      try {
+        return await res.json();
+      } catch (e) {
+        showFriendlyMenuError('Menu data is invalid. Please refresh the page or contact staff.');
+        return null;
+      }
+    })
+    .then(pizza => {
+      if (!pizza || !pizza.sizes || !pizza.sizes[idx]) return;
+      if (isCustom) {
+        // For custom pizza, get all checked toppings by data-idx
+        const toppingSpans = select.parentElement.querySelectorAll('.topping-item');
+        const selectedToppingIndexes = Array.from(toppingSpans)
+          .map(span => {
+            const cb = span.querySelector('input[type="checkbox"]');
+            return cb && cb.checked ? parseInt(span.getAttribute('data-idx')) : -1;
+          })
+          .filter(i => i !== -1);
+        // Get topping objects by index
+        const sortedToppings = selectedToppingIndexes.map(i => pizza.toppings[i]).filter(Boolean);
+        const includedToppings = 4;
+        let totalPrice = pizza.sizes[idx].price;
+        let paidToppings = [];
+        let freeToppings = [];
+        if (sortedToppings.length > includedToppings) {
+          freeToppings = sortedToppings.slice(0, includedToppings);
+          paidToppings = sortedToppings.slice(includedToppings);
+        } else {
+          freeToppings = sortedToppings;
+        }
+        // Add up paid topping prices
+        const extraTotal = paidToppings.reduce((sum, t) => {
+          console.log('Paid topping:', t.name, 'Price:', t.price);
+          return sum + (t.price || 0);
+        }, 0);
+        totalPrice += extraTotal;
+        console.log('Base price:', pizza.sizes[idx].price, 'Extra topping total:', extraTotal, 'Final total:', totalPrice);
+        const toppingsText = sortedToppings.length ? sortedToppings.map((t, i) => i < includedToppings ? t.name + ' (free)' : t.name + (t.price ? ` (+£${t.price.toFixed(2)})` : '')).join(', ') : 'No extra toppings';
+        addToCart(`Custom Pizza (${pizza.sizes[idx].size}${toppingsText ? ', ' + toppingsText : ''})`, totalPrice);
+      } else {
+        addToCart(`${name} (${pizza.sizes[idx].size})`, pizza.sizes[idx].price);
+      }
+    });
+}
+						// Toggle topping (checkbox) from pizza (live site)
 window.toggleTopping = async function(pizzaId, toppingIdx, checkbox) {
-		try {
-				const res = await fetch(`${API_BASE}/menu/${pizzaId}`);
-				if (!res.ok) {
-						showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
-						return;
-				}
-				const pizza = await res.json();
-				if (!pizza.toppings) return;
-				if (!checkbox.checked) {
-						// Support both string and object toppings
-						if (typeof pizza.toppings[toppingIdx] === 'object' && pizza.toppings[toppingIdx] !== null) {
-								// Remove by index for object toppings
-								pizza.toppings.splice(toppingIdx, 1);
-						} else {
-								// Remove by index for string toppings
-								pizza.toppings.splice(toppingIdx, 1);
-						}
-						await fetch(`${API_BASE}/menu/${pizzaId}` , {
-								method: 'PUT',
-								headers: { 'Content-Type': 'application/json' },
-								body: JSON.stringify({ toppings: pizza.toppings })
-						});
-						loadAndRenderMenu();
-				}
-		} catch (e) {
-		showFriendlyMenuError('Failed to update topping. Please try again or contact staff.');
+	try {
+		const res = await fetch(`${API_BASE}/menu/${pizzaId}`);
+		if (!res.ok) {
+			showFriendlyMenuError('Menu item not found. It may have been removed or updated. Please refresh the page or contact staff.');
+			return;
 		}
+		const pizza = await res.json();
+		if (!pizza.toppings) return;
+		if (!checkbox.checked) {
+			// Support both string and object toppings
+			if (typeof pizza.toppings[toppingIdx] === 'object' && pizza.toppings[toppingIdx] !== null) {
+				// Remove by index for object toppings
+				pizza.toppings.splice(toppingIdx, 1);
+			} else {
+				// Remove by index for string toppings
+				pizza.toppings.splice(toppingIdx, 1);
+			}
+			await fetch(`${API_BASE}/menu/${pizzaId}` , {
+				method: 'PUT',
+				headers: { 'Content-Type': 'application/json' },
+				body: JSON.stringify({ toppings: pizza.toppings })
+			});
+			loadAndRenderMenu();
+		}
+	} catch (e) {
+	showFriendlyMenuError('Failed to update topping. Please try again or contact staff.');
+	}
 }
 let cart = [];
 

@@ -9,37 +9,6 @@
 </head>
 <body>
 		<div class="container">
-		<div class="admin-section-descriptions" style="margin: 1.5em 0 2em 0; padding: 1em; background: #f8f6e7; border-left: 4px solid #e1c97a; border-radius: 4px;">
-			<h2 style="margin-top:0;">Section Descriptions (for Live Menu)</h2>
-			<form id="section-descriptions-form">
-				<div style="margin-bottom:0.7em;">
-					<label for="desc-pizzas"><strong>PIZZAS:</strong></label><br>
-					<input type="text" id="desc-pizzas" name="PIZZAS" style="width:90%;max-width:500px;" placeholder="e.g. Classic and signature pizzas, all made fresh to order.">
-				</div>
-				<div style="margin-bottom:0.7em;">
-					<label for="desc-salads"><strong>SALADS:</strong></label><br>
-					<input type="text" id="desc-salads" name="SALADS" style="width:90%;max-width:500px;" placeholder="e.g. Fresh salads with quality ingredients.">
-				</div>
-				<div style="margin-bottom:0.7em;">
-					<label for="desc-sides"><strong>SIDES:</strong></label><br>
-					<input type="text" id="desc-sides" name="SIDES" style="width:90%;max-width:500px;" placeholder="e.g. Includes fries, doughballs, garlic bread, dips, and more.">
-				</div>
-				<div style="margin-bottom:0.7em;">
-					<label for="desc-drinks"><strong>DRINKS:</strong></label><br>
-					<input type="text" id="desc-drinks" name="DRINKS" style="width:90%;max-width:500px;" placeholder="e.g. A selection of soft drinks and more.">
-				</div>
-				<div style="margin-bottom:0.7em;">
-					<label for="desc-desserts"><strong>DESSERTS:</strong></label><br>
-					<input type="text" id="desc-desserts" name="DESSERTS" style="width:90%;max-width:500px;" placeholder="e.g. Sweet treats to finish your meal.">
-				</div>
-				<div style="margin-bottom:0.7em;">
-					<label for="desc-chicken"><strong>CHICKEN:</strong></label><br>
-					<input type="text" id="desc-chicken" name="CHICKEN" style="width:90%;max-width:500px;" placeholder="e.g. Chicken menu items with size and price options.">
-				</div>
-				<button type="submit" style="margin-top:1em;">Save Descriptions</button>
-			</form>
-			<div id="section-desc-save-status" style="margin-top:0.7em;color:#2d7a00;font-weight:bold;"></div>
-		</div>
 			<div id="section-subheading" class="section-subheading" style="margin: 1em 0; padding: 0.7em 1em; background: #f8f6e7; border-left: 4px solid #e1c97a; color: #6a5a1b; font-size: 1.08em; border-radius: 4px;">
 				Welcome to the menu admin! Select a section above to manage pizzas, salads, sides, drinks, desserts, or chicken. Each section has its own options and tips.
 			</div>
@@ -52,12 +21,19 @@
 		</div>
 		<h1>Menu Management</h1>
 		<div class="menu-category-bar">
-			<button class="menu-category-btn active" data-category="PIZZAS">PIZZAS</button>
-			<button class="menu-category-btn" data-category="SALADS">SALADS</button>
-			<button class="menu-category-btn" data-category="SIDES">SIDES</button>
-			<button class="menu-category-btn" data-category="DRINKS">DRINKS</button>
-			<button class="menu-category-btn" data-category="DESSERTS">DESSERTS</button>
-			<button class="menu-category-btn" data-category="CHICKEN">CHICKEN</button>
+					<button class="menu-category-btn active" data-category="PIZZAS">PIZZAS</button>
+					<button class="menu-category-btn" data-category="SALADS">SALADS</button>
+					<button class="menu-category-btn" data-category="SIDES">SIDES</button>
+					<button class="menu-category-btn" data-category="CHICKEN">CHICKEN</button>
+					<button class="menu-category-btn" data-category="DRINKS">DRINKS</button>
+					<button class="menu-category-btn" data-category="DESSERTS">DESSERTS</button>
+				</div>
+				<div id="section-subheading-edit-box" style="margin:1em 0;display:none;">
+					<label for="section-subheading-input" style="font-weight:bold;">Section Subheading (optional):</label>
+					<textarea id="section-subheading-input" rows="2" style="width:100%;max-width:600px;min-height:2.5em;resize:vertical;"></textarea>
+					<button id="save-subheading-btn" style="margin-top:0.5em;">Save Subheading</button>
+					<span id="subheading-saved-msg" style="color:green;display:none;margin-left:1em;">Saved!</span>
+				</div>
 		</div>
 		<div class="menu-items-section">
 						<form id="add-item-form" class="add-item-form">
@@ -144,6 +120,51 @@
 		</div>
 	</div>
 <script src="admin-menu.js"></script>
+<script>
+const subheadingEditBox = document.getElementById('section-subheading-edit-box');
+const subheadingInput = document.getElementById('section-subheading-input');
+const saveSubheadingBtn = document.getElementById('save-subheading-btn');
+const savedMsg = document.getElementById('subheading-saved-msg');
+let sectionSubheadings = {};
+let currentCat = 'PIZZAS';
+async function fetchSubheadings() {
+	try {
+		const res = await fetch('/menu-section-subheadings');
+		sectionSubheadings = await res.json();
+	} catch (e) {
+		sectionSubheadings = {};
+	}
+}
+async function saveSubheading(cat, text) {
+	await fetch(`/menu-section-subheadings/${encodeURIComponent(cat)}`, {
+		method: 'PUT',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ text })
+	});
+}
+async function showSubheadingEditBox(cat) {
+	currentCat = cat;
+	subheadingEditBox.style.display = 'block';
+	await fetchSubheadings();
+	subheadingInput.value = sectionSubheadings[cat] || '';
+	savedMsg.style.display = 'none';
+}
+document.querySelectorAll('.menu-category-btn').forEach(btn => {
+	btn.addEventListener('click', function() {
+		const cat = btn.getAttribute('data-category');
+		showSubheadingEditBox(cat);
+	});
+});
+saveSubheadingBtn.onclick = async function() {
+	const text = subheadingInput.value.trim();
+	await saveSubheading(currentCat, text);
+	await fetchSubheadings();
+	savedMsg.style.display = 'inline';
+	setTimeout(()=>{savedMsg.style.display='none';}, 1200);
+};
+// Show for initial category
+showSubheadingEditBox('PIZZAS');
+</script>
 <script>
 // Subheading text for each section
 const sectionDescriptions = {

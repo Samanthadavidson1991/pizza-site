@@ -13,7 +13,7 @@
 	   <nav class="main-nav">
 		   <a href="index.html">Home</a>
 		   <a href="menu.html">Menu</a>
-		   <a href="cart.html">Checkout</a>
+		   <a href="checkout.html">Checkout</a>
 		   <a href="allergens.html">Allergens</a>
 	   </nav>
 	</header>
@@ -21,14 +21,151 @@
 		<h2 class="menu-heading underlined">Menu</h2>
 		<div id="dynamic-menu"></div>
 	</section>
+	<section id="cart"></section>
+	<section>
+		<p id="cart-total"><strong>Total: £0.00</strong></p>
+		<button class="menu-item pay-card pay-cash" onclick="checkout()">Checkout</button>
+	</section>
 	<script src="menu.js"></script>
+	<script>
+		const BACKEND = 'https://pizza-site-c8t6.onrender.com';
+		let cart = [];
+		function renderMenuItems(menu) {
+			const menuDiv = document.getElementById('dynamic-menu');
+			menuDiv.innerHTML = '';
+			const sections = [
+				{ key: "PIZZA'S", label: "PIZZA'S" },
+				{ key: "SALADS", label: "SALADS" },
+				{ key: "DRINKS", label: "DRINKS" },
+				{ key: "SIDES", label: "SIDES" },
+				{ key: "DESSERTS", label: "DESSERTS" }
+			];
+			const grouped = {};
+			menu.forEach(item => {
+				const section = item.section || 'OTHER';
+				if (!grouped[section]) grouped[section] = [];
+				grouped[section].push(item);
+			});
+			sections.forEach(sec => {
+				if (grouped[sec.key] && grouped[sec.key].length > 0) {
+					const header = document.createElement('h2');
+					header.className = 'section-heading';
+					header.textContent = sec.label;
+					menuDiv.appendChild(header);
+					grouped[sec.key].forEach(item => {
+						const div = document.createElement('div');
+						div.className = 'menu-item';
+						let optionsHtml = '';
+						if (Array.isArray(item.options) && item.options.length > 0) {
+							optionsHtml = `<label for='${item.name}-option'><b>Options:</b></label> <select id='${item.name}-option'>` +
+								item.options.map((opt, idx) => {
+									if (typeof opt === 'object') {
+										return `<option value='${idx}' data-price='${opt.price}'>${opt.label} (£${parseFloat(opt.price).toFixed(2)})</option>`;
+									} else {
+										return `<option value='${idx}'>${opt}</option>`;
+									}
+								}).join('') +
+								`</select><br>`;
+						}
+						let toppingsHtml = '';
+						if (Array.isArray(item.toppings) && item.toppings.length > 0) {
+							const isPizza = item.section === "PIZZA'S";
+							toppingsHtml = `<div><b>Ingredients (click to remove):</b><br>` +
+								item.toppings.map((topping, idx) =>
+									`<label style='margin-right:10px;'><input type='checkbox' class='topping-checkbox' data-itemid='${item.id}' value='${topping}' checked>${topping}</label>`
+								).join('') +
+								(isPizza ? `<br><label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Cheese'>No Cheese</label>` : '') +
+								(isPizza ? `<label style='margin-right:10px;'><input type='checkbox' class='special-checkbox' data-itemid='${item.id}' value='No Sauce'>No Sauce</label>` : '') +
+								`</div><div id='topping-warning-${item.id}' style='color:red;font-size:0.9em;display:none;'></div>`;
+						}
+						div.innerHTML = `
+							<p><strong>${item.name}</strong> – £${item.price.toFixed(2)}</p>
+							<p>${item.description || ''}</p>
+							${item.image ? `<img src="${item.image}" alt="${item.name}" style="height:40px;">` : ''}
+							${optionsHtml}
+							${toppingsHtml}
+							<button onclick="addDynamicToCart('${item.name.replace(/'/g, "\\'")}', ${item.id})">Add to Cart</button>
+						`;
+						menuDiv.appendChild(div);
+					});
+				}
+			});
+		}
+		async function loadMenu() {
+			const res = await fetch(`${BACKEND}/menu`);
+			const menu = await res.json();
+			window.menuData = menu;
+			renderMenuItems(menu);
+		}
+		function addToCart(name, price) {
+			cart.push({ name, price });
+			updateCartDisplay();
+			showAddToCartTicket(name);
+		}
+		function showAddToCartTicket(itemName) {
+			let ticket = document.getElementById('add-to-cart-ticket');
+			if (!ticket) {
+				ticket = document.createElement('div');
+				ticket.id = 'add-to-cart-ticket';
+				ticket.style.position = 'fixed';
+				ticket.style.top = '30px';
+				ticket.style.left = '50%';
+				ticket.style.transform = 'translateX(-50%)';
+				ticket.style.background = '#000';
+				ticket.style.color = '#fff';
+				ticket.style.fontWeight = 'bold';
+				ticket.style.fontSize = '1.2em';
+				ticket.style.padding = '1em 2em';
+				ticket.style.borderRadius = '8px';
+				ticket.style.boxShadow = '0 2px 8px #0002';
+				ticket.style.zIndex = '9999';
+				ticket.style.display = 'none';
+				document.body.appendChild(ticket);
+			}
+			ticket.textContent = `✔️ "${itemName}" added to checkout!`;
+			ticket.style.display = 'block';
+			setTimeout(() => { ticket.style.display = 'none'; }, 1800);
+		}
+		function updateCartDisplay() {
+			let total = 0;
+			cart.forEach(function(item) {
+				total += item.price;
+			});
+			document.getElementById('cart-total').innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+		}
+		function checkout() {
+			if (cart.length === 0) {
+				alert('Your cart is empty!');
+				return;
+			}
+			localStorage.setItem('cart', JSON.stringify(cart));
+			window.location.href = '/pizza-website/checkout.html';
+		}
+		function addDynamicToCart(name, id) {
+			const item = window.menuData.find(i => i.id === id);
+			let price = item.price;
+			let label = name;
+			if (Array.isArray(item.options) && item.options.length > 0 && (item.name.match(/pizza|garlic bread/i))) {
+				const select = document.getElementById(`${item.name}-size`);
+				const selectedIdx = select ? select.value : 0;
+				const selectedOpt = item.options[selectedIdx];
+				if (typeof selectedOpt === 'object') {
+					price = parseFloat(selectedOpt.price);
+					label = `${item.name} (${selectedOpt.label})`;
+				} else {
+					label = `${item.name} (${selectedOpt})`;
+				}
+			}
+			cart.push({ name: label, price });
+			updateCartDisplay();
+			showAddToCartTicket(label);
+		}
+		window.onload = loadMenu;
+		 </script>
 		 <footer>
-			<section id="cart">
-  <h2>Your Cart</h2>
-  <ul id="cart-items"></ul>
-  <p id="cart-total"><strong>Total: £0.00</strong></p>
-				<button id="go-to-checkout-btn">Go to Checkout</button>
-</section>
+				 <div class="footer-notice" style="color:#7a5a00;font-size:0.92em;margin:2em auto 1em auto;text-align:center;">
+					 <strong>Gluten-Free Pizza Notice 🍕</strong> We take every care to prepare our gluten-free pizzas with minimal risk of cross-contamination. However, please note that they are made in a kitchen where gluten is present and cooked in the same oven as our regular pizzas. While we follow strict procedures to reduce exposure, we cannot guarantee a completely gluten-free environment.
+				 </div>
 		 </footer>
 	</body>
 </html>
