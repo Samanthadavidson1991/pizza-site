@@ -2,8 +2,13 @@
 console.log('SERVER.JS STARTED');
 
 const { MongoClient } = require('mongodb');
+
 const express = require('express');
+const cors = require('cors');
 const app = express();
+
+// Enable CORS for all origins
+app.use(cors());
 
 // MongoDB connection setup (not used yet)
 const mongoUri = 'mongodb+srv://thecrustngb:Leedsutd01@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
