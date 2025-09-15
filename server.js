@@ -1,3 +1,16 @@
+// Get all orders for admin page
+app.get('/orders', async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    const ordersCollection = db.collection('orders');
+    const orders = await ordersCollection.find({}).toArray();
+    res.json(orders);
+  } catch (err) {
+    console.error('Error fetching orders:', err);
+    res.status(500).json({ error: 'Failed to fetch orders.' });
+  }
+});
 // --- Module Imports and App Initialization ---
 console.log('SERVER.JS STARTED');
 
