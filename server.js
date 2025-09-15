@@ -45,5 +45,21 @@ app.get('/menu', async (req, res) => {
   }
 });
 
+
+// Handle cash orders from checkout page
+app.post('/cash-order', async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    const ordersCollection = db.collection('orders');
+    const order = req.body;
+    await ordersCollection.insertOne(order);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error placing cash order:', err);
+    res.status(500).json({ error: 'Failed to place order.' });
+  }
+});
+
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => console.log(`Server running on http://localhost:${PORT}`));
