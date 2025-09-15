@@ -1,3 +1,36 @@
+// Fetch and display orders for admin
+async function loadOrders() {
+  try {
+    const res = await fetch('https://pizza-site-c8t6.onrender.com/orders');
+    const orders = await res.json();
+    const ordersList = document.getElementById('orders-list');
+    if (!ordersList) return;
+    if (!orders.length) {
+      ordersList.innerHTML = '<em>No orders found.</em>';
+      return;
+    }
+    ordersList.innerHTML = orders.map(order => {
+      return `<div class="order-box" style="border:1px solid #ccc;padding:1em;margin-bottom:1em;">
+        <strong>Order for:</strong> ${order.customerName || 'N/A'}<br>
+        <strong>Phone:</strong> ${order.customerPhone || 'N/A'}<br>
+        <strong>Email:</strong> ${order.customerEmail || 'N/A'}<br>
+        <strong>Type:</strong> ${order.orderType || 'N/A'}<br>
+        <strong>Time Slot:</strong> ${order.orderTimeSlot || 'N/A'}<br>
+        <strong>Items:</strong> <ul>${(order.cart||[]).map(i=>`<li>${i.name} – £${i.price.toFixed(2)}</li>`).join('')}</ul>
+        <strong>Total:</strong> £${order.total ? order.total.toFixed(2) : '0.00'}<br>
+        <strong>Comments:</strong> ${order.orderComments || ''}<br>
+        <strong>Address:</strong> ${order.customerAddress || ''} ${order.customerPostcode || ''}<br>
+        <strong>Placed At:</strong> ${order.placedAt ? new Date(order.placedAt).toLocaleString() : ''}
+      </div>`;
+    }).join('');
+  } catch (err) {
+    const ordersList = document.getElementById('orders-list');
+    if (ordersList) ordersList.innerHTML = '<span style="color:red;">Failed to load orders.</span>';
+  }
+}
+
+// Load orders on page load
+window.addEventListener('DOMContentLoaded', loadOrders);
 // Menu data loaded from backend
 let menuData = {
   PIZZAS: [],
