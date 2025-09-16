@@ -60,6 +60,22 @@ app.get('/menu', async (req, res) => {
 });
 
 
+
+// Add new menu item from admin page
+app.post('/menu', async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    const menuCollection = db.collection('menu');
+    const newItem = req.body;
+    await menuCollection.insertOne(newItem);
+    res.json({ success: true, item: newItem });
+  } catch (err) {
+    console.error('Error adding menu item:', err);
+    res.status(500).json({ error: 'Failed to add menu item.' });
+  }
+});
+
 // Handle cash orders from checkout page
 app.post('/cash-order', async (req, res) => {
   try {

@@ -43,6 +43,8 @@ let menuData = {
 
 const API_BASE = 'https://pizza-site-c8t6.onrender.com';
 async function loadMenuData() {
+  const loadingDiv = document.getElementById('menu-loading');
+  if (loadingDiv) loadingDiv.style.display = 'block';
   try {
     const res = await fetch(`${API_BASE}/menu`);
     const items = await res.json();
@@ -63,12 +65,12 @@ async function loadMenuData() {
       });
     });
     // Wait for all sortOrder updates before rendering
-    Promise.all(updateSortOrderPromises).then(() => {
-      renderMenuItems();
-    });
+    await Promise.all(updateSortOrderPromises);
+    renderMenuItems();
   } catch (err) {
     alert('Failed to load menu from server.');
   }
+  if (loadingDiv) loadingDiv.style.display = 'none';
 }
 
 async function addMenuItem(category, item) {
@@ -92,7 +94,7 @@ async function addMenuItem(category, item) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...item, category })
     });
-    await loadMenuData();
+    await loadMenuData(); // Instant sync after add
   } catch (err) {
     alert('Failed to add menu item.');
   }
