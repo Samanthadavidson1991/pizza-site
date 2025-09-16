@@ -1,3 +1,47 @@
+// Update menu item by id
+app.put('/menu/:id', async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    const menuCollection = db.collection('menu');
+    const id = req.params.id;
+    const updatedItem = req.body;
+    // Remove _id if present to avoid MongoDB update errors
+    if (updatedItem._id) delete updatedItem._id;
+    // Try both string and ObjectId for compatibility
+    const result = await menuCollection.updateOne(
+      { $or: [ { id: Number(id) }, { _id: id }, { _id: { $eq: id } } ] },
+      { $set: updatedItem }
+    );
+    if (result.matchedCount === 1) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'Menu item not found.' });
+    }
+  } catch (err) {
+    console.error('Error updating menu item:', err);
+    res.status(500).json({ error: 'Failed to update menu item.' });
+  }
+});
+// Delete menu item by id
+app.delete('/menu/:id', async (req, res) => {
+  try {
+    await client.connect();
+    const db = client.db('pizza_shop');
+    const menuCollection = db.collection('menu');
+    const id = req.params.id;
+    // Try both string and ObjectId for compatibility
+    const result = await menuCollection.deleteOne({ $or: [ { id: Number(id) }, { _id: id }, { _id: { $eq: id } } ] });
+    if (result.deletedCount === 1) {
+      res.json({ success: true });
+    } else {
+      res.status(404).json({ error: 'Menu item not found.' });
+    }
+  } catch (err) {
+    console.error('Error deleting menu item:', err);
+    res.status(500).json({ error: 'Failed to delete menu item.' });
+  }
+});
 
 // --- Module Imports and App Initialization ---
 console.log('SERVER.JS STARTED');
