@@ -1,3 +1,15 @@
+
+// --- Module Imports and App Initialization ---
+console.log('SERVER.JS STARTED');
+
+const { MongoClient } = require('mongodb');
+
+const express = require('express');
+const cors = require('cors');
+
+const app = express();
+app.use(cors());
+app.use(express.json()); // To parse JSON bodies
 // Get all orders for admin page
 app.get('/orders', async (req, res) => {
   try {
@@ -11,17 +23,6 @@ app.get('/orders', async (req, res) => {
     res.status(500).json({ error: 'Failed to fetch orders.' });
   }
 });
-// --- Module Imports and App Initialization ---
-console.log('SERVER.JS STARTED');
-
-const { MongoClient } = require('mongodb');
-
-const express = require('express');
-const cors = require('cors');
-
-const app = express();
-app.use(cors());
-app.use(express.json()); // To parse JSON bodies
 
 // Simple /login route for admin authentication
 app.post('/login', (req, res) => {
