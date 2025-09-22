@@ -3,6 +3,8 @@
 console.log('SERVER.JS STARTED');
 
 
+const express = require('express');
+const cors = require('cors');
 const { MongoClient } = require('mongodb');
 
 app.use(cors());
@@ -65,12 +67,6 @@ console.log('SERVER.JS STARTED');
 
 // ...existing code...
 
-const express = require('express');
-const cors = require('cors');
-
-const app = express();
-app.use(cors());
-app.use(express.json()); // To parse JSON bodies
 
 // Update menu item by id
 app.put('/menu/:id', async (req, res) => {
