@@ -93,6 +93,7 @@ app.put('/menu/:id', async (req, res) => {
     res.status(500).json({ error: 'Failed to update menu item.' });
   }
 });
+
 // Delete menu item by id
 app.delete('/menu/:id', async (req, res) => {
   try {
@@ -111,4 +112,10 @@ app.delete('/menu/:id', async (req, res) => {
     console.error('Error deleting menu item:', err);
     res.status(500).json({ error: 'Failed to delete menu item.' });
   }
+});
+
+// Start the server
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
 });
