@@ -6,7 +6,6 @@ const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
 
-const app = express();
 app.use(cors());
 app.use(express.json()); // To parse JSON bodies
 
@@ -41,9 +40,6 @@ app.post('/login', (req, res) => {
   }
 });
 
-// MongoDB connection setup (not used yet)
-const mongoUri = 'mongodb+srv://thecrustngb:Leedsutd01@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const client = new MongoClient(mongoUri);
 
 app.get('/menu', async (req, res) => {
   try {
