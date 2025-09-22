@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Running Orders</title>
+  <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+<body>
+  <div class="container">
+    <div class="admin-header-bar">
+  <a href="admin-dashboard.html" class="admin-menu-link">Order Management</a>
+  <a href="admin-menu.html" class="admin-menu-link">Menu Management</a>
+  <a href="admin-sales.html" class="admin-menu-link">Sales Dashboard</a>
+  <a href="admin-monthly-sales.html" class="admin-menu-link">Monthly Breakdown</a>
+  <a href="admin-running-orders.html" class="admin-menu-link">Running Orders</a>
+    </div>
+    <h1>Running Orders</h1>
+    <div id="running-orders-summary"></div>
+    <table id="running-orders-table">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Items Ordered</th>
+          <th>Time Slot</th>
+          <th>Postcode</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <script src="admin-running-orders.js"></script>
+</body>
+</html>
