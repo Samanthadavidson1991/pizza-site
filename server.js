@@ -46,12 +46,10 @@ app.delete('/menu/:id', async (req, res) => {
 // --- Module Imports and App Initialization ---
 console.log('SERVER.JS STARTED');
 
-const { MongoClient } = require('mongodb');
 
-const express = require('express');
-const cors = require('cors');
+// ...existing code...
 
-const app = express();
+
 app.use(cors());
 app.use(express.json()); // To parse JSON bodies
 // Get all orders for admin page
@@ -108,7 +106,7 @@ app.get('/menu', async (req, res) => {
 // --- Module Imports and App Initialization ---
 console.log('SERVER.JS STARTED');
 
-const { MongoClient } = require('mongodb');
+// ...existing code...
 
 const express = require('express');
 const cors = require('cors');
