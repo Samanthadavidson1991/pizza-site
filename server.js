@@ -3,10 +3,12 @@
 console.log('SERVER.JS STARTED');
 
 
+
 const express = require('express');
 const cors = require('cors');
 const { MongoClient } = require('mongodb');
 
+const app = express();
 app.use(cors());
 app.use(express.json()); // To parse JSON bodies
 
