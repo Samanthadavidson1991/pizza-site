@@ -2,8 +2,6 @@
 // --- Module Imports and App Initialization ---
 console.log('SERVER.JS STARTED');
 
-const express = require('express');
-const cors = require('cors');
 const { MongoClient } = require('mongodb');
 
 app.use(cors());
