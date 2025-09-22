@@ -2,12 +2,18 @@
 // --- Module Imports and App Initialization ---
 console.log('SERVER.JS STARTED');
 
+const express = require('express');
+const cors = require('cors');
+const { MongoClient } = require('mongodb');
 
-// ...existing code...
-
-
+const app = express();
 app.use(cors());
 app.use(express.json()); // To parse JSON bodies
+
+// MongoDB connection setup
+const mongoUri = 'mongodb+srv://thecrustngb:Leedsutd01@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
+const client = new MongoClient(mongoUri);
+
 // Get all orders for admin page
 app.get('/orders', async (req, res) => {
   try {
