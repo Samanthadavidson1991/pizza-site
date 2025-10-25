@@ -3,7 +3,7 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 // Fetch and render menu
 async function renderMenuFromAPI() {
 	try {
-	const response = await fetch('https://pizza-site-c8t6.onrender.com/menu');
+	const response = await fetch('/menu');
 		const menuData = await response.json();
 		const menuDiv = document.getElementById('dynamic-menu');
 		menuDiv.innerHTML = '';
