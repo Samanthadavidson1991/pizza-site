@@ -151,18 +151,19 @@ async function renderMenuFromAPI() {
 			categorizedMenu[category].push(item);
 		});
 		
-		// Add search bar and filters
-		menuDiv.innerHTML = `
-			<div class="menu-search-container">
-				<input type="text" id="menu-search" placeholder="Search menu items..." class="menu-search-input">
-				<div class="menu-filter-buttons">
-					<button class="filter-btn active" data-category="all">All</button>
-					${Object.keys(categorizedMenu).map(cat => 
-						`<button class="filter-btn" data-category="${cat}">${cat}</button>`
-					).join('')}
-				</div>
-			</div>
-		`;
+		// Clear the menu div and populate filter buttons
+		menuDiv.innerHTML = '';
+		
+		// Populate filter buttons
+		const filterButtonsContainer = document.getElementById('menu-filter-buttons');
+		if (filterButtonsContainer) {
+			filterButtonsContainer.innerHTML = `
+				<button class="filter-btn active" data-category="all">All</button>
+				${Object.keys(categorizedMenu).map(cat => 
+					`<button class="filter-btn" data-category="${cat}">${cat}</button>`
+				).join('')}
+			`;
+		}
 		
 		// Render each category
 		Object.keys(categorizedMenu).forEach(category => {
