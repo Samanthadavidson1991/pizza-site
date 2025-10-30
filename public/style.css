@@ -823,39 +823,84 @@ input[type="checkbox"]:checked {
 .menu-category-header {
   text-align: center;
   margin-bottom: 2rem;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
 }
 
+/* Category-specific pastel colors */
+.menu-category-section[data-category="PIZZAS"] .menu-category-header {
+  background: linear-gradient(135deg, #ffebee, #fce4ec);
+  border-color: rgba(244, 143, 177, 0.3);
+}
+
+.menu-category-section[data-category="SALADS"] .menu-category-header {
+  background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
+  border-color: rgba(139, 195, 74, 0.3);
+}
+
+.menu-category-section[data-category="SIDES"] .menu-category-header {
+  background: linear-gradient(135deg, #fff3e0, #fff8e1);
+  border-color: rgba(255, 193, 7, 0.3);
+}
+
+.menu-category-section[data-category="DRINKS"] .menu-category-header {
+  background: linear-gradient(135deg, #e3f2fd, #e1f5fe);
+  border-color: rgba(33, 150, 243, 0.3);
+}
+
+.menu-category-section[data-category="DESSERTS"] .menu-category-header {
+  background: linear-gradient(135deg, #f3e5f5, #fce4ec);
+  border-color: rgba(156, 39, 176, 0.3);
+}
+
+.menu-category-section[data-category="CHICKEN"] .menu-category-header {
+  background: linear-gradient(135deg, #fff3e0, #fde9cb);
+  border-color: rgba(255, 152, 0, 0.3);
+}
+
 .category-icon {
-  width: 80px;
-  height: 80px;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 2.5rem;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
-  margin-bottom: 0.5rem;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  width: 60px;
+  height: 8px;
+  border-radius: 4px;
+  margin: 0 auto 1rem auto;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Desktop category icon improvements */
+@media (min-width: 769px) {
+  .category-icon {
+    width: 80px;
+    height: 10px;
+    border-radius: 5px;
+    margin-bottom: 1.5rem;
+  }
 }
 
 .category-title {
-  font-size: 2rem;
-  font-weight: bold;
+  font-size: 2.2rem;
+  font-weight: 700;
   color: #2c3e50;
-  margin: 0;
+  margin: 0 0 0.8rem 0;
   text-transform: capitalize;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  letter-spacing: 0.5px;
 }
 
 .category-subtitle {
-  font-size: 1.1rem;
-  color: #7f8c8d;
+  font-size: 1.2rem;
+  color: #546e7a;
   margin: 0;
   font-style: italic;
+  font-weight: 300;
+  line-height: 1.4;
 }
 
 .menu-items-grid {
@@ -863,6 +908,26 @@ input[type="checkbox"]:checked {
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
   gap: 1.5rem;
   margin-top: 1.5rem;
+}
+
+/* Desktop-specific improvements */
+@media (min-width: 769px) {
+  .menu-items-grid {
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 1.5rem auto 0 auto;
+  }
+  
+  .menu-category-section {
+    margin-bottom: 4rem;
+  }
+  
+  .menu-category-header {
+    margin-bottom: 2.5rem;
+    padding: 2.5rem;
+    border-radius: 20px;
+  }
 }
 
 /* --- Enhanced Size Options --- */
@@ -960,6 +1025,32 @@ input[type="checkbox"]:checked {
   transform: translateY(-2px);
 }
 
+/* --- Desktop Layout Enhancements --- */
+@media (min-width: 769px) {
+  #dynamic-menu {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 2rem;
+  }
+  
+  .menu-item-card {
+    transition: all 0.3s ease;
+  }
+  
+  .menu-item-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+  
+  .category-title {
+    font-size: 2.2rem;
+  }
+  
+  .category-subtitle {
+    font-size: 1.2rem;
+  }
+}
+
 /* --- Menu Cards - Mobile Responsive Design --- */
 @media (max-width: 768px) {
   #dynamic-menu {
@@ -1020,6 +1111,19 @@ input[type="checkbox"]:checked {
   .filter-btn {
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
+  }
+  
+  .menu-category-header {
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .category-title {
+    font-size: 1.8rem;
+  }
+  
+  .category-subtitle {
+    font-size: 1rem;
   }
 }
 

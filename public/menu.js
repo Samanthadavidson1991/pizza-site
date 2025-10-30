@@ -178,7 +178,7 @@ async function renderMenuFromAPI() {
 			const categoryHeader = document.createElement('div');
 			categoryHeader.className = 'menu-category-header';
 			categoryHeader.innerHTML = `
-				<div class="category-icon" style="background: ${categoryInfo.gradient}">${categoryInfo.icon}</div>
+				<div class="category-icon" style="background: ${categoryInfo.gradient}"></div>
 				<h3 class="category-title">${category}</h3>
 				<p class="category-subtitle">${categoryInfo.description}</p>
 			`;
@@ -250,7 +250,6 @@ async function renderMenuFromAPI() {
 					const imgDiv = document.createElement('div');
 					imgDiv.className = 'menu-item-image';
 					imgDiv.style.background = categoryInfo.gradient;
-					imgDiv.innerHTML = categoryInfo.icon;
 					
 					// Content container
 					const content = document.createElement('div');
