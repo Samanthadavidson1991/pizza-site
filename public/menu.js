@@ -1,8 +1,17 @@
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
-// Fetch and render menu
+// Fetch and render menu - BULLETPROOF VERSION
 async function renderMenuFromAPI() {
+	console.log('=== STARTING MENU RENDER ===');
+	const menuDiv = document.getElementById('dynamic-menu');
+	
+	if (!menuDiv) {
+		console.error('Menu div not found!');
+		return;
+	}
+	
 	try {
+		menuDiv.innerHTML = '<p>Loading menu...</p>';
 		console.log('Fetching menu from /menu endpoint...');
 		
 		const response = await fetch('/menu');
@@ -27,11 +36,10 @@ async function renderMenuFromAPI() {
 		}
 		
 		if (menuData.length === 0) {
-			document.getElementById('dynamic-menu').innerHTML = '<p>No menu items available</p>';
+			menuDiv.innerHTML = '<p>No menu items available</p>';
 			return;
 		}
 		
-		const menuDiv = document.getElementById('dynamic-menu');
 		menuDiv.innerHTML = '';
 		
 		menuData.forEach((item, index) => {
@@ -86,37 +94,80 @@ async function renderMenuFromAPI() {
 					price = 0;
 				}
 				
-				// Create menu item
-				const div = document.createElement('div');
-				div.className = 'menu-item';
-				div.textContent = `${label} - £${price.toFixed(2)}`;
+				// Create menu item card
+				const card = document.createElement('div');
+				card.className = 'menu-item-card';
+				
+				// Item image placeholder with category-specific emoji
+				const imgDiv = document.createElement('div');
+				imgDiv.className = 'menu-item-image';
+				
+				// Set emoji based on item category/name
+				let emoji = '🍕'; // Default pizza
+				const nameLower = label.toLowerCase();
+				if (nameLower.includes('salad')) {
+					emoji = '🥗';
+				} else if (nameLower.includes('drink') || nameLower.includes('coke') || nameLower.includes('water') || nameLower.includes('juice')) {
+					emoji = '🥤';
+				} else if (nameLower.includes('side') || nameLower.includes('bread') || nameLower.includes('dough') || nameLower.includes('fries')) {
+					emoji = '🍞';
+				} else if (nameLower.includes('dessert') || nameLower.includes('cake') || nameLower.includes('ice')) {
+					emoji = '🍰';
+				} else if (nameLower.includes('chicken') || nameLower.includes('wing')) {
+					emoji = '🍗';
+				}
+				imgDiv.innerHTML = emoji;
+				
+				// Content container
+				const content = document.createElement('div');
+				content.className = 'menu-item-content';
+				
+				// Item name
+				const nameDiv = document.createElement('div');
+				nameDiv.className = 'menu-item-name';
+				nameDiv.textContent = label;
+				
+				// Item price
+				const priceDiv = document.createElement('div');
+				priceDiv.className = 'menu-item-price';
+				priceDiv.textContent = `£${price.toFixed(2)}`;
+				
+				// Item description (placeholder for now)
+				const descDiv = document.createElement('div');
+				descDiv.className = 'menu-item-description';
+				descDiv.textContent = 'Freshly made with quality ingredients';
 				
 				// Add to cart button
 				const btn = document.createElement('button');
+				btn.className = 'menu-item-button';
 				btn.textContent = 'Add to Cart';
 				btn.onclick = () => addToCart(label, price);
-				div.appendChild(btn);
-				menuDiv.appendChild(div);
 				
-				console.log(`Successfully processed: ${label} - £${price.toFixed(2)}`);
+				// Assemble card
+				content.appendChild(nameDiv);
+				content.appendChild(priceDiv);
+				content.appendChild(descDiv);
+				content.appendChild(btn);
+				
+				card.appendChild(imgDiv);
+				card.appendChild(content);
+				menuDiv.appendChild(card);
+				
+				console.log(`Successfully added item: ${label} - £${price.toFixed(2)}`);
 				
 			} catch (itemError) {
-				console.error(`Error processing item ${index}:`, itemError, 'Item data:', item);
-				// Continue processing other items instead of failing completely
+				console.error(`Error processing item ${index}:`, itemError);
+				// Continue with next item
 			}
 		});
 		
-		console.log('Menu rendering completed successfully');
+		console.log('=== MENU RENDER COMPLETED ===');
 		
 	} catch (err) {
-		console.error('Error in renderMenuFromAPI:', err);
-		const menuDiv = document.getElementById('dynamic-menu');
-		if (menuDiv) {
-			menuDiv.innerHTML = '<p>Failed to load menu. Please try again later.</p>';
-		}
+		console.error('=== MENU RENDER FAILED ===', err);
+		menuDiv.innerHTML = `<p>Failed to load menu: ${err.message}</p>`;
 	}
 }
-
 // Run on page load
 window.addEventListener('DOMContentLoaded', renderMenuFromAPI);
 
@@ -130,21 +181,28 @@ function addToCart(item, price) {
 }
 
 function showAddToCartTicket(itemName) {
-	const ticket = document.createElement('div');
-	ticket.textContent = `${itemName} added to cart!`;
-	ticket.style.cssText = `
-		position: fixed; 
-		top: 20px; 
-		right: 20px; 
-		background: #2ecc71; 
-		color: white; 
-		padding: 10px 20px; 
-		border-radius: 5px; 
-		z-index: 1000; 
-		font-weight: bold;
-	`;
-	document.body.appendChild(ticket);
-	setTimeout(() => ticket.remove(), 3000);
+	let ticket = document.getElementById('add-to-cart-ticket');
+	if (!ticket) {
+		ticket = document.createElement('div');
+		ticket.id = 'add-to-cart-ticket';
+		ticket.style.position = 'fixed';
+		ticket.style.top = '30px';
+		ticket.style.left = '50%';
+		ticket.style.transform = 'translateX(-50%)';
+		ticket.style.background = '#2ecc40';
+		ticket.style.color = '#fff';
+		ticket.style.fontWeight = 'bold';
+		ticket.style.fontSize = '1.2em';
+		ticket.style.padding = '1em 2em';
+		ticket.style.borderRadius = '8px';
+		ticket.style.boxShadow = '0 2px 8px #0002';
+		ticket.style.zIndex = '9999';
+		ticket.style.display = 'none';
+		document.body.appendChild(ticket);
+	}
+	ticket.textContent = `✔️ "${itemName}" added to checkout!`;
+	ticket.style.display = 'block';
+	setTimeout(() => { ticket.style.display = 'none'; }, 1800);
 }
 
 function updateCart() {
