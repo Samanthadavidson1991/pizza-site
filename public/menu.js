@@ -3,36 +3,120 @@ let cart = JSON.parse(localStorage.getItem('cart')) || [];
 // Fetch and render menu
 async function renderMenuFromAPI() {
 	try {
-	const response = await fetch('/menu');
+		console.log('Fetching menu from /menu endpoint...');
+		
+		const response = await fetch('/menu');
+		console.log('Response status:', response.status, response.statusText);
+		
+		if (!response.ok) {
+			throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+		}
+		
 		const menuData = await response.json();
+		console.log('Menu data received:', menuData);
+		console.log('Menu data type:', typeof menuData);
+		console.log('Menu data is array:', Array.isArray(menuData));
+		console.log('Menu data length:', menuData ? menuData.length : 'N/A');
+		
+		if (!menuData) {
+			throw new Error('Menu data is null or undefined');
+		}
+		
+		if (!Array.isArray(menuData)) {
+			throw new Error('Menu data is not an array');
+		}
+		
+		if (menuData.length === 0) {
+			document.getElementById('dynamic-menu').innerHTML = '<p>No menu items available</p>';
+			return;
+		}
+		
 		const menuDiv = document.getElementById('dynamic-menu');
 		menuDiv.innerHTML = '';
-		menuData.forEach(item => {
-			let price = item.price;
-			let label = item.name;
-			// Handle pizzas and items with sizes
-			if (Array.isArray(item.sizes) && item.sizes.length > 0) {
-				price = parseFloat(item.sizes[0].price);
-				label = `${item.name} (${item.sizes[0].size})`;
-			} else if (Array.isArray(item.types) && item.types.length > 0) {
-				price = parseFloat(item.types[0].price);
-				label = `${item.name} (${item.types[0].name})`;
+		
+		menuData.forEach((item, index) => {
+			try {
+				console.log(`Processing item ${index}:`, item);
+				
+				// Ultra-safe item processing
+				let price = 0;
+				let label = 'Unknown Item';
+				
+				// Validate item exists and is an object
+				if (!item || typeof item !== 'object') {
+					console.warn(`Item ${index} is invalid:`, item);
+					return; // Skip this item
+				}
+				
+				// Extract name safely
+				if (item.name && typeof item.name === 'string') {
+					label = item.name;
+				} else {
+					label = `Item ${index + 1}`;
+					console.warn(`Item ${index} has invalid name:`, item.name);
+				}
+				
+				// Extract price with multiple fallbacks
+				let priceValue = item.price;
+				
+				// Handle pizzas and items with sizes
+				if (Array.isArray(item.sizes) && item.sizes.length > 0 && item.sizes[0]) {
+					priceValue = item.sizes[0].price;
+					label = `${label} (${item.sizes[0].size || 'Regular'})`;
+				} else if (Array.isArray(item.types) && item.types.length > 0 && item.types[0]) {
+					priceValue = item.types[0].price;
+					label = `${label} (${item.types[0].name || 'Standard'})`;
+				}
+				
+				// Convert to number with extensive validation
+				if (typeof priceValue === 'string') {
+					priceValue = priceValue.replace(/[^0-9.]/g, ''); // Remove currency symbols
+				}
+				
+				price = parseFloat(priceValue);
+				
+				if (isNaN(price) || price < 0 || !isFinite(price)) {
+					price = 0;
+					console.warn(`Invalid price for "${label}". Original:`, priceValue, 'Setting to £0.00');
+				}
+				
+				// Additional safety check before toFixed
+				if (typeof price !== 'number' || price === null || price === undefined) {
+					console.error(`Price is not a number for "${label}":`, price, 'typeof:', typeof price);
+					price = 0;
+				}
+				
+				// Create menu item
+				const div = document.createElement('div');
+				div.className = 'menu-item';
+				div.textContent = `${label} - £${price.toFixed(2)}`;
+				
+				// Add to cart button
+				const btn = document.createElement('button');
+				btn.textContent = 'Add to Cart';
+				btn.onclick = () => addToCart(label, price);
+				div.appendChild(btn);
+				menuDiv.appendChild(div);
+				
+				console.log(`Successfully processed: ${label} - £${price.toFixed(2)}`);
+				
+			} catch (itemError) {
+				console.error(`Error processing item ${index}:`, itemError, 'Item data:', item);
+				// Continue processing other items instead of failing completely
 			}
-			const div = document.createElement('div');
-			div.className = 'menu-item';
-			div.textContent = `${label} - £${price.toFixed(2)}`;
-			// Add to cart button
-			const btn = document.createElement('button');
-			btn.textContent = 'Add to Cart';
-			btn.onclick = () => addToCart(label, price);
-			div.appendChild(btn);
-			menuDiv.appendChild(div);
 		});
+		
+		console.log('Menu rendering completed successfully');
+		
 	} catch (err) {
-		document.getElementById('dynamic-menu').textContent = 'Failed to load menu.';
-		console.error(err);
+		console.error('Error in renderMenuFromAPI:', err);
+		const menuDiv = document.getElementById('dynamic-menu');
+		if (menuDiv) {
+			menuDiv.innerHTML = '<p>Failed to load menu. Please try again later.</p>';
+		}
 	}
 }
+
 // Run on page load
 window.addEventListener('DOMContentLoaded', renderMenuFromAPI);
 
@@ -46,28 +130,21 @@ function addToCart(item, price) {
 }
 
 function showAddToCartTicket(itemName) {
-	let ticket = document.getElementById('add-to-cart-ticket');
-	if (!ticket) {
-		ticket = document.createElement('div');
-		ticket.id = 'add-to-cart-ticket';
-		ticket.style.position = 'fixed';
-		ticket.style.top = '30px';
-		ticket.style.left = '50%';
-		ticket.style.transform = 'translateX(-50%)';
-		ticket.style.background = '#2ecc40';
-		ticket.style.color = '#fff';
-		ticket.style.fontWeight = 'bold';
-		ticket.style.fontSize = '1.2em';
-		ticket.style.padding = '1em 2em';
-		ticket.style.borderRadius = '8px';
-		ticket.style.boxShadow = '0 2px 8px #0002';
-		ticket.style.zIndex = '9999';
-		ticket.style.display = 'none';
-		document.body.appendChild(ticket);
-	}
-	ticket.textContent = `✔️ "${itemName}" added to checkout!`;
-	ticket.style.display = 'block';
-	setTimeout(() => { ticket.style.display = 'none'; }, 1800);
+	const ticket = document.createElement('div');
+	ticket.textContent = `${itemName} added to cart!`;
+	ticket.style.cssText = `
+		position: fixed; 
+		top: 20px; 
+		right: 20px; 
+		background: #2ecc71; 
+		color: white; 
+		padding: 10px 20px; 
+		border-radius: 5px; 
+		z-index: 1000; 
+		font-weight: bold;
+	`;
+	document.body.appendChild(ticket);
+	setTimeout(() => ticket.remove(), 3000);
 }
 
 function updateCart() {
