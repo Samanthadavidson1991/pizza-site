@@ -127,22 +127,22 @@ body.allergens-page.app-body, body.allergens-page.app-body * {
   text-align: left;
 }
 /* --- FORCE CHECKOUT BUTTON ALWAYS VISIBLE AND STYLED --- */
-.pay-card, .pay-cash {
+.pay-card, .pay-cash, button[onclick="checkout()"] {
   background: #000 !important;
   color: #fff !important;
   border: none !important;
-  border-radius: 8px !important;
+  border-radius: 12px !important;
   opacity: 1 !important;
   visibility: visible !important;
   display: inline-block !important;
-  box-shadow: 0 2px 10px #0002 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
   font-weight: bold !important;
-  font-size: 1.15em !important;
-  padding: 0.8em 2em !important;
-  margin: 0.7em 0.3em !important;
+  font-size: 1.2em !important;
+  padding: 1em 3em !important;
+  margin: 1em 0.5em !important;
   cursor: pointer !important;
   outline: none !important;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s !important;
+  transition: all 0.3s ease !important;
   z-index: 10 !important;
 }
 /* Make h2 in the first section of each page larger and bold like a title */
@@ -502,9 +502,19 @@ button:active, .menu-item:active, .pay-card:active, .pay-cash:active {
 }
 button:hover, .pay-card:hover, .pay-cash:hover,
 button:focus, .pay-card:focus, .pay-cash:focus {
-  background: #444 !important;
+  background: #333 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px #0004 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Specific checkout button hover */
+button[onclick="checkout()"]:hover,
+button[onclick="checkout()"]:focus {
+  background: #333 !important;
+  color: #fff !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-3px) !important;
 }
 .menu-item:hover, .menu-item:focus {
   background: none !important;
