@@ -404,7 +404,7 @@ button, .pay-card, .pay-cash {
 
 .menu-item-card {
   /* Background will be set by category-specific styles */
-  background: rgba(255, 255, 255, 0.95); /* Fallback */
+  background: rgba(255, 255, 255, 0.95); /* Fallback only */
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -772,64 +772,64 @@ input[type="checkbox"]:checked {
 
 /* Category-specific pastel colors */
 .menu-category-section[data-category="PIZZAS"] .menu-category-header {
-  background: linear-gradient(135deg, #ffebee, #fce4ec);
-  border-color: rgba(244, 143, 177, 0.3);
+  background: linear-gradient(135deg, #ffebee, #fce4ec) !important;
+  border-color: rgba(244, 143, 177, 0.3) !important;
 }
 
 .menu-category-section[data-category="SALADS"] .menu-category-header {
-  background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
-  border-color: rgba(139, 195, 74, 0.3);
+  background: linear-gradient(135deg, #e8f5e8, #f1f8e9) !important;
+  border-color: rgba(139, 195, 74, 0.3) !important;
 }
 
 .menu-category-section[data-category="SIDES"] .menu-category-header {
-  background: linear-gradient(135deg, #fff3e0, #fff8e1);
-  border-color: rgba(255, 193, 7, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fff8e1) !important;
+  border-color: rgba(255, 193, 7, 0.3) !important;
 }
 
 .menu-category-section[data-category="DRINKS"] .menu-category-header {
-  background: linear-gradient(135deg, #e3f2fd, #e1f5fe);
-  border-color: rgba(33, 150, 243, 0.3);
+  background: linear-gradient(135deg, #e3f2fd, #e1f5fe) !important;
+  border-color: rgba(33, 150, 243, 0.3) !important;
 }
 
 .menu-category-section[data-category="DESSERTS"] .menu-category-header {
-  background: linear-gradient(135deg, #f3e5f5, #fce4ec);
-  border-color: rgba(156, 39, 176, 0.3);
+  background: linear-gradient(135deg, #f3e5f5, #fce4ec) !important;
+  border-color: rgba(156, 39, 176, 0.3) !important;
 }
 
 .menu-category-section[data-category="CHICKEN"] .menu-category-header {
-  background: linear-gradient(135deg, #fff3e0, #fde9cb);
-  border-color: rgba(255, 152, 0, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fde9cb) !important;
+  border-color: rgba(255, 152, 0, 0.3) !important;
 }
 
 /* --- Category-specific Menu Item Card Backgrounds --- */
 .menu-category-section[data-category="PIZZAS"] .menu-item-card {
-  background: linear-gradient(135deg, #ffebee, #fce4ec);
-  border-color: rgba(244, 143, 177, 0.3);
+  background: linear-gradient(135deg, #ffebee, #fce4ec) !important;
+  border-color: rgba(244, 143, 177, 0.3) !important;
 }
 
 .menu-category-section[data-category="SALADS"] .menu-item-card {
-  background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
-  border-color: rgba(139, 195, 74, 0.3);
+  background: linear-gradient(135deg, #e8f5e8, #f1f8e9) !important;
+  border-color: rgba(139, 195, 74, 0.3) !important;
 }
 
 .menu-category-section[data-category="SIDES"] .menu-item-card {
-  background: linear-gradient(135deg, #fff3e0, #fff8e1);
-  border-color: rgba(255, 193, 7, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fff8e1) !important;
+  border-color: rgba(255, 193, 7, 0.3) !important;
 }
 
 .menu-category-section[data-category="DRINKS"] .menu-item-card {
-  background: linear-gradient(135deg, #e3f2fd, #e1f5fe);
-  border-color: rgba(33, 150, 243, 0.3);
+  background: linear-gradient(135deg, #e3f2fd, #e1f5fe) !important;
+  border-color: rgba(33, 150, 243, 0.3) !important;
 }
 
 .menu-category-section[data-category="DESSERTS"] .menu-item-card {
-  background: linear-gradient(135deg, #f3e5f5, #fce4ec);
-  border-color: rgba(156, 39, 176, 0.3);
+  background: linear-gradient(135deg, #f3e5f5, #fce4ec) !important;
+  border-color: rgba(156, 39, 176, 0.3) !important;
 }
 
 .menu-category-section[data-category="CHICKEN"] .menu-item-card {
-  background: linear-gradient(135deg, #fff3e0, #fde9cb);
-  border-color: rgba(255, 152, 0, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fde9cb) !important;
+  border-color: rgba(255, 152, 0, 0.3) !important;
 }
 
 .category-icon {
