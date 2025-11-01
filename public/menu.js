@@ -1,3 +1,6 @@
+console.log('=== MENU.JS VERSION 4.0 - DEBUG SEARCH ISSUE ===');
+console.log('Search functionality completely removed from this file');
+console.log('🔍 DEBUGGING: Looking for search elements...');
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 // Category styling configuration
@@ -57,50 +60,7 @@ function generateItemDescription(item, category) {
 	return description;
 }
 
-// Setup search and filter functionality
-function setupSearchAndFilters() {
-	const searchInput = document.getElementById('menu-search');
-	const filterButtons = document.querySelectorAll('.filter-btn');
-	const categorySection = document.querySelectorAll('.menu-category-section');
-	
-	// Search functionality
-	if (searchInput) {
-		searchInput.addEventListener('input', function() {
-			const searchTerm = this.value.toLowerCase();
-			const allCards = document.querySelectorAll('.menu-item-card');
-			
-			allCards.forEach(card => {
-				const itemName = card.getAttribute('data-item-name') || '';
-				const isVisible = itemName.includes(searchTerm);
-				card.style.display = isVisible ? 'block' : 'none';
-			});
-		});
-	}
-	
-	// Filter functionality
-	filterButtons.forEach(btn => {
-		btn.addEventListener('click', function() {
-			// Update active button
-			filterButtons.forEach(b => b.classList.remove('active'));
-			this.classList.add('active');
-			
-			const category = this.getAttribute('data-category');
-			
-			if (category === 'all') {
-				// Show all categories
-				categorySection.forEach(section => {
-					section.style.display = 'block';
-				});
-			} else {
-				// Show only selected category
-				categorySection.forEach(section => {
-					const sectionCategory = section.getAttribute('data-category');
-					section.style.display = sectionCategory === category ? 'block' : 'none';
-				});
-			}
-		});
-	});
-}
+
 
 // Fetch and render menu
 async function renderMenuFromAPI() {
@@ -145,18 +105,39 @@ async function renderMenuFromAPI() {
 			categorizedMenu[category].push(item);
 		});
 		
-		// Add search bar and filters
-		menuDiv.innerHTML = `
-			<div class="menu-search-container">
-				<input type="text" id="menu-search" placeholder="Search menu items..." class="menu-search-input">
-				<div class="menu-filter-buttons">
-					<button class="filter-btn active" data-category="all">All</button>
-					${Object.keys(categorizedMenu).map(cat => 
-						`<button class="filter-btn" data-category="${cat}">${cat}</button>`
-					).join('')}
-				</div>
-			</div>
-		`;
+		// Clear the menu div
+		menuDiv.innerHTML = '';
+		
+		// Remove any search elements that might exist
+		console.log('🔍 DEBUGGING: Checking for search elements...');
+		const existingSearch = document.querySelector('input[type="text"]');
+		const allInputs = document.querySelectorAll('input');
+		const searchContainer = document.querySelector('.search-container, #search-container, [class*="search"]');
+		
+		console.log('🔍 Found inputs:', allInputs.length);
+		console.log('🔍 Search input found:', !!existingSearch);
+		console.log('🔍 Search container found:', !!searchContainer);
+		
+		if (existingSearch) {
+			console.log('🚨 FOUND SEARCH INPUT:', existingSearch);
+			console.log('🚨 Search input HTML:', existingSearch.outerHTML);
+			console.log('🚨 REMOVING SEARCH INPUT NOW');
+			existingSearch.remove();
+		}
+		
+		if (searchContainer) {
+			console.log('🚨 FOUND SEARCH CONTAINER:', searchContainer);
+			console.log('🚨 Search container HTML:', searchContainer.outerHTML);
+			console.log('🚨 REMOVING SEARCH CONTAINER NOW');
+			searchContainer.remove();
+		}
+		
+		// Add visual indicator that this version loaded
+		const debugIndicator = document.createElement('div');
+		debugIndicator.innerHTML = '🐛 MENU.JS V4.0 LOADED - SEARCH REMOVED';
+		debugIndicator.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;padding:5px;z-index:9999;font-size:12px;';
+		document.body.appendChild(debugIndicator);
+		setTimeout(() => debugIndicator.remove(), 5000);
 		
 		// Render each category
 		Object.keys(categorizedMenu).forEach(category => {
@@ -309,9 +290,6 @@ async function renderMenuFromAPI() {
 			categorySection.appendChild(itemsContainer);
 			menuDiv.appendChild(categorySection);
 		});
-		
-		// Add search and filter functionality
-		setupSearchAndFilters();
 		
 		console.log('Menu rendering completed successfully');
 		
