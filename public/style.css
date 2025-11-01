@@ -393,11 +393,9 @@ button, .pay-card, .pay-cash {
   position: relative;
   z-index: 2;
   border-radius: 0;
-  padding-bottom: 1.5em;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  max-width: 1200px;
+  padding: 2rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
@@ -405,13 +403,15 @@ button, .pay-card, .pay-cash {
 .menu-item-card {
   /* Background will be set by category-specific styles */
   background: rgba(255, 255, 255, 0.95); /* Fallback only */
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  width: 100%;
+  max-width: 400px;
 }
 
 .menu-item-card:hover {
@@ -425,7 +425,7 @@ button, .pay-card, .pay-cash {
 }
 
 .menu-item-content {
-  padding: 1.5rem;
+  padding: 2rem;
   text-align: left;
 }
 
@@ -745,19 +745,21 @@ input[type="checkbox"]:checked {
 
 /* --- Menu Category Sections --- */
 .menu-category-section {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
+  width: 100%;
 }
 
 .menu-category-header {
   text-align: center;
-  margin-bottom: 2rem;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0 auto 2.5rem auto;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
+  max-width: 100%;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
@@ -864,27 +866,28 @@ input[type="checkbox"]:checked {
 
 .menu-items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  justify-items: center;
 }
 
 /* Desktop-specific improvements */
 @media (min-width: 769px) {
   .menu-items-grid {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2.5rem;
     max-width: 1400px;
-    margin: 1.5rem auto 0 auto;
+    margin: 2.5rem auto 0 auto;
   }
   
   .menu-category-section {
-    margin-bottom: 4rem;
+    margin-bottom: 5rem;
   }
   
   .menu-category-header {
-    margin-bottom: 2.5rem;
-    padding: 2.5rem;
+    margin-bottom: 3rem;
+    padding: 3rem;
     border-radius: 20px;
   }
 }
@@ -1013,18 +1016,27 @@ input[type="checkbox"]:checked {
 /* --- Menu Cards - Mobile Responsive Design --- */
 @media (max-width: 768px) {
   #dynamic-menu {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1rem 0.5rem;
+    padding: 1.5rem 1rem;
   }
   
   .menu-items-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
+    justify-items: center;
   }
   
   .menu-item-card {
-    border-radius: 8px;
+    border-radius: 12px;
+    max-width: 100%;
+  }
+  
+  .menu-category-section {
+    margin-bottom: 3rem;
+  }
+  
+  .menu-category-header {
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
   }
   
   .menu-item-image {
@@ -1074,12 +1086,24 @@ input[type="checkbox"]:checked {
 
 @media (max-width: 480px) {
   #dynamic-menu {
-    padding: 0.5rem 0.25rem;
-    gap: 0.8rem;
+    padding: 1rem 0.75rem;
+  }
+  
+  .menu-items-grid {
+    gap: 1rem;
   }
   
   .menu-item-card {
-    border-radius: 6px;
+    border-radius: 10px;
+  }
+  
+  .menu-category-section {
+    margin-bottom: 2.5rem;
+  }
+  
+  .menu-category-header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
   }
   
   .menu-item-image {
