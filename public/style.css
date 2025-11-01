@@ -129,21 +129,30 @@ body.allergens-page.app-body, body.allergens-page.app-body * {
 /* --- FORCE CHECKOUT BUTTON ALWAYS VISIBLE AND STYLED --- */
 .pay-card, .pay-cash, button[onclick="checkout()"] {
   background: #000 !important;
-  color: #fff !important;
-  border: none !important;
+  color: #ffffff !important;
+  border: 2px solid #333 !important;
   border-radius: 12px !important;
   opacity: 1 !important;
   visibility: visible !important;
   display: inline-block !important;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2) !important;
-  font-weight: bold !important;
-  font-size: 1.2em !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 900 !important;
+  font-size: 1.3em !important;
   padding: 1em 3em !important;
   margin: 1em 0.5em !important;
   cursor: pointer !important;
   outline: none !important;
   transition: all 0.3s ease !important;
   z-index: 10 !important;
+  text-shadow: none !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Extra specific rule to ensure checkout button text is always visible */
+button.menu-item.pay-card.pay-cash[onclick="checkout()"] {
+  color: #ffffff !important;
+  background: #000 !important;
+  text-decoration: none !important;
 }
 /* Make h2 in the first section of each page larger and bold like a title */
 section:first-of-type h2 {
