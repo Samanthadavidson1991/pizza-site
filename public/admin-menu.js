@@ -16,6 +16,15 @@ async function loadMenuData() {
     console.log('Menu fetch response status:', res.status);
     const items = await res.json();
     console.log('Loaded menuData:', items);
+    console.log('First few items with IDs:');
+    items.slice(0, 3).forEach((item, i) => {
+      console.log(`Item ${i}:`, { 
+        name: item.name, 
+        id: item.id, 
+        _id: item._id, 
+        keys: Object.keys(item)
+      });
+    });
     // Reset
     menuData = { PIZZAS: [], SALADS: [], SIDES: [], DRINKS: [], DESSERTS: [], CHICKEN: [] };
     // Assign sortOrder if missing and update backend if needed
@@ -80,6 +89,11 @@ async function addMenuItem(category, item) {
 async function deleteMenuItem(category, id) {
   try {
     console.log('Attempting to delete item:', { category, id, url: `${API_BASE}/menu/${id}` });
+    console.log('Full item details being deleted:', menuData[category].find(item => (item.id || item._id) == id));
+    
+    if (!id) {
+      throw new Error('No ID provided for deletion');
+    }
     
     const response = await fetch(`${API_BASE}/menu/${id}`, { 
       method: 'DELETE',
@@ -89,6 +103,7 @@ async function deleteMenuItem(category, id) {
     });
     
     console.log('Delete response status:', response.status);
+    console.log('Delete response headers:', Object.fromEntries(response.headers.entries()));
     
     if (!response.ok) {
       const errorText = await response.text();
@@ -96,6 +111,8 @@ async function deleteMenuItem(category, id) {
       throw new Error(`HTTP ${response.status}: ${errorText}`);
     }
     
+    const result = await response.json();
+    console.log('Delete response body:', result);
     console.log('Delete successful, reloading menu data...');
     await loadMenuData();
     console.log('Menu data reloaded successfully');
@@ -235,18 +252,25 @@ function renderMenuItems() {
       delBtn.style.fontSize = '0.95em';
       delBtn.style.cursor = 'pointer';
       delBtn.onclick = async function() {
-        console.log('Delete button clicked for item:', item);
+        console.log('=== DELETE BUTTON CLICKED ===');
+        console.log('Full item object:', JSON.stringify(item, null, 2));
         console.log('Category:', currentCategory);
-        console.log('Item ID:', item.id || item._id);
+        console.log('Item ID field:', item.id);
+        console.log('Item _ID field:', item._id);
+        console.log('Final ID to use:', item.id || item._id);
+        console.log('Item has keys:', Object.keys(item));
         
-        if (!item.id && !item._id) {
-          alert('Error: Item has no ID. Cannot delete.');
+        const itemId = item.id || item._id;
+        if (!itemId) {
+          alert('Error: Item has no ID. Cannot delete. Item keys: ' + Object.keys(item).join(', '));
+          console.error('Item without ID:', item);
           return;
         }
         
-        if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
+        if (confirm(`Are you sure you want to delete "${item.name}"? (ID: ${itemId})`)) {
           try {
-            await deleteMenuItem(currentCategory, item.id || item._id);
+            console.log('Calling deleteMenuItem with:', { category: currentCategory, id: itemId });
+            await deleteMenuItem(currentCategory, itemId);
             alert('Item deleted successfully!');
           } catch (error) {
             console.error('Delete error:', error);
