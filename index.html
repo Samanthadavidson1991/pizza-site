@@ -3,60 +3,40 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Redirecting to Admin Dashboard...</title>
-  <script>
-    // Redirect immediately to admin dashboard
-    window.location.replace('admin-dashboard.html');
-  </script>
-  <meta http-equiv="refresh" content="0; url=admin-dashboard.html">
+  <title>None Go Bye - Authentic Neapolitan Pizza</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <meta name="theme-color" content="#4CAF50">
 </head>
 <body>
-  <div class="container">
-    <div class="admin-header-bar">
-  <a href="admin-dashboard.html" class="admin-menu-link">Order Management</a>
-  <a href="admin-menu.html" class="admin-menu-link">Menu Management</a>
-  <a href="admin-sales.html" class="admin-menu-link">Sales Dashboard</a>
-  <a href="admin-monthly-sales.html" class="admin-menu-link">Monthly Breakdown</a>
-  <a href="admin-running-orders.html" class="admin-menu-link">Running Orders</a>
-    </div>
-  <div id="login-box">
-  <h2>Admin Login</h2>
-  <p class="login-info-msg">Please log in to access the admin dashboard.</p>
-      <form id="login-form" autocomplete="off">
-        <input type="text" id="login-username" name="no-autofill-username" placeholder="Username" class="admin-input" autocomplete="off" value="">
-        <input type="password" id="login-password" name="no-autofill-password" placeholder="Password" class="admin-input admin-input-margin" autocomplete="new-password" value="">
-        <button id="login-btn" type="submit" class="admin-login-btn">Login</button>
-        <p id="login-msg" class="admin-login-msg"></p>
-      </form>
-    </div>
-  <div id="dashboard" class="hidden">
-      <h1>Order Management Dashboard</h1>
-      <div class="filter-bar">
-        <input type="text" id="search" placeholder="Search by name, phone, status..." class="admin-search-input">
-        <button onclick="loadOrders()">Refresh</button>
-        <button onclick="printOrders()" class="admin-print-btn">Print Orders</button>
-        <button id="logout-btn" class="admin-logout-btn">Logout</button>
+  <header class="header">
+    <div class="container">
+      <div class="logo">
+        <img src="pizza-shop-logo.png" alt="None Go Bye Pizza Logo" class="logo-img">
+        <h1>None Go Bye</h1>
       </div>
-      <table id="orders-table">
-        <thead>
-          <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Phone</th>
-            <th>Type</th>
-            <th>Items</th>
-            <th>Total (£)</th>
-            <th>Time Slot</th>
-            <th>Date/Time Placed</th>
-            <th>Status</th>
-            <th>Note</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody></tbody>
-      </table>
+      <nav class="nav">
+        <a href="index.html" class="nav-link active">Home</a>
+        <a href="menu.html" class="nav-link">Menu</a>
+        <a href="cart.html" class="nav-link">Cart</a>
+      </nav>
     </div>
-  </div>
-  <script src="admin-dashboard.js"></script>
+  </header>
+
+  <main class="main">
+    <section class="hero">
+      <div class="container">
+        <h2>Authentic Neapolitan Pizza</h2>
+        <p>Inspired by Naples, perfected at None Go Bye</p>
+        <a href="menu.html" class="cta-button">View Our Menu</a>
+      </div>
+    </section>
+  </main>
+  
+  <footer class="footer">
+    <div class="container">
+      <p>&copy; 2025 None Go Bye. All rights reserved.</p>
+    </div>
+  </footer>
 </body>
 </html>
