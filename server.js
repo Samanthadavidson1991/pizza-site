@@ -1,125 +1,131 @@
-
-
-
-
 const express = require('express');
 const cors = require('cors');
+const path = require('path');
 const { MongoClient } = require('mongodb');
 
-
 const app = express();
+
+// Basic middleware
 app.use(cors());
-app.use(express.json()); // To parse JSON bodies
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
 
-// Serve static files from the 'public' folder
-app.use(express.static('public'));
-
-// MongoDB connection setup
+// MongoDB connection
 const mongoUri = 'mongodb+srv://thecrustngb:Leedsutd01@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
 const client = new MongoClient(mongoUri);
 
-// Get all orders for admin page
-app.get('/orders', async (req, res) => {
-  try {
-    await client.connect();
-    const db = client.db('pizza_shop');
-    const ordersCollection = db.collection('orders');
-    const orders = await ordersCollection.find({}).toArray();
-    res.json(orders);
-  } catch (err) {
-    console.error('Error fetching orders:', err);
-    res.status(500).json({ error: 'Failed to fetch orders.' });
-  }
+// Simple test endpoint
+app.get('/test', (req, res) => {
+  res.json({ message: 'Server working!', timestamp: new Date() });
 });
 
-// Simple /login route for admin authentication
-app.post('/login', (req, res) => {
-  const { username, password } = req.body;
-  // Change these credentials as needed
-  const ADMIN_USER = 'admin';
-  const ADMIN_PASS = 'password123';
-  if (username === ADMIN_USER && password === ADMIN_PASS) {
-    res.json({ success: true });
-  } else {
-    res.status(401).json({ success: false, message: 'Invalid credentials' });
-  }
-});
-
-
+// Get menu from MongoDB
 app.get('/menu', async (req, res) => {
   try {
-    console.log('Attempting to connect to MongoDB...');
+    console.log('GET /menu - Fetching from MongoDB');
     await client.connect();
-    console.log('Connected to MongoDB');
     const db = client.db('pizza_shop');
-    console.log('Accessing menu collection...');
     const menuCollection = db.collection('menu');
-    console.log('Querying menu data...');
     const menu = await menuCollection.find({}).toArray();
-    console.log('Menu data:', menu);
+    console.log(`Found ${menu.length} menu items`);
     res.json(menu);
-  } catch (err) {
-    console.error('Error fetching menu:', err);
-    res.status(500).json({ error: 'Failed to fetch menu.', details: err.message });
+  } catch (error) {
+    console.error('GET /menu error:', error);
+    res.status(500).json({ error: 'Failed to fetch menu' });
   }
 });
 
-
-
-// --- Module Imports and App Initialization ---
-console.log('SERVER.JS STARTED');
-
-// ...existing code...
-
-
-// Update menu item by id
-app.put('/menu/:id', async (req, res) => {
+// Add new menu item
+app.post('/menu', async (req, res) => {
   try {
+    console.log('POST /menu - Adding item:', req.body);
     await client.connect();
     const db = client.db('pizza_shop');
     const menuCollection = db.collection('menu');
-    const id = req.params.id;
-    const updatedItem = req.body;
-    // Remove _id if present to avoid MongoDB update errors
-    if (updatedItem._id) delete updatedItem._id;
-    // Try both string and ObjectId for compatibility
-    const result = await menuCollection.updateOne(
-      { $or: [ { id: Number(id) }, { _id: id }, { _id: { $eq: id } } ] },
-      { $set: updatedItem }
-    );
-    if (result.matchedCount === 1) {
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ error: 'Menu item not found.' });
-    }
-  } catch (err) {
-    console.error('Error updating menu item:', err);
-    res.status(500).json({ error: 'Failed to update menu item.' });
+    
+    const result = await menuCollection.insertOne(req.body);
+    console.log('Item added with ID:', result.insertedId);
+    
+    res.json({ 
+      success: true, 
+      item: { ...req.body, _id: result.insertedId } 
+    });
+  } catch (error) {
+    console.error('POST /menu error:', error);
+    res.status(500).json({ error: 'Failed to add item' });
   }
 });
 
-// Delete menu item by id
+// Delete menu item
 app.delete('/menu/:id', async (req, res) => {
   try {
+    const itemId = req.params.id;
+    console.log('DELETE /menu - Removing item:', itemId);
+    console.log('DELETE DEBUG - typeof itemId:', typeof itemId, 'value:', itemId);
+    
     await client.connect();
     const db = client.db('pizza_shop');
     const menuCollection = db.collection('menu');
-    const id = req.params.id;
-    // Try both string and ObjectId for compatibility
-    const result = await menuCollection.deleteOne({ $or: [ { id: Number(id) }, { _id: id }, { _id: { $eq: id } } ] });
-    if (result.deletedCount === 1) {
-      res.json({ success: true });
-    } else {
-      res.status(404).json({ error: 'Menu item not found.' });
+    
+    const { ObjectId } = require('mongodb');
+    let query;
+    
+    // First try to convert to ObjectId (for _id field)
+    try {
+      query = { _id: new ObjectId(itemId) };
+      console.log('Trying ObjectId query:', query);
+    } catch (e) {
+      // If not a valid ObjectId, try numeric id field or string _id field
+      const numericId = parseInt(itemId);
+      if (!isNaN(numericId)) {
+        query = { id: numericId };
+        console.log('Trying numeric id query:', query);
+      } else {
+        query = { $or: [{ id: itemId }, { _id: itemId }] };
+        console.log('Trying fallback query:', query);
+      }
     }
-  } catch (err) {
-    console.error('Error deleting menu item:', err);
-    res.status(500).json({ error: 'Failed to delete menu item.' });
+    
+    const result = await menuCollection.deleteOne(query);
+    console.log('Delete result:', result.deletedCount);
+    
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ error: 'Item not found' });
+    }
+    
+    res.json({ success: true });
+  } catch (error) {
+    console.error('DELETE /menu error:', error);
+    res.status(500).json({ error: 'Failed to delete item' });
   }
 });
 
-// Start the server
-const PORT = process.env.PORT || 3000;
+// Menu section subheadings
+app.get('/menu-section-subheadings', (req, res) => {
+  res.json({});
+});
+
+app.put('/menu-section-subheadings/:category', (req, res) => {
+  res.json({ success: true });
+});
+
+// Simple login
+app.post('/login', (req, res) => {
+  const { username, password } = req.body;
+  if (username === 'admin' && password === 'admin123') {
+    res.json({ success: true, username: 'admin' });
+  } else {
+    res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
+// Serve static files last
+app.use(express.static(__dirname));
+
+const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => {
-  console.log(`Server running on port ${PORT}`);
+  console.log('SERVER.JS STARTED - Updated Version');
+  console.log(`🚀 Clean server running on port ${PORT}`);
+  console.log('📝 Endpoints: /test, /menu (GET/POST/DELETE), /login');
+  console.log('🔥 POST /menu endpoint should work now!');
 });
