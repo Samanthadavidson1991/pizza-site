@@ -1,6 +1,3 @@
-console.log('=== MENU.JS VERSION 4.0 - DEBUG SEARCH ISSUE ===');
-console.log('Search functionality completely removed from this file');
-console.log('🔍 DEBUGGING: Looking for search elements...');
 let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 // Category styling configuration
@@ -109,7 +106,7 @@ async function renderMenuFromAPI() {
 		menuDiv.innerHTML = '';
 		
 		// Remove any search elements that might exist
-		console.log('🔍 DEBUGGING: Checking for search elements...');
+
 		const existingSearch = document.querySelector('input[type="text"]');
 		const allInputs = document.querySelectorAll('input');
 		const searchContainer = document.querySelector('.search-container, #search-container, [class*="search"]');
@@ -132,12 +129,7 @@ async function renderMenuFromAPI() {
 			searchContainer.remove();
 		}
 		
-		// Add visual indicator that this version loaded
-		const debugIndicator = document.createElement('div');
-		debugIndicator.innerHTML = '🐛 MENU.JS V4.0 LOADED - SEARCH REMOVED';
-		debugIndicator.style.cssText = 'position:fixed;top:10px;right:10px;background:red;color:white;padding:5px;z-index:9999;font-size:12px;';
-		document.body.appendChild(debugIndicator);
-		setTimeout(() => debugIndicator.remove(), 5000);
+
 		
 		// Render each category
 		Object.keys(categorizedMenu).forEach(category => {

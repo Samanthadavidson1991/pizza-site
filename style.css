@@ -127,23 +127,32 @@ body.allergens-page.app-body, body.allergens-page.app-body * {
   text-align: left;
 }
 /* --- FORCE CHECKOUT BUTTON ALWAYS VISIBLE AND STYLED --- */
-.pay-card, .pay-cash {
+.pay-card, .pay-cash, button[onclick="checkout()"] {
   background: #000 !important;
-  color: #fff !important;
-  border: none !important;
-  border-radius: 8px !important;
+  color: #ffffff !important;
+  border: 2px solid #333 !important;
+  border-radius: 12px !important;
   opacity: 1 !important;
   visibility: visible !important;
   display: inline-block !important;
-  box-shadow: 0 2px 10px #0002 !important;
-  font-weight: bold !important;
-  font-size: 1.15em !important;
-  padding: 0.8em 2em !important;
-  margin: 0.7em 0.3em !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+  font-weight: 900 !important;
+  font-size: 1.3em !important;
+  padding: 1em 3em !important;
+  margin: 1em 0.5em !important;
   cursor: pointer !important;
   outline: none !important;
-  transition: background 0.2s, color 0.2s, box-shadow 0.2s !important;
+  transition: all 0.3s ease !important;
   z-index: 10 !important;
+  text-shadow: none !important;
+  letter-spacing: 0.5px !important;
+}
+
+/* Extra specific rule to ensure checkout button text is always visible */
+button.menu-item.pay-card.pay-cash[onclick="checkout()"] {
+  color: #ffffff !important;
+  background: #000 !important;
+  text-decoration: none !important;
 }
 /* Make h2 in the first section of each page larger and bold like a title */
 section:first-of-type h2 {
@@ -393,25 +402,25 @@ button, .pay-card, .pay-cash {
   position: relative;
   z-index: 2;
   border-radius: 0;
-  padding-bottom: 1.5em;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  max-width: 1200px;
+  padding: 2rem 1rem;
+  max-width: 1400px;
+  margin: 0 auto;
   margin: 0 auto;
   padding: 2rem 1rem;
 }
 
 .menu-item-card {
   /* Background will be set by category-specific styles */
-  background: rgba(255, 255, 255, 0.95); /* Fallback */
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  background: rgba(255, 255, 255, 0.95); /* Fallback only */
+  border-radius: 16px;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
   overflow: hidden;
   transition: all 0.3s ease;
-  border: 1px solid rgba(0, 0, 0, 0.1);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  width: 100%;
+  max-width: 400px;
 }
 
 .menu-item-card:hover {
@@ -421,18 +430,11 @@ button, .pay-card, .pay-cash {
 }
 
 .menu-item-image {
-  height: 120px;
-  background: linear-gradient(135deg, #e67e22, #f39c12);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 3rem;
-  color: white;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  display: none !important;
 }
 
 .menu-item-content {
-  padding: 1.5rem;
+  padding: 2rem;
   text-align: left;
 }
 
@@ -509,9 +511,19 @@ button:active, .menu-item:active, .pay-card:active, .pay-cash:active {
 }
 button:hover, .pay-card:hover, .pay-cash:hover,
 button:focus, .pay-card:focus, .pay-cash:focus {
-  background: #444 !important;
+  background: #333 !important;
   color: #fff !important;
-  box-shadow: 0 4px 16px #0004 !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Specific checkout button hover */
+button[onclick="checkout()"]:hover,
+button[onclick="checkout()"]:focus {
+  background: #333 !important;
+  color: #fff !important;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4) !important;
+  transform: translateY(-3px) !important;
 }
 .menu-item:hover, .menu-item:focus {
   background: none !important;
@@ -752,19 +764,21 @@ input[type="checkbox"]:checked {
 
 /* --- Menu Category Sections --- */
 .menu-category-section {
-  margin-bottom: 3rem;
+  margin-bottom: 4rem;
+  width: 100%;
 }
 
 .menu-category-header {
   text-align: center;
-  margin-bottom: 2rem;
-  padding: 2rem;
-  border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  -webkit-backdrop-filter: blur(10px);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  margin: 0 auto 2.5rem auto;
+  padding: 2.5rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 6px 25px rgba(0, 0, 0, 0.1);
+  -webkit-backdrop-filter: blur(15px);
+  backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.3);
   display: flex;
+  max-width: 100%;
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
@@ -772,64 +786,64 @@ input[type="checkbox"]:checked {
 
 /* Category-specific pastel colors */
 .menu-category-section[data-category="PIZZAS"] .menu-category-header {
-  background: linear-gradient(135deg, #ffebee, #fce4ec);
-  border-color: rgba(244, 143, 177, 0.3);
+  background: linear-gradient(135deg, #ffebee, #fce4ec) !important;
+  border-color: rgba(244, 143, 177, 0.3) !important;
 }
 
 .menu-category-section[data-category="SALADS"] .menu-category-header {
-  background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
-  border-color: rgba(139, 195, 74, 0.3);
+  background: linear-gradient(135deg, #e8f5e8, #f1f8e9) !important;
+  border-color: rgba(139, 195, 74, 0.3) !important;
 }
 
 .menu-category-section[data-category="SIDES"] .menu-category-header {
-  background: linear-gradient(135deg, #fff3e0, #fff8e1);
-  border-color: rgba(255, 193, 7, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fff8e1) !important;
+  border-color: rgba(255, 193, 7, 0.3) !important;
 }
 
 .menu-category-section[data-category="DRINKS"] .menu-category-header {
-  background: linear-gradient(135deg, #e3f2fd, #e1f5fe);
-  border-color: rgba(33, 150, 243, 0.3);
+  background: linear-gradient(135deg, #e3f2fd, #e1f5fe) !important;
+  border-color: rgba(33, 150, 243, 0.3) !important;
 }
 
 .menu-category-section[data-category="DESSERTS"] .menu-category-header {
-  background: linear-gradient(135deg, #f3e5f5, #fce4ec);
-  border-color: rgba(156, 39, 176, 0.3);
+  background: linear-gradient(135deg, #f3e5f5, #fce4ec) !important;
+  border-color: rgba(156, 39, 176, 0.3) !important;
 }
 
 .menu-category-section[data-category="CHICKEN"] .menu-category-header {
-  background: linear-gradient(135deg, #fff3e0, #fde9cb);
-  border-color: rgba(255, 152, 0, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fde9cb) !important;
+  border-color: rgba(255, 152, 0, 0.3) !important;
 }
 
 /* --- Category-specific Menu Item Card Backgrounds --- */
 .menu-category-section[data-category="PIZZAS"] .menu-item-card {
-  background: linear-gradient(135deg, #ffebee, #fce4ec);
-  border-color: rgba(244, 143, 177, 0.3);
+  background: linear-gradient(135deg, #ffebee, #fce4ec) !important;
+  border-color: rgba(244, 143, 177, 0.3) !important;
 }
 
 .menu-category-section[data-category="SALADS"] .menu-item-card {
-  background: linear-gradient(135deg, #e8f5e8, #f1f8e9);
-  border-color: rgba(139, 195, 74, 0.3);
+  background: linear-gradient(135deg, #e8f5e8, #f1f8e9) !important;
+  border-color: rgba(139, 195, 74, 0.3) !important;
 }
 
 .menu-category-section[data-category="SIDES"] .menu-item-card {
-  background: linear-gradient(135deg, #fff3e0, #fff8e1);
-  border-color: rgba(255, 193, 7, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fff8e1) !important;
+  border-color: rgba(255, 193, 7, 0.3) !important;
 }
 
 .menu-category-section[data-category="DRINKS"] .menu-item-card {
-  background: linear-gradient(135deg, #e3f2fd, #e1f5fe);
-  border-color: rgba(33, 150, 243, 0.3);
+  background: linear-gradient(135deg, #e3f2fd, #e1f5fe) !important;
+  border-color: rgba(33, 150, 243, 0.3) !important;
 }
 
 .menu-category-section[data-category="DESSERTS"] .menu-item-card {
-  background: linear-gradient(135deg, #f3e5f5, #fce4ec);
-  border-color: rgba(156, 39, 176, 0.3);
+  background: linear-gradient(135deg, #f3e5f5, #fce4ec) !important;
+  border-color: rgba(156, 39, 176, 0.3) !important;
 }
 
 .menu-category-section[data-category="CHICKEN"] .menu-item-card {
-  background: linear-gradient(135deg, #fff3e0, #fde9cb);
-  border-color: rgba(255, 152, 0, 0.3);
+  background: linear-gradient(135deg, #fff3e0, #fde9cb) !important;
+  border-color: rgba(255, 152, 0, 0.3) !important;
 }
 
 .category-icon {
@@ -871,27 +885,28 @@ input[type="checkbox"]:checked {
 
 .menu-items-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.5rem;
-  margin-top: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 2rem;
+  margin-top: 2rem;
+  justify-items: center;
 }
 
 /* Desktop-specific improvements */
 @media (min-width: 769px) {
   .menu-items-grid {
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 2rem;
+    grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    gap: 2.5rem;
     max-width: 1400px;
-    margin: 1.5rem auto 0 auto;
+    margin: 2.5rem auto 0 auto;
   }
   
   .menu-category-section {
-    margin-bottom: 4rem;
+    margin-bottom: 5rem;
   }
   
   .menu-category-header {
-    margin-bottom: 2.5rem;
-    padding: 2.5rem;
+    margin-bottom: 3rem;
+    padding: 3rem;
     border-radius: 20px;
   }
 }
@@ -1020,23 +1035,31 @@ input[type="checkbox"]:checked {
 /* --- Menu Cards - Mobile Responsive Design --- */
 @media (max-width: 768px) {
   #dynamic-menu {
-    grid-template-columns: 1fr;
-    gap: 1rem;
-    padding: 1rem 0.5rem;
+    padding: 1.5rem 1rem;
   }
   
   .menu-items-grid {
     grid-template-columns: 1fr;
-    gap: 1rem;
+    gap: 1.5rem;
+    justify-items: center;
   }
   
   .menu-item-card {
-    border-radius: 8px;
+    border-radius: 12px;
+    max-width: 100%;
+  }
+  
+  .menu-category-section {
+    margin-bottom: 3rem;
+  }
+  
+  .menu-category-header {
+    padding: 2rem 1.5rem;
+    margin-bottom: 2rem;
   }
   
   .menu-item-image {
-    height: 100px;
-    font-size: 2.5rem;
+    display: none !important;
   }
   
   .menu-item-content {
@@ -1082,17 +1105,28 @@ input[type="checkbox"]:checked {
 
 @media (max-width: 480px) {
   #dynamic-menu {
-    padding: 0.5rem 0.25rem;
-    gap: 0.8rem;
+    padding: 1rem 0.75rem;
+  }
+  
+  .menu-items-grid {
+    gap: 1rem;
   }
   
   .menu-item-card {
-    border-radius: 6px;
+    border-radius: 10px;
+  }
+  
+  .menu-category-section {
+    margin-bottom: 2.5rem;
+  }
+  
+  .menu-category-header {
+    padding: 1.5rem 1rem;
+    margin-bottom: 1.5rem;
   }
   
   .menu-item-image {
-    height: 80px;
-    font-size: 2rem;
+    display: none !important;
   }
   
   .menu-item-content {
