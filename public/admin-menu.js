@@ -17,13 +17,18 @@ async function loadMenuData() {
     const items = await res.json();
     console.log('Loaded menuData:', items);
     console.log('First few items with IDs:');
-    items.slice(0, 3).forEach((item, i) => {
+    items.slice(0, 5).forEach((item, i) => {
       console.log(`Item ${i}:`, { 
         name: item.name, 
         id: item.id, 
         _id: item._id, 
-        keys: Object.keys(item)
+        keys: Object.keys(item),
+        fullItem: item
       });
+    });
+    console.log('All item IDs in database:');
+    items.forEach((item, i) => {
+      console.log(`${i}: "${item.name}" - id: ${item.id}, _id: ${item._id}`);
     });
     // Reset
     menuData = { PIZZAS: [], SALADS: [], SIDES: [], DRINKS: [], DESSERTS: [], CHICKEN: [] };
