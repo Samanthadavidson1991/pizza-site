@@ -1,36 +1,3 @@
-// Fetch and display orders for admin
-async function loadOrders() {
-  try {
-    const res = await fetch('https://pizza-site-c8t6.onrender.com/orders');
-    const orders = await res.json();
-    const ordersList = document.getElementById('orders-list');
-    if (!ordersList) return;
-    if (!orders.length) {
-      ordersList.innerHTML = '<em>No orders found.</em>';
-      return;
-    }
-    ordersList.innerHTML = orders.map(order => {
-      return `<div class="order-box" style="border:1px solid #ccc;padding:1em;margin-bottom:1em;">
-        <strong>Order for:</strong> ${order.customerName || 'N/A'}<br>
-        <strong>Phone:</strong> ${order.customerPhone || 'N/A'}<br>
-        <strong>Email:</strong> ${order.customerEmail || 'N/A'}<br>
-        <strong>Type:</strong> ${order.orderType || 'N/A'}<br>
-        <strong>Time Slot:</strong> ${order.orderTimeSlot || 'N/A'}<br>
-        <strong>Items:</strong> <ul>${(order.cart||[]).map(i=>`<li>${i.name} – £${i.price.toFixed(2)}</li>`).join('')}</ul>
-        <strong>Total:</strong> £${order.total ? order.total.toFixed(2) : '0.00'}<br>
-        <strong>Comments:</strong> ${order.orderComments || ''}<br>
-        <strong>Address:</strong> ${order.customerAddress || ''} ${order.customerPostcode || ''}<br>
-        <strong>Placed At:</strong> ${order.placedAt ? new Date(order.placedAt).toLocaleString() : ''}
-      </div>`;
-    }).join('');
-  } catch (err) {
-    const ordersList = document.getElementById('orders-list');
-    if (ordersList) ordersList.innerHTML = '<span style="color:red;">Failed to load orders.</span>';
-  }
-}
-
-// Load orders on page load
-window.addEventListener('DOMContentLoaded', loadOrders);
 // Menu data loaded from backend
 let menuData = {
   PIZZAS: [],
@@ -41,13 +8,14 @@ let menuData = {
   CHICKEN: []
 };
 
-const API_BASE = 'https://pizza-site-c8t6.onrender.com';
+const API_BASE = window.location.origin; // Use same server as admin panel
 async function loadMenuData() {
-  const loadingDiv = document.getElementById('menu-loading');
-  if (loadingDiv) loadingDiv.style.display = 'block';
   try {
+    console.log('Loading menu data from:', `${API_BASE}/menu`);
     const res = await fetch(`${API_BASE}/menu`);
+    console.log('Menu fetch response status:', res.status);
     const items = await res.json();
+    console.log('Loaded menuData:', items);
     // Reset
     menuData = { PIZZAS: [], SALADS: [], SIDES: [], DRINKS: [], DESSERTS: [], CHICKEN: [] };
     // Assign sortOrder if missing and update backend if needed
@@ -65,12 +33,12 @@ async function loadMenuData() {
       });
     });
     // Wait for all sortOrder updates before rendering
-    await Promise.all(updateSortOrderPromises);
-    renderMenuItems();
+    Promise.all(updateSortOrderPromises).then(() => {
+      renderMenuItems();
+    });
   } catch (err) {
     alert('Failed to load menu from server.');
   }
-  if (loadingDiv) loadingDiv.style.display = 'none';
 }
 
 async function addMenuItem(category, item) {
@@ -89,12 +57,21 @@ async function addMenuItem(category, item) {
       });
       item.id = maxId + 1;
     }
-    await fetch(`${API_BASE}/menu`, {
+    console.log('About to POST to:', `${API_BASE}/menu`);
+    console.log('API_BASE is:', API_BASE);
+    console.log('Item to add:', { ...item, category });
+    
+    const response = await fetch(`${API_BASE}/menu`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ...item, category })
     });
-    await loadMenuData(); // Instant sync after add
+    
+    console.log('POST response status:', response.status);
+    const result = await response.json();
+    console.log('POST response:', result);
+    
+    await loadMenuData();
   } catch (err) {
     alert('Failed to add menu item.');
   }
@@ -102,10 +79,30 @@ async function addMenuItem(category, item) {
 
 async function deleteMenuItem(category, id) {
   try {
-    await fetch(`${API_BASE}/menu/${id}`, { method: 'DELETE' });
+    console.log('Attempting to delete item:', { category, id, url: `${API_BASE}/menu/${id}` });
+    
+    const response = await fetch(`${API_BASE}/menu/${id}`, { 
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+    
+    console.log('Delete response status:', response.status);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      console.error('Delete failed with response:', errorText);
+      throw new Error(`HTTP ${response.status}: ${errorText}`);
+    }
+    
+    console.log('Delete successful, reloading menu data...');
     await loadMenuData();
+    console.log('Menu data reloaded successfully');
+    
   } catch (err) {
-    alert('Failed to delete menu item.');
+    console.error('Delete error:', err);
+    throw err; // Re-throw so the caller can handle it
   }
 }
 
@@ -238,7 +235,24 @@ function renderMenuItems() {
       delBtn.style.fontSize = '0.95em';
       delBtn.style.cursor = 'pointer';
       delBtn.onclick = async function() {
-        await deleteMenuItem(currentCategory, item.id || item._id);
+        console.log('Delete button clicked for item:', item);
+        console.log('Category:', currentCategory);
+        console.log('Item ID:', item.id || item._id);
+        
+        if (!item.id && !item._id) {
+          alert('Error: Item has no ID. Cannot delete.');
+          return;
+        }
+        
+        if (confirm(`Are you sure you want to delete "${item.name}"?`)) {
+          try {
+            await deleteMenuItem(currentCategory, item.id || item._id);
+            alert('Item deleted successfully!');
+          } catch (error) {
+            console.error('Delete error:', error);
+            alert('Failed to delete item: ' + error.message);
+          }
+        }
       };
       li.appendChild(delBtn);
 // Move menu item up or down in the list (UI only for now)
