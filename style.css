@@ -920,12 +920,74 @@ input[type="checkbox"]:checked {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.3rem 0;
+  padding: 0.5rem 0.8rem;
   border-bottom: 1px solid #ecf0f1;
+  border-radius: 6px;
+  margin-bottom: 0.3rem;
+  transition: all 0.2s ease;
+  background: #f8f9fa;
 }
 
 .size-option:last-child {
-  border-bottom: none;
+  border-bottom: 1px solid #ecf0f1;
+  margin-bottom: 0;
+}
+
+.size-option:hover {
+  background: #e3f2fd;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.size-option.selected {
+  background: #e8f5e8;
+  border: 2px solid #27ae60;
+  font-weight: bold;
+}
+
+.size-option.selected .size-name {
+  color: #27ae60;
+}
+
+.size-option.selected .size-price {
+  color: #27ae60;
+}
+
+/* Auto-add items styling */
+.size-option.auto-add {
+  background: linear-gradient(135deg, #fff3cd, #ffeaa7);
+  border: 1px solid #f1c40f;
+  position: relative;
+}
+
+.size-option.auto-add:hover {
+  background: linear-gradient(135deg, #ffd93d, #fdcb6e);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px rgba(241, 196, 15, 0.3);
+}
+
+.size-option.auto-add::after {
+  content: "Click to add";
+  position: absolute;
+  right: 0.5rem;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.7rem;
+  color: #856404;
+  font-weight: normal;
+  opacity: 0.8;
+}
+
+.size-option.auto-add.selected {
+  background: linear-gradient(135deg, #d4edda, #c3e6cb);
+  border: 2px solid #28a745;
+  animation: autoAddSuccess 0.5s ease;
+}
+
+@keyframes autoAddSuccess {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
 }
 
 .size-name {

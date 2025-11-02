@@ -231,14 +231,27 @@ async function renderMenuFromAPI() {
 					priceContainer.className = 'menu-item-prices';
 					
 					if (sizeOptions.length > 1) {
-						// Multiple size options
+						// Multiple size options - make them clickable
 						sizeOptions.forEach((sizeOpt, idx) => {
 							const sizeDiv = document.createElement('div');
-							sizeDiv.className = 'size-option';
+							let className = 'size-option';
+							if (item.autoAdd) {
+								className += ' auto-add';
+							} else if (idx === 0) {
+								className += ' selected';
+							}
+							sizeDiv.className = className;
+							sizeDiv.setAttribute('data-price', sizeOpt.price);
+							sizeDiv.setAttribute('data-size', sizeOpt.size);
 							sizeDiv.innerHTML = `
 								<span class="size-name">${sizeOpt.size}</span>
 								<span class="size-price">£${parseFloat(sizeOpt.price || 0).toFixed(2)}</span>
 							`;
+							
+							// Make size option clickable
+							sizeDiv.onclick = () => selectSizeOption(card, sizeDiv, sizeOpt.size, sizeOpt.price, item.name, item.autoAdd);
+							sizeDiv.style.cursor = 'pointer';
+							
 							priceContainer.appendChild(sizeDiv);
 						});
 					} else {
@@ -254,18 +267,48 @@ async function renderMenuFromAPI() {
 					descDiv.className = 'menu-item-description';
 					descDiv.textContent = generateItemDescription(item, category);
 					
-					// Add to cart button
-					const btn = document.createElement('button');
-					btn.className = 'menu-item-button';
-					btn.style.background = categoryInfo.color;
-					btn.textContent = 'Add to Cart';
-					btn.onclick = () => addToCart(label, price);
+					// Add to cart button (only for non-auto-add items)
+					if (!item.autoAdd) {
+						const btn = document.createElement('button');
+						btn.className = 'menu-item-button';
+						btn.style.background = categoryInfo.color;
+						btn.textContent = 'Add to Cart';
+						
+						// Store original item info and current selection
+						btn.setAttribute('data-base-name', label);
+						btn.setAttribute('data-current-price', price);
+						btn.setAttribute('data-current-size', sizeOptions.length > 1 ? sizeOptions[0].size : '');
+						
+						btn.onclick = () => {
+							const currentPrice = parseFloat(btn.getAttribute('data-current-price'));
+							const currentSize = btn.getAttribute('data-current-size');
+							const itemName = currentSize ? `${label} (${currentSize})` : label;
+							addToCart(itemName, currentPrice);
+						};
+						
+						card.appendChild(btn);
+					} else {
+						// For auto-add items, show instruction text
+						const instructionDiv = document.createElement('div');
+						instructionDiv.className = 'auto-add-instruction';
+						instructionDiv.textContent = 'Click any option above to add to cart';
+						instructionDiv.style.cssText = `
+							text-align: center;
+							color: #856404;
+							font-style: italic;
+							font-size: 0.9rem;
+							padding: 0.5rem;
+							background: #fff3cd;
+							border-radius: 4px;
+							margin-top: 0.5rem;
+						`;
+						card.appendChild(instructionDiv);
+					}
 					
 					// Assemble card
 					content.appendChild(nameDiv);
 					content.appendChild(priceContainer);
 					content.appendChild(descDiv);
-					content.appendChild(btn);
 					
 					card.appendChild(imgDiv);
 					card.appendChild(content);
@@ -291,6 +334,36 @@ async function renderMenuFromAPI() {
 		if (menuDiv) {
 			menuDiv.innerHTML = '<p>Failed to load menu. Please try again later.</p>';
 		}
+	}
+}
+
+// Function to handle size option selection
+function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, autoAdd) {
+	// Remove selected class from all size options in this card
+	const allSizeOptions = card.querySelectorAll('.size-option');
+	allSizeOptions.forEach(option => option.classList.remove('selected'));
+	
+	// Add selected class to clicked option
+	selectedDiv.classList.add('selected');
+	
+	// Check if this should auto-add to cart
+	if (autoAdd) {
+		// Automatically add to cart
+		const fullItemName = `${itemName} - ${sizeName}`;
+		addToCart(fullItemName, sizePrice);
+		console.log(`Auto-added to cart: ${fullItemName} for £${sizePrice}`);
+		
+		// Remove selection after short delay to show it was added
+		setTimeout(() => {
+			selectedDiv.classList.remove('selected');
+		}, 500);
+	} else {
+		// Update the add to cart button with new price and size
+		const addToCartBtn = card.querySelector('.menu-item-button');
+		addToCartBtn.setAttribute('data-current-price', sizePrice);
+		addToCartBtn.setAttribute('data-current-size', sizeName);
+		
+		console.log(`Selected ${sizeName} for £${sizePrice}`);
 	}
 }
 
