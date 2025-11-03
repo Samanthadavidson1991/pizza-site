@@ -179,6 +179,7 @@ async function renderMenuFromAPI() {
 					// Extract price with multiple fallbacks
 					let priceValue = item.price;
 					let sizeOptions = [];
+					let currentButton = null;
 					
 					// Handle pizzas and items with sizes
 					if (Array.isArray(item.sizes) && item.sizes.length > 0) {
@@ -286,8 +287,7 @@ async function renderMenuFromAPI() {
 							addToCart(itemName, currentPrice);
 						};
 						
-						content.appendChild(btn);
-					} else {
+						// Button will be added after assembly} else {
 						// For auto-add items, create a disabled "Add to Cart" button at the bottom
 						const btn = document.createElement('button');
 						btn.className = 'menu-item-button';
@@ -299,8 +299,7 @@ async function renderMenuFromAPI() {
 							alert('Click on the variety options above to add them to your cart!');
 						};
 						
-						// Add button to content, not directly to card
-						content.appendChild(btn);
+						// Button will be added after assembly
 					}
 					
 					// Assemble card
