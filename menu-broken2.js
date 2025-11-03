@@ -532,7 +532,7 @@ updateCartDisplay();
  } 
  
  c o n s t   m e n u I t e m s   =   a w a i t   r e s p o n s e . j s o n ( ) ; 
- c o n s o l e . l o g ( ' =ï¿½ï¿½ï¿½  M e n u   l o a d e d : ' ,   m e n u I t e m s . l e n g t h ,   ' i t e m s ' ) ; 
+ c o n s o l e . l o g ( ' =ØËÜ  M e n u   l o a d e d : ' ,   m e n u I t e m s . l e n g t h ,   ' i t e m s ' ) ; 
  
  c o n s t   m e n u C o n t a i n e r   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' d y n a m i c - m e n u ' ) ; 
  i f   ( ! m e n u C o n t a i n e r )   { 
@@ -610,7 +610,7 @@ updateCartDisplay();
  s i z e D i v . c l a s s N a m e   =   ' s i z e - o p t i o n ' ; 
  s i z e D i v . i n n e r H T M L   =   ` 
  < s p a n   c l a s s = " s i z e - n a m e " > $ { s i z e O p t i o n . s i z e   | |   s i z e O p t i o n . n a m e } < / s p a n > 
- < s p a n   c l a s s = " s i z e - p r i c e " > ï¿½ $ { s i z e O p t i o n . p r i c e . t o F i x e d ( 2 ) } < / s p a n > 
+ < s p a n   c l a s s = " s i z e - p r i c e " > £ $ { s i z e O p t i o n . p r i c e . t o F i x e d ( 2 ) } < / s p a n > 
  ` ; 
  
  s i z e D i v . o n c l i c k   =   f u n c t i o n ( )   { 
@@ -630,7 +630,7 @@ updateCartDisplay();
  c o n s t   p r i c e D i v   =   d o c u m e n t . c r e a t e E l e m e n t ( ' d i v ' ) ; 
  p r i c e D i v . c l a s s N a m e   =   ' s i n g l e - p r i c e - o p t i o n ' ; 
  p r i c e D i v . i n n e r H T M L   =   ` 
- < s p a n   c l a s s = " p r i c e " > ï¿½ $ { i t e m . p r i c e . t o F i x e d ( 2 ) } < / s p a n > 
+ < s p a n   c l a s s = " p r i c e " > £ $ { i t e m . p r i c e . t o F i x e d ( 2 ) } < / s p a n > 
  ` ; 
  
  p r i c e D i v . o n c l i c k   =   f u n c t i o n ( )   { 
@@ -643,4 +643,10 @@ updateCartDisplay();
  
  r e t u r n   c a r d ; 
  } 
+ 
+ / /   L o a d   m e n u   w h e n   p a g e   l o a d s 
+ d o c u m e n t . a d d E v e n t L i s t e n e r ( ' D O M C o n t e n t L o a d e d ' ,   f u n c t i o n ( )   { 
+ l o a d M e n u ( ) ; 
+ u p d a t e C a r t D i s p l a y ( ) ; 
+ } ) ;  
  

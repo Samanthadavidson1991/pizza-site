@@ -414,7 +414,6 @@ function showAddToCartTicket(itemName) {
 }
 
 function updateCart() {
-	updateCartDisplay();
 }
 
 function checkout() {
@@ -482,7 +481,6 @@ function updateCartDisplay() {
 function removeFromCart(itemName) {
 	cart = cart.filter(item => item.item !== itemName);
 	localStorage.setItem('cart', JSON.stringify(cart));
-	updateCartDisplay();
 }
 
  
@@ -508,14 +506,12 @@ return;
 if (confirm('Are you sure you want to clear all items from your cart?')) {
 cart = [];
 localStorage.setItem('cart', JSON.stringify(cart));
-updateCartDisplay();
 
 // Show confirmation message
 const cartSection = document.getElementById('cart');
 if (cartSection) {
 cartSection.innerHTML = '<div class="cart-cleared-message">🗑️ Cart cleared successfully!</div>';
 setTimeout(() => {
-updateCartDisplay();
 }, 2000);
 }
 }
@@ -644,3 +640,7 @@ updateCartDisplay();
  r e t u r n   c a r d ; 
  } 
  
+ / /   L o a d   m e n u   w h e n   p a g e   l o a d s 
+ d o c u m e n t . a d d E v e n t L i s t e n e r ( ' D O M C o n t e n t L o a d e d ' ,   f u n c t i o n ( )   { 
+ l o a d M e n u ( ) ; 
+ u p d a t e C a r t D i s p l a y ( ) ; 
