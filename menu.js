@@ -251,7 +251,12 @@ async function renderMenuFromAPI() {
 							`;
 							
 							// Make size option clickable
-							sizeDiv.onclick = () => selectSizeOption(card, sizeDiv, sizeOpt.size, sizeOpt.price, item.name, item.autoAdd);
+							sizeDiv.onclick = function() {
+							console.log('🖱️ CLICK DETECTED on:', sizeOpt.size || sizeOpt.name, 'for', item.name);
+							const sizeName = sizeOpt.size || sizeOpt.name || 'Unknown';
+							const sizePrice = sizeOpt.price || 0;
+							selectSizeOption(card, sizeDiv, sizeName, sizePrice, item.name, item.autoAdd);
+						};
 							sizeDiv.style.cursor = 'pointer';
 							
 							priceContainer.appendChild(sizeDiv);
