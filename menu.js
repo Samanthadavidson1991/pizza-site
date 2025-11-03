@@ -197,29 +197,41 @@ async function renderMenuFromAPI() {
 					descDiv.className = 'menu-item-description';
 					descDiv.textContent = generateItemDescription(item, category);
 
-					// Add to cart button
-					const btn = document.createElement('button');
-					btn.className = 'menu-item-button';
-					btn.style.background = categoryInfo.color;
-					btn.textContent = 'Add to Cart';
-
-					// Store original item info and current selection
-					btn.setAttribute('data-base-name', label);
-					btn.setAttribute('data-current-price', price);
-					btn.setAttribute('data-current-size', sizeOptions.length > 1 ? sizeOptions[0].size : '');
-
-					btn.onclick = () => {
-						const currentPrice = parseFloat(btn.getAttribute('data-current-price'));
-						const currentSize = btn.getAttribute('data-current-size');
-						const itemName = currentSize ? `${label} (${currentSize})` : label;
-						addToCart(itemName, currentPrice);
-					};
+					// Click instruction for single-price items
+					if (sizeOptions.length <= 1) {
+						const instructionDiv = document.createElement('div');
+						instructionDiv.className = 'click-instruction';
+						instructionDiv.textContent = 'Click price to add to cart';
+						instructionDiv.style.cssText = `
+							font-size: 0.85rem;
+							color: #666;
+							font-style: italic;
+							margin-top: 0.5rem;
+						`;
+						
+						// Make single price clickable for items without size options
+						const priceDiv = priceContainer.querySelector('.menu-item-price');
+						if (priceDiv) {
+							priceDiv.onclick = () => addToCart(label, price);
+							priceDiv.style.cursor = 'pointer';
+							priceDiv.style.padding = '0.5rem';
+							priceDiv.style.borderRadius = '4px';
+							priceDiv.style.transition = 'background-color 0.2s';
+							priceDiv.addEventListener('mouseover', () => {
+								priceDiv.style.backgroundColor = categoryInfo.color + '20';
+							});
+							priceDiv.addEventListener('mouseout', () => {
+								priceDiv.style.backgroundColor = 'transparent';
+							});
+						}
+						
+						content.appendChild(instructionDiv);
+					}
 
 					// Assemble card
 					content.appendChild(nameDiv);
 					content.appendChild(priceContainer);
 					content.appendChild(descDiv);
-					content.appendChild(btn);
 
 					card.appendChild(imgDiv);
 					card.appendChild(content);
@@ -247,7 +259,7 @@ async function renderMenuFromAPI() {
 	}
 }
 
-// Function to handle size option selection
+// Function to handle size option selection - ALL OPTIONS AUTO-ADD TO CART
 function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, autoAdd) {
 	// Remove selected class from all size options in this card
 	const allSizeOptions = card.querySelectorAll('.size-option');
@@ -256,25 +268,15 @@ function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, auto
 	// Add selected class to clicked option
 	selectedDiv.classList.add('selected');
 
-	// Check if this should auto-add to cart
-	if (autoAdd) {
-		// Automatically add to cart
-		const fullItemName = `${itemName} - ${sizeName}`;
-		addToCart(fullItemName, sizePrice);
-		console.log(`Auto-added to cart: ${fullItemName} for £${sizePrice}`);
+	// ALWAYS auto-add to cart when any option is clicked
+	const fullItemName = `${itemName} - ${sizeName}`;
+	addToCart(fullItemName, sizePrice);
+	console.log(`Auto-added to cart: ${fullItemName} for £${sizePrice}`);
 
-		// Remove selection after short delay to show it was added
-		setTimeout(() => {
-			selectedDiv.classList.remove('selected');
-		}, 500);
-	} else {
-		// Update the add to cart button with new price and size
-		const addToCartBtn = card.querySelector('.menu-item-button');
-		addToCartBtn.setAttribute('data-current-price', sizePrice);
-		addToCartBtn.setAttribute('data-current-size', sizeName);
-
-		console.log(`Selected ${sizeName} for £${sizePrice}`);
-	}
+	// Remove selection after short delay to show it was added
+	setTimeout(() => {
+		selectedDiv.classList.remove('selected');
+	}, 500);
 }
 
 function addToCart(item, price) {
