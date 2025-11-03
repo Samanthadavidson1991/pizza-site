@@ -61,6 +61,7 @@ function generateItemDescription(item, category) {
 
 // Fetch and render menu
 async function renderMenuFromAPI() {
+	console.log('🚀 renderMenuFromAPI starting...');
 	try {
 		console.log('Fetching menu from /menu endpoint...');
 		
@@ -323,7 +324,12 @@ async function renderMenuFromAPI() {
 			menuDiv.appendChild(categorySection);
 		});
 		
-		console.log('Menu rendering completed successfully');
+		console.log('✅ Menu rendering completed successfully - checking for clickable elements...');
+			const allSizeOptions = document.querySelectorAll('.size-option');
+			console.log('🔍 Found', allSizeOptions.length, 'size-option elements');
+			allSizeOptions.forEach((option, i) => {
+				console.log('Option', i + 1, ':', option.textContent.trim(), 'clickable:', option.onclick ? 'YES' : 'NO');
+			});
 		
 	} catch (err) {
 		console.error('Error in renderMenuFromAPI:', err);
@@ -336,6 +342,7 @@ async function renderMenuFromAPI() {
 
 // Function to handle size option selection
 function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, autoAdd) {
+	console.log('🎯 selectSizeOption called:', sizeName, 'for', itemName, 'autoAdd:', autoAdd);
 	// Remove selected class from all size options in this card
 	const allSizeOptions = card.querySelectorAll('.size-option');
 	allSizeOptions.forEach(option => option.classList.remove('selected'));
