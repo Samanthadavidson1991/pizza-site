@@ -288,21 +288,19 @@ async function renderMenuFromAPI() {
 						
 						card.appendChild(btn);
 					} else {
-						// For auto-add items, show instruction text
-						const instructionDiv = document.createElement('div');
-						instructionDiv.className = 'auto-add-instruction';
-						instructionDiv.textContent = 'Click any option above to add to cart';
-						instructionDiv.style.cssText = `
-							text-align: center;
-							color: #856404;
-							font-style: italic;
-							font-size: 0.9rem;
-							padding: 0.5rem;
-							background: #fff3cd;
-							border-radius: 4px;
-							margin-top: 0.5rem;
-						`;
-						card.appendChild(instructionDiv);
+						// For auto-add items, create a disabled "Add to Cart" button at the bottom
+						const btn = document.createElement('button');
+						btn.className = 'menu-item-button';
+						btn.style.background = categoryInfo.color;
+						btn.textContent = 'Add to Cart';
+						btn.style.opacity = '0.6';
+						btn.style.cursor = 'default';
+						btn.onclick = () => {
+							alert('Click on the variety options above to add them to your cart!');
+						};
+						
+						// Add button to content, not directly to card
+						content.appendChild(btn);
 					}
 					
 					// Assemble card

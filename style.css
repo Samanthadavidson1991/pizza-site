@@ -1242,4 +1242,51 @@ input[type="checkbox"]:checked {
      c u r s o r :   p o i n t e r   ! i m p o r t a n t ;  
      o p a c i t y :   1   ! i m p o r t a n t ;  
  }  
+ / *   F i x   c l i c k a b i l i t y   a n d   l a y o u t   i s s u e s   * /  
+  
+ / *   E n s u r e   s i z e   o p t i o n s   a r e   p r o p e r l y   c l i c k a b l e   * /  
+ . s i z e - o p t i o n   {  
+     c u r s o r :   p o i n t e r   ! i m p o r t a n t ;  
+     u s e r - s e l e c t :   n o n e ;  
+     - w e b k i t - u s e r - s e l e c t :   n o n e ;  
+     - m o z - u s e r - s e l e c t :   n o n e ;  
+     - m s - u s e r - s e l e c t :   n o n e ;  
+     p o s i t i o n :   r e l a t i v e ;  
+     z - i n d e x :   1 ;  
+ }  
+  
+ / *   M a k e   s u r e   t h e   e n t i r e   s i z e   o p t i o n   a r e a   i s   c l i c k a b l e   * /  
+ . s i z e - o p t i o n   *   {  
+     p o i n t e r - e v e n t s :   n o n e ;  
+ }  
+  
+ / *   I m p r o v e   m e n u   c a r d   l a y o u t   * /  
+ . m e n u - c a r d   {  
+     d i s p l a y :   f l e x   ! i m p o r t a n t ;  
+     f l e x - d i r e c t i o n :   c o l u m n   ! i m p o r t a n t ;  
+     p o s i t i o n :   r e l a t i v e ;  
+ }  
+  
+ . m e n u - c a r d - c o n t e n t   {  
+     f l e x :   1 ;  
+     d i s p l a y :   f l e x ;  
+     f l e x - d i r e c t i o n :   c o l u m n ;  
+ }  
+  
+ / *   F o r c e   b u t t o n s   t o   b o t t o m   * /  
+ . m e n u - i t e m - b u t t o n   {  
+     m a r g i n - t o p :   a u t o   ! i m p o r t a n t ;  
+     o r d e r :   9 9 9   ! i m p o r t a n t ;  
+ }  
+  
+ / *   R e m o v e   a n y   c o n f l i c t i n g   s t y l e s   * /  
+ . s i z e - o p t i o n . a u t o - a d d : : a f t e r   {  
+     d i s p l a y :   n o n e   ! i m p o r t a n t ;  
+ }  
+  
+ / *   E n s u r e   p r o p e r   s t a c k i n g   * /  
+ . m e n u - i t e m - p r i c e s   {  
+     p o s i t i o n :   r e l a t i v e ;  
+     z - i n d e x :   2 ;  
+ }  
  
