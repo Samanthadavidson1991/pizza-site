@@ -63,9 +63,9 @@ function generateItemDescription(item, category) {
 async function renderMenuFromAPI() {
 	console.log('ðŸš€ renderMenuFromAPI starting...');
 	try {
-		console.log('Fetching menu from /menu endpoint...');
+		console.log('Fetching menu from API server...');
 		
-		const response = await fetch('/menu');
+		const response = await fetch('https://pizza-site-c8t6.onrender.com/menu');
 		console.log('Response status:', response.status, response.statusText);
 		
 		if (!response.ok) {
@@ -646,6 +646,8 @@ updateCartDisplay();
  
 
  
- }  
- }  
+ } 
+ 
+ } 
+ 
  
