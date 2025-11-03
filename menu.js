@@ -363,6 +363,46 @@ function removeFromCart(itemName) {
 	updateCartDisplay();
 }
 
+function clearCart() {
+	if (cart.length === 0) {
+		alert('Cart is already empty!');
+		return;
+	}
+	
+	if (confirm('Are you sure you want to clear all items from your cart?')) {
+		cart = [];
+		localStorage.setItem('cart', JSON.stringify(cart));
+		updateCartDisplay();
+		
+		// Show confirmation message
+		const confirmationDiv = document.createElement('div');
+		confirmationDiv.textContent = '🗑️ Cart cleared successfully!';
+		confirmationDiv.style.cssText = `
+			position: fixed;
+			top: 20px;
+			right: 20px;
+			background: #e74c3c;
+			color: white;
+			padding: 1rem;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			z-index: 1000;
+			animation: slideIn 0.3s ease;
+		`;
+		
+		document.body.appendChild(confirmationDiv);
+		
+		setTimeout(() => {
+			confirmationDiv.style.animation = 'slideOut 0.3s ease';
+			setTimeout(() => {
+				if (document.body.contains(confirmationDiv)) {
+					document.body.removeChild(confirmationDiv);
+				}
+			}, 300);
+		}, 2000);
+	}
+}
+
 function checkout() {
 	if (cart.length === 0) {
 		alert('Your cart is empty!');
