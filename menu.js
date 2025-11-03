@@ -484,3 +484,28 @@ function removeFromCart(itemName) {
 	localStorage.setItem('cart', JSON.stringify(cart));
 	updateCartDisplay();
 }
+
+ 
+ f u n c t i o n   c l e a r C a r t ( )   { 
+ i f   ( c a r t . l e n g t h   = = =   0 )   { 
+ a l e r t ( ' C a r t   i s   a l r e a d y   e m p t y ! ' ) ; 
+ r e t u r n ; 
+ } 
+ 
+ i f   ( c o n f i r m ( ' A r e   y o u   s u r e   y o u   w a n t   t o   c l e a r   a l l   i t e m s   f r o m   y o u r   c a r t ? ' ) )   { 
+ c a r t   =   [ ] ; 
+ l o c a l S t o r a g e . s e t I t e m ( ' c a r t ' ,   J S O N . s t r i n g i f y ( c a r t ) ) ; 
+ u p d a t e C a r t D i s p l a y ( ) ; 
+ 
+ / /   S h o w   c o n f i r m a t i o n   m e s s a g e 
+ c o n s t   c a r t S e c t i o n   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' c a r t ' ) ; 
+ i f   ( c a r t S e c t i o n )   { 
+ c a r t S e c t i o n . i n n e r H T M L   =   ' < d i v   c l a s s = \  
+ c a r t - c l e a r e d - m e s s a g e \ > =ьящЧ  C a r t   c l e a r e d   s u c c e s s f u l l y ! < / d i v > ' ; 
+ s e t T i m e o u t ( ( )   = >   { 
+ u p d a t e C a r t D i s p l a y ( ) ; 
+ } ,   2 0 0 0 ) ; 
+ } 
+ } 
+ }  
+ 
