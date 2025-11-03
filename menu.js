@@ -286,7 +286,7 @@ async function renderMenuFromAPI() {
 							addToCart(itemName, currentPrice);
 						};
 						
-						card.appendChild(btn);
+						content.appendChild(btn);
 					} else {
 						// For auto-add items, create a disabled "Add to Cart" button at the bottom
 						const btn = document.createElement('button');

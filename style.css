@@ -1290,3 +1290,15 @@ input[type="checkbox"]:checked {
      z - i n d e x :   2 ;  
  }  
  
+ / *   F o r c e   b u t t o n s   t o   b o t t o m   o f   m e n u   c a r d s   * / 
+ . m e n u - i t e m - b u t t o n   { 
+     m a r g i n - t o p :   a u t o   ! i m p o r t a n t ; 
+     o r d e r :   9 9 9   ! i m p o r t a n t ; 
+ } 
+ 
+ / *   E n s u r e   f l e x   l a y o u t   f o r   m e n u   c a r d s   * / 
+ . m e n u - c a r d - c o n t e n t   { 
+     d i s p l a y :   f l e x   ! i m p o r t a n t ; 
+     f l e x - d i r e c t i o n :   c o l u m n   ! i m p o r t a n t ; 
+ }  
+ 
