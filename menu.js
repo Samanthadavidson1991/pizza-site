@@ -270,7 +270,7 @@ async function renderMenuFromAPI() {
 					
 					// Add to cart button (only for non-auto-add items)
 					if (!item.autoAdd) {
-						const btn = document.createElement('button');
+						btn = document.createElement('button');
 						btn.className = 'menu-item-button';
 						btn.style.background = categoryInfo.color;
 						btn.textContent = 'Add to Cart';
@@ -289,7 +289,7 @@ async function renderMenuFromAPI() {
 						
 						// Button will be added after assembly} else {
 						// For auto-add items, create a disabled "Add to Cart" button at the bottom
-						const btn = document.createElement('button');
+						btn = document.createElement('button');
 						btn.className = 'menu-item-button';
 						btn.style.background = categoryInfo.color;
 						btn.textContent = 'Add to Cart';
