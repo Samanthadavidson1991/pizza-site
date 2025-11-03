@@ -1,4 +1,4 @@
-﻿let cart = JSON.parse(localStorage.getItem('cart')) || [];
+let cart = JSON.parse(localStorage.getItem('cart')) || [];
 
 // Category styling configuration
 const categoryConfig = {
@@ -61,7 +61,7 @@ function generateItemDescription(item, category) {
 
 // Fetch and render menu
 async function renderMenuFromAPI() {
-	console.log('ðŸš€ renderMenuFromAPI starting...');
+	console.log('🚀 renderMenuFromAPI starting...');
 	try {
 		console.log('Fetching menu from /menu endpoint...');
 		
@@ -112,21 +112,21 @@ async function renderMenuFromAPI() {
 		const allInputs = document.querySelectorAll('input');
 		const searchContainer = document.querySelector('.search-container, #search-container, [class*="search"]');
 		
-		console.log('ðŸ” Found inputs:', allInputs.length);
-		console.log('ðŸ” Search input found:', !!existingSearch);
-		console.log('ðŸ” Search container found:', !!searchContainer);
+		console.log('🔍 Found inputs:', allInputs.length);
+		console.log('🔍 Search input found:', !!existingSearch);
+		console.log('🔍 Search container found:', !!searchContainer);
 		
 		if (existingSearch) {
-			console.log('ðŸš¨ FOUND SEARCH INPUT:', existingSearch);
-			console.log('ðŸš¨ Search input HTML:', existingSearch.outerHTML);
-			console.log('ðŸš¨ REMOVING SEARCH INPUT NOW');
+			console.log('🚨 FOUND SEARCH INPUT:', existingSearch);
+			console.log('🚨 Search input HTML:', existingSearch.outerHTML);
+			console.log('🚨 REMOVING SEARCH INPUT NOW');
 			existingSearch.remove();
 		}
 		
 		if (searchContainer) {
-			console.log('ðŸš¨ FOUND SEARCH CONTAINER:', searchContainer);
-			console.log('ðŸš¨ Search container HTML:', searchContainer.outerHTML);
-			console.log('ðŸš¨ REMOVING SEARCH CONTAINER NOW');
+			console.log('🚨 FOUND SEARCH CONTAINER:', searchContainer);
+			console.log('🚨 Search container HTML:', searchContainer.outerHTML);
+			console.log('🚨 REMOVING SEARCH CONTAINER NOW');
 			searchContainer.remove();
 		}
 		
@@ -200,7 +200,7 @@ async function renderMenuFromAPI() {
 					
 					if (isNaN(price) || price < 0 || !isFinite(price)) {
 						price = 0;
-						console.warn(`Invalid price for "${label}". Original:`, priceValue, 'Setting to Â£0.00');
+						console.warn(`Invalid price for "${label}". Original:`, priceValue, 'Setting to £0.00');
 					}
 					
 					// Additional safety check before toFixed
@@ -247,12 +247,12 @@ async function renderMenuFromAPI() {
 							sizeDiv.setAttribute('data-size', sizeOpt.size);
 							sizeDiv.innerHTML = `
 								<span class="size-name">${sizeOpt.size}</span>
-								<span class="size-price">Â£${parseFloat(sizeOpt.price || 0).toFixed(2)}</span>
+								<span class="size-price">£${parseFloat(sizeOpt.price || 0).toFixed(2)}</span>
 							`;
 							
 							// Make size option clickable
 							sizeDiv.onclick = function() {
-							console.log('ðŸ–±ï¸ CLICK DETECTED on:', sizeOpt.size || sizeOpt.name, 'for', item.name);
+							console.log('🖱️ CLICK DETECTED on:', sizeOpt.size || sizeOpt.name, 'for', item.name);
 							const sizeName = sizeOpt.size || sizeOpt.name || 'Unknown';
 							const sizePrice = sizeOpt.price || 0;
 							selectSizeOption(card, sizeDiv, sizeName, sizePrice, item.name, item.autoAdd);
@@ -265,7 +265,7 @@ async function renderMenuFromAPI() {
 						// Single price
 						const priceDiv = document.createElement('div');
 						priceDiv.className = 'menu-item-price';
-						priceDiv.textContent = `Â£${price.toFixed(2)}`;
+						priceDiv.textContent = `£${price.toFixed(2)}`;
 						priceContainer.appendChild(priceDiv);
 					}
 					
@@ -317,7 +317,7 @@ async function renderMenuFromAPI() {
 					card.appendChild(content);
 					itemsContainer.appendChild(card);
 					
-					console.log(`Successfully added item: ${label} - Â£${price.toFixed(2)}`);
+					console.log(`Successfully added item: ${label} - £${price.toFixed(2)}`);
 					
 				} catch (itemError) {
 					console.error(`Error processing item ${index}:`, itemError, 'Item data:', item);
@@ -329,9 +329,9 @@ async function renderMenuFromAPI() {
 			menuDiv.appendChild(categorySection);
 		});
 		
-		console.log('âœ… Menu rendering completed successfully - checking for clickable elements...');
+		console.log('✅ Menu rendering completed successfully - checking for clickable elements...');
 			const allSizeOptions = document.querySelectorAll('.size-option');
-			console.log('ðŸ” Found', allSizeOptions.length, 'size-option elements');
+			console.log('🔍 Found', allSizeOptions.length, 'size-option elements');
 			allSizeOptions.forEach((option, i) => {
 				console.log('Option', i + 1, ':', option.textContent.trim(), 'clickable:', option.onclick ? 'YES' : 'NO');
 			});
@@ -347,7 +347,7 @@ async function renderMenuFromAPI() {
 
 // Function to handle size option selection
 function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, autoAdd) {
-	console.log('ðŸŽ¯ selectSizeOption called:', sizeName, 'for', itemName, 'autoAdd:', autoAdd);
+	console.log('🎯 selectSizeOption called:', sizeName, 'for', itemName, 'autoAdd:', autoAdd);
 	// Remove selected class from all size options in this card
 	const allSizeOptions = card.querySelectorAll('.size-option');
 	allSizeOptions.forEach(option => option.classList.remove('selected'));
@@ -360,7 +360,7 @@ function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, auto
 		// Automatically add to cart
 		const fullItemName = `${itemName} - ${sizeName}`;
 		addToCart(fullItemName, sizePrice);
-		console.log(`Auto-added to cart: ${fullItemName} for Â£${sizePrice}`);
+		console.log(`Auto-added to cart: ${fullItemName} for £${sizePrice}`);
 		
 		// Remove selection after short delay to show it was added
 		setTimeout(() => {
@@ -372,7 +372,7 @@ function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, auto
 		addToCartBtn.setAttribute('data-current-price', sizePrice);
 		addToCartBtn.setAttribute('data-current-size', sizeName);
 		
-		console.log(`Selected ${sizeName} for Â£${sizePrice}`);
+		console.log(`Selected ${sizeName} for £${sizePrice}`);
 	}
 }
 
@@ -390,7 +390,7 @@ function showAddToCartTicket(itemName) {
 	// Create a temporary notification
 	const ticket = document.createElement('div');
 	ticket.className = 'cart-ticket';
-	ticket.textContent = `âœ“ ${itemName} added to cart`;
+	ticket.textContent = `✓ ${itemName} added to cart`;
 	ticket.style.cssText = `
 		position: fixed;
 		top: 20px;
@@ -447,7 +447,7 @@ function updateCartDisplay() {
 	
 	if (cart.length === 0) {
 		cartSection.innerHTML = '';
-		cartTotal.innerHTML = '<strong>Total: Â£0.00</strong>';
+		cartTotal.innerHTML = '<strong>Total: £0.00</strong>';
 		return;
 	}
 	
@@ -470,13 +470,13 @@ function updateCartDisplay() {
 		${Object.values(groupedCart).map(item => `
 			<div class="cart-item">
 				<span>${item.item} x${item.quantity}</span>
-				<span>Â£${(item.price * item.quantity).toFixed(2)}</span>
+				<span>£${(item.price * item.quantity).toFixed(2)}</span>
 				<button onclick="removeFromCart('${item.item}')" class="remove-item">Remove</button>
 			</div>
 		`).join('')}
 	`;
 	
-	cartTotal.innerHTML = `<strong>Total: Â£${total.toFixed(2)}</strong>`;
+	cartTotal.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
 }
 
 function removeFromCart(itemName) {
@@ -498,25 +498,38 @@ function removeFromCart(itemName) {
  u p d a t e C a r t D i s p l a y ( ) ; 
  
  / /   S h o w   c o n f i r m a t i o n   m e s s a g e 
-
-function clearCart() {
-if (cart.length === 0) {
-alert('Cart is already empty!');
-return;
-}
-
-if (confirm('Are you sure you want to clear all items from your cart?')) {
-cart = [];
-localStorage.setItem('cart', JSON.stringify(cart));
-updateCartDisplay();
-
-// Show confirmation message
-const cartSection = document.getElementById('cart');
-if (cartSection) {
-cartSection.innerHTML = '<div class="cart-cleared-message">🗑️ Cart cleared successfully!</div>';
-setTimeout(() => {
-updateCartDisplay();
-}, 2000);
-}
-}
-}
+ c o n s t   c a r t S e c t i o n   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' c a r t ' ) ; 
+ i f   ( c a r t S e c t i o n )   { 
+ c a r t S e c t i o n . i n n e r H T M L   =   ' < d i v   c l a s s = \  
+ c a r t - c l e a r e d - m e s s a g e \ > =����  C a r t   c l e a r e d   s u c c e s s f u l l y ! < / d i v > ' ; 
+ s e t T i m e o u t ( ( )   = >   { 
+ u p d a t e C a r t D i s p l a y ( ) ; 
+ } ,   2 0 0 0 ) ; 
+ } 
+ } 
+ }  
+ 
+ 
+ f u n c t i o n   c l e a r C a r t ( )   { 
+ i f   ( c a r t . l e n g t h   = = =   0 )   { 
+ a l e r t ( ' C a r t   i s   a l r e a d y   e m p t y ! ' ) ; 
+ r e t u r n ; 
+ } 
+ 
+ i f   ( c o n f i r m ( ' A r e   y o u   s u r e   y o u   w a n t   t o   c l e a r   a l l   i t e m s   f r o m   y o u r   c a r t ? ' ) )   { 
+ c a r t   =   [ ] ; 
+ l o c a l S t o r a g e . s e t I t e m ( ' c a r t ' ,   J S O N . s t r i n g i f y ( c a r t ) ) ; 
+ u p d a t e C a r t D i s p l a y ( ) ; 
+ 
+ / /   S h o w   c o n f i r m a t i o n   m e s s a g e 
+ c o n s t   c a r t S e c t i o n   =   d o c u m e n t . g e t E l e m e n t B y I d ( ' c a r t ' ) ; 
+ i f   ( c a r t S e c t i o n )   { 
+ c a r t S e c t i o n . i n n e r H T M L   =   ' < d i v   c l a s s = \  
+ c a r t - c l e a r e d - m e s s a g e \ >   C a r t   c l e a r e d   s u c c e s s f u l l y ! < / d i v > ' ; 
+ s e t T i m e o u t ( ( )   = >   { 
+ u p d a t e C a r t D i s p l a y ( ) ; 
+ } ,   2 0 0 0 ) ; 
+ } 
+ } 
+ }  
+ 
