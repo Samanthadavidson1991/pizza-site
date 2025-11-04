@@ -1,6 +1,7 @@
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs');
 const { MongoClient } = require('mongodb');
 
 const app = express();
@@ -116,6 +117,77 @@ app.post('/login', (req, res) => {
     res.json({ success: true, username: 'admin' });
   } else {
     res.status(401).json({ error: 'Invalid credentials' });
+  }
+});
+
+// Order submission endpoint
+app.post('/submit-order', (req, res) => {
+  console.log('Order submission received:', req.body);
+  try {
+    // Read existing orders
+    let orders = [];
+    try {
+      const ordersData = fs.readFileSync('orders.json', 'utf8');
+      orders = JSON.parse(ordersData);
+    } catch (e) {
+      console.log('No existing orders file, creating new one');
+      orders = [];
+    }
+    
+    // Add new order with timestamp and ID
+    const newOrder = {
+      ...req.body,
+      id: Date.now(),
+      timestamp: new Date().toISOString(),
+      status: 'pending'
+    };
+    orders.push(newOrder);
+    
+    // Save orders back to file
+    fs.writeFileSync('orders.json', JSON.stringify(orders, null, 2));
+    
+    console.log('Order saved successfully with ID:', newOrder.id);
+    res.json({ success: true, orderId: newOrder.id, message: 'Order placed successfully' });
+  } catch (error) {
+    console.error('Order submission error:', error);
+    res.status(500).json({ error: 'Failed to submit order', details: error.message });
+  }
+});
+
+// Get orders endpoint
+app.get('/orders.json', (req, res) => {
+  try {
+    const ordersData = fs.readFileSync('orders.json', 'utf8');
+    const orders = JSON.parse(ordersData);
+    res.json(orders);
+  } catch (e) {
+    console.log('No orders file found');
+    res.json([]);
+  }
+});
+
+// Update order status endpoint
+app.post('/update-order', (req, res) => {
+  try {
+    const { index, status, username } = req.body;
+    
+    const ordersData = fs.readFileSync('orders.json', 'utf8');
+    const orders = JSON.parse(ordersData);
+    
+    if (index >= 0 && index < orders.length) {
+      orders[index].status = status;
+      orders[index].updatedAt = new Date().toISOString();
+      orders[index].updatedBy = username || 'system';
+      
+      fs.writeFileSync('orders.json', JSON.stringify(orders, null, 2));
+      
+      res.json({ success: true, message: 'Order updated successfully' });
+    } else {
+      res.status(400).json({ error: 'Invalid order index' });
+    }
+  } catch (error) {
+    console.error('Update order error:', error);
+    res.status(500).json({ error: 'Failed to update order' });
   }
 });
 
