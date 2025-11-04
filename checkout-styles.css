@@ -387,6 +387,31 @@
     cursor: not-allowed;
 }
 
+/* Remove any black overlay effects from buttons */
+.payment-btn:active,
+.payment-btn:focus,
+button.payment-btn:active,
+button.payment-btn:focus,
+#pay-with-cash:active,
+#pay-with-card:active,
+#pay-with-cash:focus,
+#pay-with-card:focus {
+    box-shadow: none !important;
+    background: #f8f9fa !important;
+    border-color: #80bdff !important;
+    outline: none !important;
+    transform: none !important;
+}
+
+.cash-btn:active,
+.cash-btn:focus,
+#pay-with-cash:active,
+#pay-with-cash:focus {
+    background: #f8fff9 !important;
+    border-color: #28a745 !important;
+    box-shadow: none !important;
+}
+
 .btn-icon {
     font-size: 2rem;
 }
