@@ -280,7 +280,7 @@ function selectSizeOption(card, selectedDiv, sizeName, sizePrice, itemName, auto
 }
 
 function addToCart(item, price) {
-	cart.push({ item, price, quantity: 1 });
+	cart.push({ name: item, price, quantity: 1 });
 	localStorage.setItem('cart', JSON.stringify(cart));
 	showAddToCartTicket(item);
 	updateCartDisplay();
