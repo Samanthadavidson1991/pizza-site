@@ -18,7 +18,8 @@ class CheckoutManager {
     }
 
     setupEventListeners() {
-        // Order type toggle
+        // Since delivery is the only option, no need for order type toggle
+        // Order type toggle (kept for future extensibility)
         document.querySelectorAll('input[name="orderType"]').forEach(radio => {
             radio.addEventListener('change', (e) => this.handleOrderTypeChange(e));
         });
@@ -90,19 +91,10 @@ class CheckoutManager {
     }
 
     handleOrderTypeChange(event) {
+        // Since delivery is the only option, delivery fields are always visible
         const deliveryFields = document.getElementById('delivery-fields');
-        const isDelivery = event.target.value === 'delivery';
-        
-        deliveryFields.style.display = isDelivery ? 'block' : 'none';
-        
-        // Clear delivery field errors if switching to collection
-        if (!isDelivery) {
-            this.clearError(document.getElementById('customer-address'));
-            this.clearError(document.getElementById('customer-postcode'));
-        }
-    }
-
-    validateField(field) {
+        deliveryFields.style.display = 'block';
+    }    validateField(field) {
         const value = field.value.trim();
         const fieldName = field.id;
         let isValid = true;
@@ -113,7 +105,8 @@ class CheckoutManager {
 
         // Check if field is required
         const isRequired = field.hasAttribute('required') || field.classList.contains('required');
-        const isDelivery = document.querySelector('input[name="orderType"]:checked').value === 'delivery';
+        // Since delivery is the only option, it's always true
+        const isDelivery = true;
 
         switch (fieldName) {
             case 'customer-name':
@@ -144,14 +137,14 @@ class CheckoutManager {
                 break;
 
             case 'customer-address':
-                if (isDelivery && !value) {
+                if (!value) {
                     errorMessage = 'Please enter your delivery address';
                     isValid = false;
                 }
                 break;
 
             case 'customer-postcode':
-                if (isDelivery && !value) {
+                if (!value) {
                     errorMessage = 'Please enter your postcode';
                     isValid = false;
                 }
@@ -196,13 +189,10 @@ class CheckoutManager {
         const requiredFields = [
             'customer-name',
             'customer-phone',
-            'order-time-slot'
+            'order-time-slot',
+            'customer-address',
+            'customer-postcode'
         ];
-
-        const isDelivery = document.querySelector('input[name="orderType"]:checked').value === 'delivery';
-        if (isDelivery) {
-            requiredFields.push('customer-address', 'customer-postcode');
-        }
 
         let isFormValid = true;
         const firstErrorField = requiredFields.find(fieldId => {
@@ -300,17 +290,14 @@ class CheckoutManager {
         
         // Show success message
         const customerName = document.getElementById('customer-name').value.trim();
-        const orderType = document.querySelector('input[name="orderType"]:checked').value;
         const timeSlot = document.getElementById('order-time-slot').value;
-        
+
         const message = `Thank you ${customerName}!\n\n` +
                        `Your order has been placed successfully.\n` +
                        `Order ID: ${result.orderId || 'N/A'}\n` +
-                       `${orderType === 'delivery' ? 'Delivery' : 'Collection'}: ${timeSlot}\n\n` +
-                       `You will pay with cash when your order ${orderType === 'delivery' ? 'is delivered' : 'is ready for collection'}.\n\n` +
-                       `We'll contact you if there are any issues.`;
-        
-        alert(message);
+                       `Delivery: ${timeSlot}\n\n` +
+                       `You will pay with cash when your order is delivered.\n\n` +
+                       `We'll contact you if there are any issues.`;        alert(message);
         
         // Redirect to home page
         window.location.href = 'index.html';
