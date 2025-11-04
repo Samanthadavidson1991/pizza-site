@@ -235,9 +235,49 @@ class CheckoutManager {
         this.showLoading(true);
 
         try {
+            // Check stock availability first
+            const stockCheckResponse = await fetch('https://thecrustatngb.co.uk/check-stock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ items: this.cart })
+            });
+
+            if (!stockCheckResponse.ok) {
+                throw new Error('Failed to check stock availability');
+            }
+
+            const stockCheck = await stockCheckResponse.json();
+            
+            if (!stockCheck.available) {
+                let message = 'Sorry, some items in your cart are no longer available:\n\n';
+                stockCheck.unavailableItems.forEach(item => {
+                    message += `• ${item.name}${item.size ? ` (${item.size})` : ''}: `;
+                    message += `Requested ${item.requested}, only ${item.available} available\n`;
+                });
+                message += '\nPlease update your cart and try again.';
+                alert(message);
+                return;
+            }
+
+            // Check time slot availability
+            const timeSlot = document.getElementById('order-time-slot').value;
+            const timeslotResponse = await fetch('https://thecrustatngb.co.uk/timeslot-availability');
+            
+            if (timeslotResponse.ok) {
+                const timeslotData = await timeslotResponse.json();
+                const currentCount = timeslotData.slotCounts[timeSlot] || 0;
+                
+                if (currentCount >= timeslotData.maxOrdersPerSlot) {
+                    alert(`Sorry, the ${timeSlot} time slot is now full. Please select a different time slot.`);
+                    return;
+                }
+            }
+
             // Gather form data
             const formData = this.gatherFormData();
-            
+
             // Submit order
             const response = await fetch('https://thecrustatngb.co.uk/submit-order', {
                 method: 'POST',
@@ -253,7 +293,16 @@ class CheckoutManager {
             }
 
             const result = await response.json();
-            
+
+            // Update stock levels after successful order
+            await fetch('https://thecrustatngb.co.uk/update-stock', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ items: this.cart })
+            });
+
             // Success!
             this.handleOrderSuccess(result);
 
@@ -263,9 +312,7 @@ class CheckoutManager {
         } finally {
             this.showLoading(false);
         }
-    }
-
-    gatherFormData() {
+    }    gatherFormData() {
         const total = this.cart.reduce((sum, item) => sum + (item.price * (item.quantity || 1)), 0);
         
         return {

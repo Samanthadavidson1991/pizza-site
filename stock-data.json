@@ -1,0 +1,50 @@
+{
+  "Margherita Pizza": {
+    "stock": 25,
+    "minStock": 5,
+    "category": "Pizza",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  },
+  "Pepperoni Pizza": {
+    "stock": 3,
+    "minStock": 5,
+    "category": "Pizza",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  },
+  "Hawaiian Pizza": {
+    "stock": 15,
+    "minStock": 5,
+    "category": "Pizza",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  },
+  "BBQ Chicken Pizza": {
+    "stock": 0,
+    "minStock": 5,
+    "category": "Pizza",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  },
+  "Garlic Bread": {
+    "stock": 8,
+    "minStock": 3,
+    "category": "Sides",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  },
+  "Chicken Wings": {
+    "stock": 12,
+    "minStock": 5,
+    "category": "Sides",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  },
+  "Coca Cola": {
+    "stock": 2,
+    "minStock": 10,
+    "category": "Drinks",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  },
+  "Pepsi": {
+    "stock": 0,
+    "minStock": 10,
+    "category": "Drinks",
+    "lastUpdated": "2024-01-20T10:00:00Z"
+  }
+}
