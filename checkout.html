@@ -60,86 +60,102 @@
 				<div class="checkout-section customer-info">
 					<h2><span class="step-icon">👤</span> Your Information</h2>
 					<form id="checkout-form" class="checkout-form">
-						<!-- Contact Information -->
-						<div class="form-group">
-							<label for="customer-name" class="required">Full Name</label>
-							<input type="text" id="customer-name" name="customerName" required 
-								   placeholder="Enter your full name" class="form-input">
-							<div class="error-message" id="name-error"></div>
+						
+						<!-- Contact Details Section -->
+						<div class="form-section">
+							<h3 class="section-title">📞 Contact Details</h3>
+							<div class="form-row">
+								<div class="form-group">
+									<label for="customer-name" class="required">Full Name</label>
+									<input type="text" id="customer-name" name="customerName" required 
+										   placeholder="Enter your full name" class="form-input">
+									<div class="error-message" id="name-error"></div>
+								</div>
+
+								<div class="form-group">
+									<label for="customer-phone" class="required">Phone Number</label>
+									<input type="tel" id="customer-phone" name="customerPhone" required 
+										   placeholder="Enter your phone number" class="form-input">
+									<div class="error-message" id="phone-error"></div>
+								</div>
+							</div>
+
+							<div class="form-group">
+								<label for="customer-email">Email Address</label>
+								<input type="email" id="customer-email" name="customerEmail" 
+									   placeholder="Enter email for order confirmation (optional)" class="form-input">
+								<small class="field-hint">We'll send you an order confirmation</small>
+							</div>
 						</div>
 
-						<div class="form-group">
-							<label for="customer-phone" class="required">Phone Number</label>
-							<input type="tel" id="customer-phone" name="customerPhone" required 
-								   placeholder="Enter your phone number" class="form-input">
-							<div class="error-message" id="phone-error"></div>
-						</div>
+						<!-- Delivery Details Section -->
+						<div class="form-section">
+							<h3 class="section-title">🚚 Delivery Details</h3>
+							
+							<!-- Order Type -->
+							<div class="form-group order-type-group">
+								<label class="group-label required">Delivery Service</label>
+								<div class="radio-group">
+									<label class="radio-option">
+										<input type="radio" name="orderType" value="delivery" checked>
+										<span class="radio-custom"></span>
+										<div class="radio-content">
+											<strong>Home Delivery</strong>
+											<small>We'll deliver to your address</small>
+										</div>
+									</label>
+								</div>
+							</div>
 
-						<div class="form-group">
-							<label for="customer-email">Email Address</label>
-							<input type="email" id="customer-email" name="customerEmail" 
-								   placeholder="Enter email for order confirmation (optional)" class="form-input">
-							<small class="field-hint">We'll send you an order confirmation</small>
-						</div>
-
-						<!-- Order Type -->
-						<div class="form-group order-type-group">
-							<label class="group-label required">Order Type</label>
-							<div class="radio-group">
-								<label class="radio-option">
-									<input type="radio" name="orderType" value="delivery" checked>
-									<span class="radio-custom"></span>
-									<div class="radio-content">
-										<strong>Delivery</strong>
-										<small>We'll deliver to you</small>
+							<!-- Delivery Address -->
+							<div id="delivery-fields" class="delivery-section">
+								<div class="form-row">
+									<div class="form-group address-group">
+										<label for="customer-address" class="required">Delivery Address</label>
+										<input type="text" id="customer-address" name="customerAddress" 
+											   placeholder="Enter your full address" class="form-input">
+										<div class="error-message" id="address-error"></div>
 									</div>
-								</label>
+
+									<div class="form-group postcode-group">
+										<label for="customer-postcode" class="required">Postcode</label>
+										<input type="text" id="customer-postcode" name="customerPostcode" 
+											   placeholder="Enter your postcode" class="form-input">
+										<div class="error-message" id="postcode-error"></div>
+									</div>
+								</div>
 							</div>
 						</div>
 
-						<!-- Delivery Address -->
-						<div id="delivery-fields" class="delivery-section">
+						<!-- Order Preferences Section -->
+						<div class="form-section">
+							<h3 class="section-title">⏰ Order Preferences</h3>
+							
 							<div class="form-group">
-								<label for="customer-address" class="required">Delivery Address</label>
-								<input type="text" id="customer-address" name="customerAddress" 
-									   placeholder="Enter your full address" class="form-input">
-								<div class="error-message" id="address-error"></div>
+								<label for="order-time-slot" class="required">Preferred Delivery Time</label>
+								<select id="order-time-slot" name="orderTimeSlot" required class="form-select">
+									<option value="">Select your preferred time...</option>
+									<option value="17:00-17:30">17:00 - 17:30</option>
+									<option value="17:30-18:00">17:30 - 18:00</option>
+									<option value="18:00-18:30">18:00 - 18:30</option>
+									<option value="18:30-19:00">18:30 - 19:00</option>
+									<option value="19:00-19:30">19:00 - 19:30</option>
+									<option value="19:30-20:00">19:30 - 20:00</option>
+									<option value="20:00-20:30">20:00 - 20:30</option>
+									<option value="20:30-21:00">20:30 - 21:00</option>
+									<option value="21:00-21:30">21:00 - 21:30</option>
+									<option value="21:30-22:00">21:30 - 22:00</option>
+								</select>
+								<div class="error-message" id="timeslot-error"></div>
 							</div>
 
 							<div class="form-group">
-								<label for="customer-postcode" class="required">Postcode</label>
-								<input type="text" id="customer-postcode" name="customerPostcode" 
-									   placeholder="Enter your postcode" class="form-input">
-								<div class="error-message" id="postcode-error"></div>
+								<label for="order-comments">Special Instructions</label>
+								<textarea id="order-comments" name="orderComments" 
+										  placeholder="Any special requests, allergies, or delivery notes..." 
+										  class="form-textarea" rows="3"></textarea>
+								<small class="field-hint">Optional: Let us know about allergies or special requirements</small>
 							</div>
-						</div>
-
-						<!-- Time Slot -->
-						<div class="form-group">
-							<label for="order-time-slot" class="required">Preferred Time</label>
-							<select id="order-time-slot" name="orderTimeSlot" required class="form-select">
-								<option value="">Select your preferred time...</option>
-								<option value="17:00-17:30">17:00 - 17:30</option>
-								<option value="17:30-18:00">17:30 - 18:00</option>
-								<option value="18:00-18:30">18:00 - 18:30</option>
-								<option value="18:30-19:00">18:30 - 19:00</option>
-								<option value="19:00-19:30">19:00 - 19:30</option>
-								<option value="19:30-20:00">19:30 - 20:00</option>
-								<option value="20:00-20:30">20:00 - 20:30</option>
-								<option value="20:30-21:00">20:30 - 21:00</option>
-								<option value="21:00-21:30">21:00 - 21:30</option>
-								<option value="21:30-22:00">21:30 - 22:00</option>
-							</select>
-							<div class="error-message" id="timeslot-error"></div>
-						</div>
-
-						<!-- Special Instructions -->
-						<div class="form-group">
-							<label for="order-comments">Special Instructions</label>
-							<textarea id="order-comments" name="orderComments" 
-									  placeholder="Any special requests, allergies, or delivery notes..." 
-									  class="form-textarea" rows="3"></textarea>
-							<small class="field-hint">Optional: Let us know about allergies or special requirements</small>
 						</div>
 					</form>
 				</div>
