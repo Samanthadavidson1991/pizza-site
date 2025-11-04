@@ -3,185 +3,202 @@
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Checkout</title>
+	<title>Checkout - The Crust at NGB</title>
 	<link rel="stylesheet" href="style.css">
-	<!-- Stripe.js -->
-	<script src="https://js.stripe.com/v3/"></script>
+	<link rel="stylesheet" href="checkout-styles.css">
 </head>
-<body class="allergens-page app-body">
+<body class="checkout-page app-body">
 	<header>
 		<h1 class="main-heading no-underline">Inspired by Naples, perfected at None Go Bye.</h1>
 		<nav class="main-nav">
-			   <a href="index.html">Home</a>
-			   <a href="menu.html">Menu</a>
-			   <a href="checkout.html">Checkout</a>
-			   <a href="allergens.html">Allergens</a>
+			<a href="index.html">Home</a>
+			<a href="menu.html">Menu</a>
+			<a href="checkout.html" class="active">Checkout</a>
+			<a href="allergens.html">Allergens</a>
 		</nav>
 	</header>
-	<main>
-		<section id="checkout-cart">
-			<h2>Your Selected Items</h2>
-			<div id="cart-items"></div>
-			<div id="order-details" class="order-details-box">
-				<h3 class="no-margin-top">Order Details</h3>
-				<label><input type="radio" name="orderType" value="collection" checked> Collection</label>
-				<label class="ml-1em"><input type="radio" name="orderType" value="delivery"> Delivery</label><br><br>
-				<input type="text" id="customer-name" placeholder="Your Name" class="input-wide mb-halfrem"><br>
-				<input type="text" id="customer-phone" placeholder="Phone Number" class="input-wide mb-halfrem"><br>
-				<input type="email" id="customer-email" placeholder="Email (for receipt)" class="input-wide mb-halfrem"><br>
-				<textarea id="order-comments" placeholder="Comments (e.g. allergies, delivery notes)" class="input-wide mb-halfrem minheight-60"></textarea><br>
-				<div id="delivery-fields">
-					<input type="text" id="customer-address" placeholder="Address (for delivery)" class="input-wide mb-halfrem"><br>
-					<input type="text" id="customer-postcode" placeholder="Postcode" class="input-wide mb-halfrem"><br>
+	
+	<main class="checkout-main">
+		<div class="checkout-container">
+			<!-- Progress Indicator -->
+			<div class="checkout-progress">
+				<div class="progress-step active">
+					<span class="step-number">1</span>
+					<span class="step-label">Review Order</span>
 				</div>
-				<label for="order-time-slot" class="label-bold mt-halfrem block">Choose a time slot:</label>
-				<select id="order-time-slot" class="input-wide">
-					<option value="">Select a time...</option>
-					<option value="17:00-17:30">17:00 - 17:30</option>
-					<option value="17:30-18:00">17:30 - 18:00</option>
-					<option value="18:00-18:30">18:00 - 18:30</option>
-					<option value="18:30-19:00">18:30 - 19:00</option>
-					<option value="19:00-19:30">19:00 - 19:30</option>
-					<option value="19:30-20:00">19:30 - 20:00</option>
-					<option value="20:00-20:30">20:00 - 20:30</option>
-					<option value="20:30-21:00">20:30 - 21:00</option>
-					<option value="21:00-21:30">21:00 - 21:30</option>
-					<option value="21:30-22:00">21:30 - 22:00</option>
-				</select>
+				<div class="progress-step active">
+					<span class="step-number">2</span>
+					<span class="step-label">Your Details</span>
+				</div>
+				<div class="progress-step">
+					<span class="step-number">3</span>
+					<span class="step-label">Complete</span>
+				</div>
 			</div>
-			<p id="cart-total"><strong>Total: £0.00</strong></p>
-			<div style="text-align:center;margin:2em 0 1em 0;">
-				<p id="cart-total-bottom"><strong>Total: £0.00</strong></p>
+
+			<div class="checkout-content">
+				<!-- Order Summary -->
+				<div class="checkout-section order-summary">
+					<h2><span class="step-icon">🛒</span> Your Order</h2>
+					<div id="cart-items" class="cart-items-list">
+						<div class="empty-cart">Your cart is empty</div>
+					</div>
+					<div class="order-total-display">
+						<div class="total-row">
+							<span>Subtotal:</span>
+							<span id="cart-subtotal">£0.00</span>
+						</div>
+						<div class="total-row final-total">
+							<span>Total:</span>
+							<span id="cart-total">£0.00</span>
+						</div>
+					</div>
+					<a href="menu.html" class="add-more-btn">+ Add More Items</a>
+				</div>
+
+				<!-- Customer Information -->
+				<div class="checkout-section customer-info">
+					<h2><span class="step-icon">👤</span> Your Information</h2>
+					<form id="checkout-form" class="checkout-form">
+						<!-- Contact Information -->
+						<div class="form-group">
+							<label for="customer-name" class="required">Full Name</label>
+							<input type="text" id="customer-name" name="customerName" required 
+								   placeholder="Enter your full name" class="form-input">
+							<div class="error-message" id="name-error"></div>
+						</div>
+
+						<div class="form-group">
+							<label for="customer-phone" class="required">Phone Number</label>
+							<input type="tel" id="customer-phone" name="customerPhone" required 
+								   placeholder="Enter your phone number" class="form-input">
+							<div class="error-message" id="phone-error"></div>
+						</div>
+
+						<div class="form-group">
+							<label for="customer-email">Email Address</label>
+							<input type="email" id="customer-email" name="customerEmail" 
+								   placeholder="Enter email for order confirmation (optional)" class="form-input">
+							<small class="field-hint">We'll send you an order confirmation</small>
+						</div>
+
+						<!-- Order Type -->
+						<div class="form-group order-type-group">
+							<label class="group-label required">Order Type</label>
+							<div class="radio-group">
+								<label class="radio-option">
+									<input type="radio" name="orderType" value="collection" checked>
+									<span class="radio-custom"></span>
+									<div class="radio-content">
+										<strong>Collection</strong>
+										<small>Pick up from restaurant</small>
+									</div>
+								</label>
+								<label class="radio-option">
+									<input type="radio" name="orderType" value="delivery">
+									<span class="radio-custom"></span>
+									<div class="radio-content">
+										<strong>Delivery</strong>
+										<small>We'll deliver to you</small>
+									</div>
+								</label>
+							</div>
+						</div>
+
+						<!-- Delivery Address (Hidden by default) -->
+						<div id="delivery-fields" class="delivery-section" style="display: none;">
+							<div class="form-group">
+								<label for="customer-address" class="required">Delivery Address</label>
+								<input type="text" id="customer-address" name="customerAddress" 
+									   placeholder="Enter your full address" class="form-input">
+								<div class="error-message" id="address-error"></div>
+							</div>
+
+							<div class="form-group">
+								<label for="customer-postcode" class="required">Postcode</label>
+								<input type="text" id="customer-postcode" name="customerPostcode" 
+									   placeholder="Enter your postcode" class="form-input">
+								<div class="error-message" id="postcode-error"></div>
+							</div>
+						</div>
+
+						<!-- Time Slot -->
+						<div class="form-group">
+							<label for="order-time-slot" class="required">Preferred Time</label>
+							<select id="order-time-slot" name="orderTimeSlot" required class="form-select">
+								<option value="">Select your preferred time...</option>
+								<option value="17:00-17:30">17:00 - 17:30</option>
+								<option value="17:30-18:00">17:30 - 18:00</option>
+								<option value="18:00-18:30">18:00 - 18:30</option>
+								<option value="18:30-19:00">18:30 - 19:00</option>
+								<option value="19:00-19:30">19:00 - 19:30</option>
+								<option value="19:30-20:00">19:30 - 20:00</option>
+								<option value="20:00-20:30">20:00 - 20:30</option>
+								<option value="20:30-21:00">20:30 - 21:00</option>
+								<option value="21:00-21:30">21:00 - 21:30</option>
+								<option value="21:30-22:00">21:30 - 22:00</option>
+							</select>
+							<div class="error-message" id="timeslot-error"></div>
+						</div>
+
+						<!-- Special Instructions -->
+						<div class="form-group">
+							<label for="order-comments">Special Instructions</label>
+							<textarea id="order-comments" name="orderComments" 
+									  placeholder="Any special requests, allergies, or delivery notes..." 
+									  class="form-textarea" rows="3"></textarea>
+							<small class="field-hint">Optional: Let us know about allergies or special requirements</small>
+						</div>
+					</form>
+				</div>
+
+				<!-- Payment & Completion -->
+				<div class="checkout-section payment-section">
+					<h2><span class="step-icon">💳</span> Complete Your Order</h2>
+					
+					<div class="payment-summary">
+						<div class="summary-row">
+							<span>Order Total:</span>
+							<span id="final-total" class="final-amount">£0.00</span>
+						</div>
+					</div>
+
+					<div class="payment-buttons">
+						<button type="button" id="pay-with-cash" class="payment-btn cash-btn">
+							<span class="btn-icon">💵</span>
+							<div class="btn-content">
+								<strong>Pay with Cash</strong>
+								<small>Pay when you collect or receive delivery</small>
+							</div>
+						</button>
+						
+						<button type="button" id="pay-with-card" class="payment-btn card-btn" disabled>
+							<span class="btn-icon">💳</span>
+							<div class="btn-content">
+								<strong>Pay with Card</strong>
+								<small>Coming Soon - Currently unavailable</small>
+							</div>
+						</button>
+					</div>
+
+					<div class="order-actions">
+						<button type="button" id="back-to-menu" class="secondary-btn">
+							← Back to Menu
+						</button>
+					</div>
+				</div>
 			</div>
-			<button class="menu-item pay-card" id="pay-with-card">Pay with Card</button>
-			<button class="menu-item pay-cash" id="pay-with-cash">Pay with Cash</button>
-			<div id="voucher-section" class="voucher-section">
-				<input type="text" id="voucher-input" placeholder="Enter voucher code" class="voucher-input">
-				<button class="menu-item ml-halfrem" id="apply-voucher-btn">Apply</button>
-				<div id="voucher-message" class="voucher-message"></div>
+		</div>
+
+		<!-- Loading Overlay -->
+		<div id="loading-overlay" class="loading-overlay" style="display: none;">
+			<div class="loading-content">
+				<div class="spinner"></div>
+				<p>Processing your order...</p>
 			</div>
-		</section>
+		</div>
 	</main>
-	<script>
-	// Load cart from localStorage and display items and total
-// Enhanced checkout cart functionality
-function loadCheckoutCart() {
-const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-const cartItemsDiv = document.getElementById('cart-items');
-const cartTotalP = document.getElementById('cart-total');
-const cartTotalBottom = document.getElementById('cart-total-bottom');
 
-if (cart.length === 0) {
-cartItemsDiv.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Your cart is empty. <a href="menu.html">Go to menu</a> to add items.</p>';
-cartTotalP.innerHTML = '<strong>Total: �0.00</strong>';
-if (cartTotalBottom) {
-cartTotalBottom.innerHTML = '<strong>Total: �0.00</strong>';
-}
-return;
-}
-
-// Group cart items by name  
-const groupedCart = {};
-cart.forEach(item => {
-if (groupedCart[item.item]) {
-groupedCart[item.item].quantity += item.quantity;
-} else {
-groupedCart[item.item] = { ...item };
-}
-});
-
-// Calculate total
-const total = Object.values(groupedCart).reduce((sum, item) => sum + (item.price * item.quantity), 0);
-
-// Display cart items with delete buttons
-cartItemsDiv.innerHTML = Object.values(groupedCart).map(item => `
-<div class="checkout-cart-item">
-<div class="item-details">
-<span class="item-name">${item.item}</span>
-<span class="item-quantity">x${item.quantity}</span>
-</div>
-<div class="item-actions">
-<span class="item-price">�${(item.price * item.quantity).toFixed(2)}</span>
-<button onclick="removeItemFromCheckout('${item.item}')" class="delete-item-btn"></button>
-</div>
-</div>
-`).join('');
-
-cartTotalP.innerHTML = `<strong>Total: �${total.toFixed(2)}</strong>`;
-if (cartTotalBottom) {
-cartTotalBottom.innerHTML = `<strong>Total: �${total.toFixed(2)}</strong>`;
-}
-}
-
-function removeItemFromCheckout(itemName) {
-if (confirm(`Remove "${itemName}" from your cart?`)) {
-let cart = JSON.parse(localStorage.getItem('cart') || '[]');
-cart = cart.filter(item => item.item !== itemName);
-localStorage.setItem('cart', JSON.stringify(cart));
-loadCheckoutCart();
-
-const cartItemsDiv = document.getElementById('cart-items');
-const tempMessage = document.createElement('div');
-tempMessage.className = 'item-removed-message';
-tempMessage.textContent = `"${itemName}" removed from cart`;
-cartItemsDiv.insertBefore(tempMessage, cartItemsDiv.firstChild);
-
-setTimeout(() => {
-if (tempMessage.parentNode) {
-tempMessage.parentNode.removeChild(tempMessage);
-}
-}, 2000);
-}
-}
-	window.onload = function() {
-		loadCheckoutCart();
-			document.getElementById('pay-with-cash').addEventListener('click', async function() {
-				const cart = JSON.parse(localStorage.getItem('cart') || '[]');
-				const total = cart.reduce((sum, item) => sum + item.price, 0);
-				const orderType = document.querySelector('input[name="orderType"]:checked').value;
-				const customerName = document.getElementById('customer-name').value;
-				const customerPhone = document.getElementById('customer-phone').value;
-				const customerEmail = document.getElementById('customer-email').value;
-				const orderComments = document.getElementById('order-comments').value;
-				const customerAddress = document.getElementById('customer-address').value;
-				const customerPostcode = document.getElementById('customer-postcode').value;
-				const orderTimeSlot = document.getElementById('order-time-slot').value;
-				if (!cart.length || !customerName || !customerPhone || !orderTimeSlot) {
-					alert('Please fill in all required fields and add items to your cart.');
-					return;
-				}
-					const order = {
-						cart,
-						total,
-						orderType,
-						customerName,
-						customerPhone,
-						customerEmail,
-						orderComments,
-						customerAddress,
-						customerPostcode,
-						orderTimeSlot,
-						placedAt: new Date().toISOString()
-					};
-				try {
-					const res = await fetch('https://thecrustatngb.co.uk/submit-order', {
-						method: 'POST',
-						headers: { 'Content-Type': 'application/json' },
-						body: JSON.stringify(order)
-					});
-					if (res.ok) {
-						alert('Thank you! Your order has been placed for cash payment. Please pay at the counter or on delivery.');
-						localStorage.removeItem('cart');
-						window.location.href = 'index.html';
-					} else {
-						const data = await res.json();
-						alert('Error placing order: ' + (data.error || 'Unknown error'));
-					}
-				} catch (e) {
-					alert('Network error. Please try again.');
-				}
-			});
-	};
-	</script>
+	<script src="checkout-streamlined.js"></script>
 </body>
 </html>
