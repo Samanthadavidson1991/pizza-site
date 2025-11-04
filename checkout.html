@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
@@ -49,9 +49,9 @@
 					<option value="21:30-22:00">21:30 - 22:00</option>
 				</select>
 			</div>
-			<p id="cart-total"><strong>Total: Â£0.00</strong></p>
+			<p id="cart-total"><strong>Total: £0.00</strong></p>
 			<div style="text-align:center;margin:2em 0 1em 0;">
-				<p id="cart-total-bottom"><strong>Total: Â£0.00</strong></p>
+				<p id="cart-total-bottom"><strong>Total: £0.00</strong></p>
 			</div>
 			<button class="menu-item pay-card" id="pay-with-card">Pay with Card</button>
 			<button class="menu-item pay-cash" id="pay-with-cash">Pay with Cash</button>
@@ -73,9 +73,9 @@ const cartTotalBottom = document.getElementById('cart-total-bottom');
 
 if (cart.length === 0) {
 cartItemsDiv.innerHTML = '<p style="text-align: center; color: #666; font-style: italic;">Your cart is empty. <a href="menu.html">Go to menu</a> to add items.</p>';
-cartTotalP.innerHTML = '<strong>Total: £0.00</strong>';
+cartTotalP.innerHTML = '<strong>Total: �0.00</strong>';
 if (cartTotalBottom) {
-cartTotalBottom.innerHTML = '<strong>Total: £0.00</strong>';
+cartTotalBottom.innerHTML = '<strong>Total: �0.00</strong>';
 }
 return;
 }
@@ -101,15 +101,15 @@ cartItemsDiv.innerHTML = Object.values(groupedCart).map(item => `
 <span class="item-quantity">x${item.quantity}</span>
 </div>
 <div class="item-actions">
-<span class="item-price">£${(item.price * item.quantity).toFixed(2)}</span>
+<span class="item-price">�${(item.price * item.quantity).toFixed(2)}</span>
 <button onclick="removeItemFromCheckout('${item.item}')" class="delete-item-btn"></button>
 </div>
 </div>
 `).join('');
 
-cartTotalP.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+cartTotalP.innerHTML = `<strong>Total: �${total.toFixed(2)}</strong>`;
 if (cartTotalBottom) {
-cartTotalBottom.innerHTML = `<strong>Total: £${total.toFixed(2)}</strong>`;
+cartTotalBottom.innerHTML = `<strong>Total: �${total.toFixed(2)}</strong>`;
 }
 }
 
@@ -164,7 +164,7 @@ tempMessage.parentNode.removeChild(tempMessage);
 						placedAt: new Date().toISOString()
 					};
 				try {
-					const res = await fetch('https://pizza-site-c8t6.onrender.com/cash-order', {
+					const res = await fetch('https://thecrustatngb.co.uk/submit-order', {
 						method: 'POST',
 						headers: { 'Content-Type': 'application/json' },
 						body: JSON.stringify(order)
