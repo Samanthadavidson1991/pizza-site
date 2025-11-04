@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Monthly Sales Breakdown</title>
+  <link rel="stylesheet" href="admin-dashboard.css">
+</head>
+<body>
+  <div class="container">
+    <div class="admin-header-bar">
+  <a href="admin-dashboard.html" class="admin-menu-link">Order Management</a>
+  <a href="admin-menu.html" class="admin-menu-link">Menu Management</a>
+  <a href="admin-sales.html" class="admin-menu-link">Sales Dashboard</a>
+  <a href="admin-monthly-sales.html" class="admin-menu-link">Monthly Breakdown</a>
+  <a href="admin-running-orders.html" class="admin-menu-link">Running Orders</a>
+      <a href="admin-stock-management.html" class="admin-menu-link"> Stock Management</a>
+    </div>
+    <h1>Monthly Sales Breakdown</h1>
+    <div class="filter-bar">
+      <input type="month" id="sales-month" class="admin-search-input">
+      <button onclick="loadMonthlySales()">Show Breakdown</button>
+      <button onclick="printMonthlySales()" class="admin-print-btn">Print Breakdown</button>
+    </div>
+    <div id="monthly-sales-summary"></div>
+    <table id="monthly-sales-table">
+      <thead>
+        <tr>
+          <th>Item Name</th>
+          <th>Category</th>
+          <th>Orders</th>
+          <th>Total Sold</th>
+          <th>Total (£)</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+  <script src="admin-monthly-sales.js"></script>
+</body>
+</html>
