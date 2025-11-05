@@ -169,7 +169,7 @@ class StockManager {
 
     async loadMenuItems() {
         try {
-            const response = await fetch('/menu.json');
+            const response = await fetch('/menu');
             this.menuItems = await response.json();
             console.log('Menu items loaded:', this.menuItems.length);
         } catch (error) {
