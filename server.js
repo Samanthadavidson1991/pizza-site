@@ -573,9 +573,9 @@ app.get('/checkout', (req, res) => {
   res.redirect(301, '/checkout-enhanced.html');
 });
 
-// Handle root route - serve admin dashboard
+// Handle root route - serve customer homepage
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+  res.sendFile(path.join(__dirname, 'index.html'));
 });
 
 // Set cache control headers for static files
