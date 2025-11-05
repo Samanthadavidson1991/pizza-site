@@ -17,7 +17,9 @@ app.use(session({
   secret: 'admin-session-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }, // 24 hours
+  // Suppress MemoryStore warning for small-scale admin system
+  store: new session.MemoryStore()
 }));
 
 // Admin authentication middleware

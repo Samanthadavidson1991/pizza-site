@@ -169,7 +169,7 @@ class StockManager {
 
     async loadMenuItems() {
         try {
-            const response = await fetch('https://thecrustatngb.co.uk/menu.json');
+            const response = await fetch('/menu.json');
             this.menuItems = await response.json();
             console.log('Menu items loaded:', this.menuItems.length);
         } catch (error) {
@@ -181,7 +181,7 @@ class StockManager {
     async loadStockData() {
         try {
             // Try to load existing stock data
-            const response = await fetch('https://thecrustatngb.co.uk/stock-data.json');
+            const response = await fetch('/stock-data.json');
             if (response.ok) {
                 this.stockData = await response.json();
             } else {
@@ -225,7 +225,7 @@ class StockManager {
 
     async loadSettings() {
         try {
-            const response = await fetch('https://thecrustatngb.co.uk/stock-settings.json');
+            const response = await fetch('/timeslot-settings.json');
             if (response.ok) {
                 const savedSettings = await response.json();
                 this.settings = { ...this.settings, ...savedSettings };
