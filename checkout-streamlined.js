@@ -9,6 +9,7 @@ class CheckoutManager {
     init() {
         this.loadCart();
         this.setupEventListeners();
+        this.initializeDateAndTimeSlots();
         this.updateDisplay();
     }
 
@@ -40,6 +41,67 @@ class CheckoutManager {
             e.preventDefault();
             this.processCashOrder();
         });
+    }
+
+    // Function to populate available time slots based on selected date
+    populateTimeSlots() {
+        const dateInput = document.getElementById('order-date');
+        const timeSlotSelect = document.getElementById('order-time-slot');
+        
+        if (!dateInput || !timeSlotSelect) return;
+        
+        const selectedDate = new Date(dateInput.value);
+        const today = new Date();
+        const isToday = selectedDate.toDateString() === today.toDateString();
+
+        // Clear existing options except the first one
+        timeSlotSelect.innerHTML = '<option value="">Select your preferred time...</option>';
+
+        // Define all possible time slots
+        const allSlots = [
+            '17:00-17:30', '17:30-18:00', '18:00-18:30', '18:30-19:00', '19:00-19:30',
+            '19:30-20:00', '20:00-20:30', '20:30-21:00', '21:00-21:30', '21:30-22:00'
+        ];
+
+        const now = new Date();
+        const currentTimeMinutes = now.getHours() * 60 + now.getMinutes();
+
+        allSlots.forEach(slot => {
+            const [startTime] = slot.split('-');
+            const [hours, minutes] = startTime.split(':').map(Number);
+            const slotStartMinutes = hours * 60 + minutes;
+
+            // For today: exclude slots that start within 15 minutes
+            // For future dates: show all slots
+            if (!isToday || (slotStartMinutes > currentTimeMinutes + 15)) {
+                const option = document.createElement('option');
+                option.value = slot;
+                option.textContent = slot.replace('-', ' - ');
+                timeSlotSelect.appendChild(option);
+            }
+        });
+    }
+
+    // Function to set minimum date (today) and populate initial time slots
+    initializeDateAndTimeSlots() {
+        const dateInput = document.getElementById('order-date');
+        
+        if (!dateInput) return;
+        
+        const today = new Date();
+        const todayString = today.toISOString().split('T')[0];
+        
+        // Set minimum date to today
+        dateInput.min = todayString;
+        
+        // Set default date to today
+        dateInput.value = todayString;
+        
+        // Populate initial time slots
+        this.populateTimeSlots();
+        
+        // Add event listener for date changes
+        dateInput.addEventListener('change', () => this.populateTimeSlots());
     }
 
     updateDisplay() {
@@ -147,6 +209,21 @@ class CheckoutManager {
                 if (!value) {
                     errorMessage = 'Please enter your postcode';
                     isValid = false;
+                }
+                break;
+
+            case 'order-date':
+                if (!value) {
+                    errorMessage = 'Please select a delivery date';
+                    isValid = false;
+                } else {
+                    const selectedDate = new Date(value);
+                    const today = new Date();
+                    today.setHours(0, 0, 0, 0);
+                    if (selectedDate < today) {
+                        errorMessage = 'Please select today or a future date';
+                        isValid = false;
+                    }
                 }
                 break;
 
@@ -326,6 +403,7 @@ class CheckoutManager {
             customerAddress: document.getElementById('customer-address').value.trim(),
             customerPostcode: document.getElementById('customer-postcode').value.trim(),
             orderTimeSlot: document.getElementById('order-time-slot').value,
+            orderDate: document.getElementById('order-date').value,
             orderComments: document.getElementById('order-comments').value.trim(),
             placedAt: new Date().toISOString()
         };

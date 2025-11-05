@@ -36,6 +36,11 @@ class StockManager {
         await this.loadStockData();
         await this.loadSettings();
         await this.loadDoughStock();
+        
+        console.log('Dough stock initialized:', this.doughStock);
+        console.log('Checking for dough elements...');
+        console.log('Dough available element:', document.getElementById('dough-available'));
+        console.log('Dough remaining count element:', document.getElementById('dough-remaining-count'));
         this.setupEventListeners();
         this.renderStockItems();
         this.renderTimeSlots();
@@ -44,12 +49,19 @@ class StockManager {
 
     async checkAuthStatus() {
         try {
+            // For local development, bypass auth if on localhost
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                console.log('Local development detected - bypassing auth');
+                this.isAuthenticated = true;
+                return true;
+            }
+
             const response = await fetch('/admin/status');
             const status = await response.json();
             this.isAuthenticated = status.isAdmin;
             return this.isAuthenticated;
         } catch (error) {
-            console.error('Auth check failed:', error);
+            console.log('Auth check failed, assuming not authenticated');
             this.isAuthenticated = false;
             return false;
         }
@@ -587,7 +599,15 @@ class StockManager {
         document.getElementById('low-stock-count').textContent = lowStockItems;
         document.getElementById('available-slots-count').textContent = availableSlots;
         document.getElementById('total-capacity-count').textContent = totalCapacity;
-        document.getElementById('dough-remaining-count').textContent = doughRemaining;
+        
+        // Update dough remaining with debugging
+        const doughElement = document.getElementById('dough-remaining-count');
+        if (doughElement) {
+            doughElement.textContent = doughRemaining;
+            console.log('Updated dough remaining display to:', doughRemaining);
+        } else {
+            console.error('Dough remaining count element not found!');
+        }
 
         // Update dough status card styling
         const doughCard = document.querySelector('.status-card.dough-stock');
@@ -598,6 +618,9 @@ class StockManager {
             } else if (doughRemaining <= this.doughStock.lowThreshold) {
                 doughCard.classList.add('low-stock');
             }
+            console.log('Updated dough card styling');
+        } else {
+            console.error('Dough status card not found in DOM!');
         }
     }    applySettingsToUI() {
         document.getElementById('slot-duration').value = this.timeSlotSettings.duration;
