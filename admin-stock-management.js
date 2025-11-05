@@ -316,20 +316,33 @@ class StockManager {
             this.settings.trackHistory = e.target.checked;
         });
 
-        // Dough management
-        document.getElementById('dough-available').addEventListener('change', (e) => {
-            this.doughStock.available = parseInt(e.target.value);
-            this.updateStatusCards();
-            this.saveDoughStock();
-        });
+        // Dough management (with error handling)
+        try {
+            const doughAvailable = document.getElementById('dough-available');
+            const doughThreshold = document.getElementById('dough-low-threshold');
+            const resetBtn = document.getElementById('reset-dough-stock');
+            const addBtn = document.getElementById('add-dough-portions');
 
-        document.getElementById('dough-low-threshold').addEventListener('change', (e) => {
-            this.doughStock.lowThreshold = parseInt(e.target.value);
-            this.saveDoughStock();
-        });
+            if (doughAvailable) {
+                doughAvailable.addEventListener('change', (e) => {
+                    this.doughStock.available = parseInt(e.target.value);
+                    this.updateStatusCards();
+                    this.saveDoughStock();
+                });
+            }
 
-        document.getElementById('reset-dough-stock').addEventListener('click', () => this.resetDoughStock());
-        document.getElementById('add-dough-portions').addEventListener('click', () => this.addDoughPortions());
+            if (doughThreshold) {
+                doughThreshold.addEventListener('change', (e) => {
+                    this.doughStock.lowThreshold = parseInt(e.target.value);
+                    this.saveDoughStock();
+                });
+            }
+
+            if (resetBtn) resetBtn.addEventListener('click', () => this.resetDoughStock());
+            if (addBtn) addBtn.addEventListener('click', () => this.addDoughPortions());
+        } catch (error) {
+            console.log('Dough management elements not ready yet:', error);
+        }
 
         // Quick actions
         document.getElementById('emergency-disable-all').addEventListener('click', () => this.emergencyDisableAll());
@@ -583,10 +596,18 @@ class StockManager {
         document.getElementById('default-stock-amount').value = this.settings.defaultStockAmount;
         document.getElementById('track-stock-history').checked = this.settings.trackHistory;
         
-        // Apply dough settings
-        document.getElementById('dough-available').value = this.doughStock.available;
-        document.getElementById('dough-used').value = this.doughStock.used;
-        document.getElementById('dough-low-threshold').value = this.doughStock.lowThreshold;
+        // Apply dough settings (with error handling)
+        try {
+            const doughAvailable = document.getElementById('dough-available');
+            const doughUsed = document.getElementById('dough-used');
+            const doughThreshold = document.getElementById('dough-low-threshold');
+            
+            if (doughAvailable) doughAvailable.value = this.doughStock.available;
+            if (doughUsed) doughUsed.value = this.doughStock.used;
+            if (doughThreshold) doughThreshold.value = this.doughStock.lowThreshold;
+        } catch (error) {
+            console.log('Dough elements not found yet:', error);
+        }
     }
 
     async saveAllSettings() {
