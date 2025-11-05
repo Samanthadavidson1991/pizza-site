@@ -354,23 +354,25 @@
     align-items: center;
     width: 100%;
     padding: 1.25rem;
-    border: 2px solid #e9ecef;
+    border: 2px solid #000;
     border-radius: 8px;
-    background: white;
+    background: #000;
+    color: white;
     cursor: pointer;
-    transition: all 0.3s ease;
     text-align: left;
 }
 
 .payment-btn:hover {
-    border-color: #FF9B7A; /* Peachy orange for hover */
-    background: #FFF8F5; /* Light peach background on hover */
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(255, 155, 122, 0.2); /* Peachy shadow */
+    /* No hover effects - keep consistent styling */
+    border-color: #000;
+    background: #000;
+    color: white;
 }
 
 .payment-btn:active {
-    transform: translateY(0);
+    /* No active effects - keep consistent styling */
+    background: #000;
+    border-color: #000;
 }
 
 .payment-icon {
@@ -381,13 +383,26 @@
 .payment-title {
     font-weight: bold;
     font-size: 1.1rem;
-    color: #333;
+    color: white;
     margin-bottom: 0.25rem;
 }
 
 .payment-description {
-    color: #6c757d;
+    color: white;
     font-size: 0.9rem;
+}
+
+/* Ensure payment button text is white */
+.payment-btn .btn-content strong {
+    color: white;
+}
+
+.payment-btn .btn-content small {
+    color: white;
+}
+
+.payment-btn .btn-icon {
+    color: white;
 }
 
 /* Voucher Section */
