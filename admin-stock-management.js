@@ -16,6 +16,11 @@ class StockManager {
             defaultStockAmount: 20,
             trackHistory: true
         };
+        this.doughStock = {
+            available: 50, // Total dough portions available
+            used: 0,       // Dough portions used today
+            lowThreshold: 10 // Alert when dough is running low
+        };
         this.isAuthenticated = false;
         this.init();
     }
@@ -30,6 +35,7 @@ class StockManager {
         await this.loadMenuItems();
         await this.loadStockData();
         await this.loadSettings();
+        await this.loadDoughStock();
         this.setupEventListeners();
         this.renderStockItems();
         this.renderTimeSlots();
@@ -310,6 +316,21 @@ class StockManager {
             this.settings.trackHistory = e.target.checked;
         });
 
+        // Dough management
+        document.getElementById('dough-available').addEventListener('change', (e) => {
+            this.doughStock.available = parseInt(e.target.value);
+            this.updateStatusCards();
+            this.saveDoughStock();
+        });
+
+        document.getElementById('dough-low-threshold').addEventListener('change', (e) => {
+            this.doughStock.lowThreshold = parseInt(e.target.value);
+            this.saveDoughStock();
+        });
+
+        document.getElementById('reset-dough-stock').addEventListener('click', () => this.resetDoughStock());
+        document.getElementById('add-dough-portions').addEventListener('click', () => this.addDoughPortions());
+
         // Quick actions
         document.getElementById('emergency-disable-all').addEventListener('click', () => this.emergencyDisableAll());
         document.getElementById('restock-all').addEventListener('click', () => this.restockAll());
@@ -446,6 +467,44 @@ class StockManager {
         return Math.floor(Math.random() * this.timeSlotSettings.pizzasPerSlot);
     }
 
+    isDoughBasedItem(itemName, category) {
+        // Check if an item uses dough
+        const doughCategories = ['PIZZAS'];
+        const doughItems = ['garlic bread', 'dough balls', 'doughballs', 'pizza bread'];
+        
+        return doughCategories.includes(category?.toUpperCase()) || 
+               doughItems.some(doughItem => itemName?.toLowerCase().includes(doughItem));
+    }
+
+    updateDoughStock(doughPortionsUsed) {
+        this.doughStock.used += doughPortionsUsed;
+        
+        // Check if we've run out of dough
+        if (this.doughStock.used >= this.doughStock.available) {
+            this.disableAllDoughItems();
+            this.showNotification('⚠️ Out of dough! All dough-based items have been disabled.', 'warning');
+        } else if ((this.doughStock.available - this.doughStock.used) <= this.doughStock.lowThreshold) {
+            this.showNotification(`⚠️ Low dough warning! Only ${this.doughStock.available - this.doughStock.used} portions remaining.`, 'warning');
+        }
+        
+        this.updateStatusCards();
+        this.saveDoughStock();
+    }
+
+    disableAllDoughItems() {
+        Object.keys(this.stockData).forEach(key => {
+            const item = this.stockData[key];
+            if (this.isDoughBasedItem(item.name, item.category)) {
+                item.enabled = false;
+            }
+        });
+        this.renderStockItems();
+    }
+
+    getDoughRemaining() {
+        return Math.max(0, this.doughStock.available - this.doughStock.used);
+    }
+
     getStockStatus(stock) {
         if (stock === 0) return 'Out of Stock';
         if (stock <= this.settings.lowStockThreshold) return 'Low Stock';
@@ -495,14 +554,25 @@ class StockManager {
         ).length;
         const availableSlots = this.generateTimeSlots().length;
         const totalCapacity = availableSlots * this.timeSlotSettings.pizzasPerSlot;
-        
+        const doughRemaining = this.getDoughRemaining();
+
         document.getElementById('total-items-count').textContent = totalItems;
         document.getElementById('low-stock-count').textContent = lowStockItems;
         document.getElementById('available-slots-count').textContent = availableSlots;
         document.getElementById('total-capacity-count').textContent = totalCapacity;
-    }
+        document.getElementById('dough-remaining-count').textContent = doughRemaining;
 
-    applySettingsToUI() {
+        // Update dough status card styling
+        const doughCard = document.querySelector('.status-card.dough-stock');
+        if (doughCard) {
+            doughCard.classList.remove('low-stock', 'out-of-stock');
+            if (doughRemaining === 0) {
+                doughCard.classList.add('out-of-stock');
+            } else if (doughRemaining <= this.doughStock.lowThreshold) {
+                doughCard.classList.add('low-stock');
+            }
+        }
+    }    applySettingsToUI() {
         document.getElementById('slot-duration').value = this.timeSlotSettings.duration;
         document.getElementById('pizzas-per-slot').value = this.timeSlotSettings.pizzasPerSlot;
         document.getElementById('start-time').value = this.timeSlotSettings.startTime;
@@ -512,6 +582,11 @@ class StockManager {
         document.getElementById('auto-reset-daily').checked = this.settings.autoResetDaily;
         document.getElementById('default-stock-amount').value = this.settings.defaultStockAmount;
         document.getElementById('track-stock-history').checked = this.settings.trackHistory;
+        
+        // Apply dough settings
+        document.getElementById('dough-available').value = this.doughStock.available;
+        document.getElementById('dough-used').value = this.doughStock.used;
+        document.getElementById('dough-low-threshold').value = this.doughStock.lowThreshold;
     }
 
     async saveAllSettings() {
@@ -584,12 +659,14 @@ class StockManager {
             date: new Date().toISOString().split('T')[0],
             stockData: this.stockData,
             settings: this.settings,
+            doughStock: this.doughStock,
             summary: {
                 totalItems: Object.keys(this.stockData).length,
                 lowStockItems: Object.values(this.stockData).filter(
                     item => item.stock <= this.settings.lowStockThreshold
                 ).length,
-                totalSold: Object.values(this.stockData).reduce((sum, item) => sum + item.sold, 0)
+                totalSold: Object.values(this.stockData).reduce((sum, item) => sum + item.sold, 0),
+                doughRemaining: this.getDoughRemaining()
             }
         };
         
@@ -606,6 +683,57 @@ class StockManager {
 
     showLoading(show) {
         document.getElementById('loading-overlay').style.display = show ? 'flex' : 'none';
+    }
+
+    resetDoughStock() {
+        if (confirm('Reset dough count? This will set used dough to 0 and re-enable all dough items.')) {
+            this.doughStock.used = 0;
+            this.enableAllDoughItems();
+            this.updateStatusCards();
+            this.saveDoughStock();
+            this.showNotification('Dough stock reset successfully!', 'success');
+        }
+    }
+
+    addDoughPortions() {
+        const portions = prompt('How many dough portions to add?', '20');
+        if (portions && !isNaN(portions)) {
+            const addedPortions = parseInt(portions);
+            this.doughStock.available += addedPortions;
+            this.enableAllDoughItems();
+            this.updateStatusCards();
+            this.saveDoughStock();
+            this.showNotification(`Added ${addedPortions} dough portions!`, 'success');
+        }
+    }
+
+    enableAllDoughItems() {
+        // Only re-enable dough items if we have dough available
+        if (this.getDoughRemaining() > 0) {
+            Object.keys(this.stockData).forEach(key => {
+                const item = this.stockData[key];
+                if (this.isDoughBasedItem(item.name, item.category)) {
+                    item.enabled = true;
+                }
+            });
+            this.renderStockItems();
+        }
+    }
+
+    async saveDoughStock() {
+        // Save dough stock to localStorage (in production, this would go to your server)
+        localStorage.setItem('doughStock', JSON.stringify(this.doughStock));
+    }
+
+    async loadDoughStock() {
+        try {
+            const saved = localStorage.getItem('doughStock');
+            if (saved) {
+                this.doughStock = { ...this.doughStock, ...JSON.parse(saved) };
+            }
+        } catch (error) {
+            console.log('Using default dough stock settings');
+        }
     }
 
     showNotification(message, type = 'info') {

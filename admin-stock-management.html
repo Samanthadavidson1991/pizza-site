@@ -60,6 +60,13 @@
                         <span id="total-capacity-count">Loading...</span>
                     </div>
                 </div>
+                <div class="status-card dough-stock">
+                    <div class="card-icon">🍞</div>
+                    <div class="card-content">
+                        <h3>Dough Remaining</h3>
+                        <span id="dough-remaining-count">Loading...</span>
+                    </div>
+                </div>
             </div>
 
             <!-- Main Content Tabs -->
@@ -186,6 +193,26 @@
                             </div>
                             <div class="setting-group">
                                 <button id="export-stock-report" class="btn-secondary">📈 Export Report</button>
+                            </div>
+                        </div>
+
+                        <div class="setting-card">
+                            <h3>🍞 Dough Management</h3>
+                            <div class="setting-group">
+                                <label for="dough-available">Total Dough Portions Available:</label>
+                                <input type="number" id="dough-available" min="0" max="200" value="50">
+                            </div>
+                            <div class="setting-group">
+                                <label for="dough-used">Dough Portions Used Today:</label>
+                                <input type="number" id="dough-used" min="0" readonly>
+                            </div>
+                            <div class="setting-group">
+                                <label for="dough-low-threshold">Low Dough Alert Threshold:</label>
+                                <input type="number" id="dough-low-threshold" min="0" max="50" value="10">
+                            </div>
+                            <div class="setting-group">
+                                <button id="reset-dough-stock" class="btn-secondary">🔄 Reset Dough Count</button>
+                                <button id="add-dough-portions" class="btn-primary">➕ Add Dough Portions</button>
                             </div>
                         </div>
                     </div>

@@ -42,6 +42,16 @@
     border-left: 4px solid #ff6b6b;
 }
 
+.status-card.out-of-stock {
+    background: linear-gradient(135deg, #ffebee 0%, #ffcdd2 100%);
+    border-left: 4px solid #d32f2f;
+}
+
+.status-card.dough-stock {
+    background: linear-gradient(135deg, #fef7e0 0%, #ffe0b2 100%);
+    border-left: 4px solid #8B4513;
+}
+
 .card-icon {
     font-size: 2rem;
     opacity: 0.8;
