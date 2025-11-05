@@ -478,10 +478,10 @@ function checkout() {
 
 	// Store cart data for checkout page
 	localStorage.setItem('checkoutCart', JSON.stringify(cart));
-	localStorage.setItem('checkoutTotal', total.toFixed(2));
+  localStorage.setItem('checkoutTotal', total.toFixed(2));
 
-	// Redirect to checkout
-	window.location.href = 'checkout.html';
+  // Redirect to checkout
+  window.location.href = 'checkout-enhanced.html';
 }
 
 // Run on page load
