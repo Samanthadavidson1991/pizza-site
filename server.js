@@ -17,9 +17,7 @@ app.use(session({
   secret: 'admin-session-secret-key',
   resave: false,
   saveUninitialized: false,
-  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 }, // 24 hours
-  // Suppress MemoryStore warning for small-scale admin system
-  store: new session.MemoryStore()
+  cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
 }));
 
 // Admin authentication middleware
@@ -36,12 +34,59 @@ const requireAdminAuth = (req, res, next) => {
 
 // MongoDB connection
 const mongoUri = 'mongodb+srv://thecrustngb:Leedsutd01@cluster0.qec8gul.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0';
-const client = new MongoClient(mongoUri);
+const client = new MongoClient(mongoUri, {
+  serverSelectionTimeoutMS: 5000, // Timeout after 5s instead of 30s
+  connectTimeoutMS: 10000, // Give up initial connection after 10s
+});
 
 // Simple test endpoint
 app.get('/test', (req, res) => {
   res.json({ message: 'Server working!', timestamp: new Date() });
 });
+
+// Helper functions for dough management
+function isDoughBasedItem(itemName) {
+  const doughItems = ['pizza', 'garlic bread', 'dough balls', 'doughballs', 'pizza bread'];
+  return doughItems.some(doughItem => itemName?.toLowerCase().includes(doughItem));
+}
+
+function updateDoughStock(doughPortionsUsed) {
+  try {
+    // Load current dough stock
+    let doughStock = {
+      available: 50,
+      used: 0,
+      lowThreshold: 10
+    };
+    
+    try {
+      const saved = fs.readFileSync('dough-stock.json', 'utf8');
+      doughStock = { ...doughStock, ...JSON.parse(saved) };
+    } catch (e) {
+      console.log('No existing dough stock file, using defaults');
+    }
+
+    // Update used count
+    doughStock.used += doughPortionsUsed;
+    
+    // Save updated dough stock
+    fs.writeFileSync('dough-stock.json', JSON.stringify(doughStock, null, 2));
+    
+    // Check if we need to disable dough items
+    const remaining = doughStock.available - doughStock.used;
+    if (remaining <= 0) {
+      console.log('⚠️ DOUGH DEPLETED - All dough items should be disabled');
+      // In a full system, this would trigger disabling all dough items in your menu
+    } else if (remaining <= doughStock.lowThreshold) {
+      console.log(`⚠️ LOW DOUGH WARNING - Only ${remaining} portions remaining`);
+    }
+    
+    return doughStock;
+  } catch (error) {
+    console.error('Failed to update dough stock:', error);
+    throw error;
+  }
+}
 
 // Get menu from MongoDB
 app.get('/menu', async (req, res) => {
@@ -55,7 +100,14 @@ app.get('/menu', async (req, res) => {
     res.json(menu);
   } catch (error) {
     console.error('GET /menu error:', error);
-    res.status(500).json({ error: 'Failed to fetch menu' });
+    // Fallback to local menu.json if MongoDB fails
+    try {
+      const localMenu = JSON.parse(fs.readFileSync('menu.json', 'utf8'));
+      console.log('Falling back to local menu.json');
+      res.json(localMenu);
+    } catch (localError) {
+      res.status(500).json({ error: 'Failed to fetch menu from database and local file' });
+    }
   }
 });
 
@@ -86,6 +138,7 @@ app.delete('/menu/:id', async (req, res) => {
     const itemId = req.params.id;
     console.log('DELETE /menu - Removing item:', itemId);
     console.log('DELETE DEBUG - typeof itemId:', typeof itemId, 'value:', itemId);
+    console.log('DELETE TIMESTAMP:', new Date().toISOString());
     
     await client.connect();
     const db = client.db('pizza_shop');
@@ -109,6 +162,10 @@ app.delete('/menu/:id', async (req, res) => {
         console.log('Trying fallback query:', query);
       }
     }
+    
+    // Test: First find the item to see if it exists
+    const testFind = await menuCollection.findOne(query);
+    console.log('FOUND ITEM BEFORE DELETE:', testFind);
     
     const result = await menuCollection.deleteOne(query);
     console.log('Delete result:', result.deletedCount);
@@ -143,7 +200,7 @@ app.post('/login', (req, res) => {
   }
 });
 
-// Order submission endpoint
+// Order submission endpoint (for admin panel to receive orders)
 app.post('/submit-order', (req, res) => {
   console.log('Order submission received:', req.body);
   try {
@@ -165,11 +222,29 @@ app.post('/submit-order', (req, res) => {
       status: 'pending'
     };
     orders.push(newOrder);
-    
+
     // Save orders back to file
     fs.writeFileSync('orders.json', JSON.stringify(orders, null, 2));
-    
-    console.log('Order saved successfully with ID:', newOrder.id);
+
+    // Update dough stock when order contains dough-based items
+    try {
+      let doughUsed = 0;
+      if (newOrder.items && Array.isArray(newOrder.items)) {
+        newOrder.items.forEach(item => {
+          if (isDoughBasedItem(item.name)) {
+            doughUsed += item.quantity || 1;
+          }
+        });
+      }
+
+      if (doughUsed > 0) {
+        updateDoughStock(doughUsed);
+        console.log(`Order ${newOrder.id}: Used ${doughUsed} dough portions`);
+      }
+    } catch (doughError) {
+      console.error('Dough stock update error:', doughError);
+      // Don't fail the order if dough update fails
+    }    console.log('Order saved successfully with ID:', newOrder.id);
     res.json({ success: true, orderId: newOrder.id, message: 'Order placed successfully' });
   } catch (error) {
     console.error('Order submission error:', error);
@@ -214,12 +289,22 @@ app.post('/update-order', (req, res) => {
   }
 });
 
-// Stock management has been moved to admin-only server for security
-// All stock endpoints are now protected and only accessible through admin panel
+// PROTECTED ADMIN-ONLY STOCK MANAGEMENT ENDPOINTS
+// All stock management endpoints require admin authentication
 
-// Serve static files last
+// Get stock data (admin only)
+app.get('/stock-data.json', requireAdminAuth, (req, res) => {
+  try {
+    const stockData = fs.readFileSync('stock-data.json', 'utf8');
+    res.json(JSON.parse(stockData));
+  } catch (e) {
+    console.log('No stock data file found, returning empty object');
+    res.json({});
+  }
+});
 
-app.post('/stock-data', (req, res) => {
+// Update stock data (admin only)
+app.post('/stock-data', requireAdminAuth, (req, res) => {
   try {
     const stockData = req.body;
     fs.writeFileSync('stock-data.json', JSON.stringify(stockData, null, 2));
@@ -230,7 +315,46 @@ app.post('/stock-data', (req, res) => {
   }
 });
 
-app.get('/stock-settings.json', (req, res) => {
+// Get dough stock status
+app.get('/dough-stock.json', (req, res) => {
+  try {
+    let doughStock = {
+      available: 50,
+      used: 0,
+      lowThreshold: 10
+    };
+    
+    try {
+      const saved = fs.readFileSync('dough-stock.json', 'utf8');
+      doughStock = { ...doughStock, ...JSON.parse(saved) };
+    } catch (e) {
+      // Return defaults if no file exists
+    }
+    
+    res.json({
+      ...doughStock,
+      remaining: Math.max(0, doughStock.available - doughStock.used)
+    });
+  } catch (error) {
+    console.error('Get dough stock error:', error);
+    res.status(500).json({ error: 'Failed to get dough stock' });
+  }
+});
+
+// Save dough stock (admin only)
+app.post('/dough-stock.json', requireAdminAuth, (req, res) => {
+  try {
+    const doughStock = req.body;
+    fs.writeFileSync('dough-stock.json', JSON.stringify(doughStock, null, 2));
+    res.json({ success: true, message: 'Dough stock saved successfully' });
+  } catch (error) {
+    console.error('Save dough stock error:', error);
+    res.status(500).json({ error: 'Failed to save dough stock' });
+  }
+});
+
+// Get stock settings (admin only)
+app.get('/stock-settings.json', requireAdminAuth, (req, res) => {
   try {
     const settingsData = fs.readFileSync('stock-settings.json', 'utf8');
     res.json(JSON.parse(settingsData));
@@ -252,7 +376,8 @@ app.get('/stock-settings.json', (req, res) => {
   }
 });
 
-app.post('/stock-settings', (req, res) => {
+// Update stock settings (admin only)
+app.post('/stock-settings', requireAdminAuth, (req, res) => {
   try {
     const settingsData = req.body;
     fs.writeFileSync('stock-settings.json', JSON.stringify(settingsData, null, 2));
@@ -263,7 +388,42 @@ app.post('/stock-settings', (req, res) => {
   }
 });
 
-// Check stock availability endpoint
+// Get timeslot settings (admin only)
+app.get('/timeslot-settings.json', requireAdminAuth, (req, res) => {
+  try {
+    const settingsData = fs.readFileSync('timeslot-settings.json', 'utf8');
+    res.json(JSON.parse(settingsData));
+  } catch (e) {
+    console.log('No timeslot settings file found, returning defaults');
+    res.json({
+      lowStockThreshold: 3,
+      autoDisableLowStock: true,
+      autoResetDaily: true,
+      defaultStockAmount: 20,
+      trackHistory: true,
+      timeSlots: {
+        duration: 30,
+        ordersPerSlot: 8,
+        startTime: '17:00',
+        endTime: '22:00'
+      }
+    });
+  }
+});
+
+// Update timeslot settings (admin only)
+app.post('/timeslot-settings', requireAdminAuth, (req, res) => {
+  try {
+    const settingsData = req.body;
+    fs.writeFileSync('timeslot-settings.json', JSON.stringify(settingsData, null, 2));
+    res.json({ success: true, message: 'Timeslot settings updated successfully' });
+  } catch (error) {
+    console.error('Save timeslot settings error:', error);
+    res.status(500).json({ error: 'Failed to save timeslot settings' });
+  }
+});
+
+// Check stock availability - This can be used by checkout but requires minimal auth
 app.post('/check-stock', (req, res) => {
   try {
     const { items } = req.body;
@@ -300,7 +460,7 @@ app.post('/check-stock', (req, res) => {
   }
 });
 
-// Update stock after order endpoint
+// Update stock after order - Used by checkout system
 app.post('/update-stock', (req, res) => {
   try {
     const { items } = req.body;
@@ -341,86 +501,32 @@ app.get('/timeslot-availability', (req, res) => {
       endTime: '22:00'
     };
     
-    // Count orders per time slot for today
+    // Calculate available time slots for today
     const today = new Date().toISOString().split('T')[0];
     const todayOrders = ordersData.filter(order => 
-      order.placedAt && order.placedAt.startsWith(today)
+      order.deliveryDate === today
     );
     
     const slotCounts = {};
     todayOrders.forEach(order => {
-      if (order.orderTimeSlot) {
-        slotCounts[order.orderTimeSlot] = (slotCounts[order.orderTimeSlot] || 0) + 1;
+      if (order.deliveryTime) {
+        slotCounts[order.deliveryTime] = (slotCounts[order.deliveryTime] || 0) + 1;
       }
     });
     
+    const availableSlots = {};
+    Object.keys(slotCounts).forEach(slot => {
+      availableSlots[slot] = Math.max(0, timeSlotSettings.ordersPerSlot - slotCounts[slot]);
+    });
+    
     res.json({
-      slotCounts,
-      maxOrdersPerSlot: timeSlotSettings.ordersPerSlot,
-      settings: timeSlotSettings
+      settings: timeSlotSettings,
+      availability: availableSlots,
+      totalOrdersToday: todayOrders.length
     });
   } catch (error) {
-    console.error('Check timeslot availability error:', error);
-    res.status(500).json({ error: 'Failed to check timeslot availability' });
-  }
-});
-
-// ADMIN STOCK MANAGEMENT ENDPOINTS
-// Get stock data (admin only)
-app.get('/stock-data.json', requireAdminAuth, (req, res) => {
-  try {
-    const stockData = fs.readFileSync('stock-data.json', 'utf8');
-    res.json(JSON.parse(stockData));
-  } catch (e) {
-    console.log('No stock data file found, returning empty object');
-    res.json({});
-  }
-});
-
-// Update stock data (admin only)
-app.post('/stock-data', requireAdminAuth, (req, res) => {
-  try {
-    const stockData = req.body;
-    fs.writeFileSync('stock-data.json', JSON.stringify(stockData, null, 2));
-    res.json({ success: true, message: 'Stock data updated successfully' });
-  } catch (error) {
-    console.error('Save stock data error:', error);
-    res.status(500).json({ error: 'Failed to save stock data' });
-  }
-});
-
-// Get stock settings (admin only)
-app.get('/stock-settings.json', requireAdminAuth, (req, res) => {
-  try {
-    const settingsData = fs.readFileSync('timeslot-settings.json', 'utf8');
-    res.json(JSON.parse(settingsData));
-  } catch (e) {
-    console.log('No stock settings file found, returning defaults');
-    res.json({
-      lowStockThreshold: 3,
-      autoDisableLowStock: true,
-      autoResetDaily: true,
-      defaultStockAmount: 20,
-      trackHistory: true,
-      timeSlots: {
-        duration: 30,
-        ordersPerSlot: 8,
-        startTime: '17:00',
-        endTime: '22:00'
-      }
-    });
-  }
-});
-
-// Update stock settings (admin only)
-app.post('/stock-settings', requireAdminAuth, (req, res) => {
-  try {
-    const settingsData = req.body;
-    fs.writeFileSync('timeslot-settings.json', JSON.stringify(settingsData, null, 2));
-    res.json({ success: true, message: 'Stock settings updated successfully' });
-  } catch (error) {
-    console.error('Save stock settings error:', error);
-    res.status(500).json({ error: 'Failed to save stock settings' });
+    console.error('Timeslot availability error:', error);
+    res.status(500).json({ error: 'Failed to get timeslot availability' });
   }
 });
 
@@ -457,15 +563,38 @@ app.get('/admin/status', (req, res) => {
   });
 });
 
-// Serve static files from public directory
-app.use(express.static('public'));
-app.use(express.static(__dirname));
+// Redirect checkout.html to checkout-enhanced.html to fix caching issues
+app.get('/checkout.html', (req, res) => {
+  res.redirect(301, '/checkout-enhanced.html');
+});
+
+// Redirect bare /checkout to enhanced version
+app.get('/checkout', (req, res) => {
+  res.redirect(301, '/checkout-enhanced.html');
+});
+
+// Handle root route - serve admin dashboard
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+});
+
+// Set cache control headers for static files
+app.use(express.static(__dirname, {
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      // Don't cache HTML files to prevent old checkout from being cached
+      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+      res.setHeader('Pragma', 'no-cache');
+      res.setHeader('Expires', '0');
+    }
+  }
+}));
 
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => {
   console.log('SERVER.JS STARTED - Updated Version');
-  console.log(`🚀 Server running on port ${PORT}`);
+  console.log(`🚀 Admin server running on port ${PORT}`);
   console.log('📝 Endpoints: /test, /menu, /admin/*, /stock-* (admin protected)');
-  console.log('� Admin stock management system active');
-  console.log('✅ COMPLETE PIZZA SITE SERVER LOADED!');
+  console.log('� Admin-only stock management endpoints active');
+  console.log('✅ SECURE ADMIN SERVER LOADED!');
 });
