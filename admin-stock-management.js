@@ -340,6 +340,12 @@ class StockManager {
 
             if (resetBtn) resetBtn.addEventListener('click', () => this.resetDoughStock());
             if (addBtn) addBtn.addEventListener('click', () => this.addDoughPortions());
+
+            const useDoughBtn = document.getElementById('use-dough-manual');
+            const testSaleBtn = document.getElementById('test-pizza-sale');
+            
+            if (useDoughBtn) useDoughBtn.addEventListener('click', () => this.manualDoughUsage());
+            if (testSaleBtn) testSaleBtn.addEventListener('click', () => this.testPizzaSale());
         } catch (error) {
             console.log('Dough management elements not ready yet:', error);
         }
@@ -383,7 +389,7 @@ class StockManager {
                 <div class="stock-item ${statusClass}">
                     <div class="item-info">
                         <h3>${item.name}${item.size ? ` - ${item.size}` : ''}</h3>
-                        <p>Category: ${item.category} | Sold today: ${item.sold}</p>
+                        <p>Category: ${item.category} | Sold today: ${item.sold}${this.isDoughBasedItem(item.name, item.category) ? ' 🍞' : ''}</p>
                     </div>
                     <div class="item-category">${item.category}</div>
                     <div class="stock-control">
@@ -525,21 +531,29 @@ class StockManager {
     }
 
     updateStock(itemKey, newStock) {
+        const oldStock = this.stockData[itemKey].stock;
         this.stockData[itemKey].stock = newStock;
-        
+
+        // Track dough usage when stock decreases
+        if (newStock < oldStock) {
+            const item = this.stockData[itemKey];
+            if (this.isDoughBasedItem(item.name, item.category)) {
+                const doughUsed = oldStock - newStock;
+                this.updateDoughStock(doughUsed);
+            }
+        }
+
         // Auto-disable if needed
         if (this.settings.autoDisableLowStock && newStock === 0) {
             this.stockData[itemKey].enabled = false;
         } else if (newStock > 0) {
             this.stockData[itemKey].enabled = true;
         }
-        
+
         this.renderStockItems();
         this.updateStatusCards();
         this.saveStockData();
-    }
-
-    setBulkStock() {
+    }    setBulkStock() {
         const amount = parseInt(document.getElementById('bulk-stock-input').value);
         if (isNaN(amount) || amount < 0) {
             this.showNotification('Please enter a valid stock amount', 'error');
@@ -603,7 +617,15 @@ class StockManager {
             const doughThreshold = document.getElementById('dough-low-threshold');
             
             if (doughAvailable) doughAvailable.value = this.doughStock.available;
-            if (doughUsed) doughUsed.value = this.doughStock.used;
+            if (doughUsed) {
+                doughUsed.value = this.doughStock.used;
+                // Update in real-time whenever called
+                setTimeout(() => {
+                    if (document.getElementById('dough-used')) {
+                        document.getElementById('dough-used').value = this.doughStock.used;
+                    }
+                }, 100);
+            }
             if (doughThreshold) doughThreshold.value = this.doughStock.lowThreshold;
         } catch (error) {
             console.log('Dough elements not found yet:', error);
@@ -754,6 +776,38 @@ class StockManager {
             }
         } catch (error) {
             console.log('Using default dough stock settings');
+        }
+    }
+
+    manualDoughUsage() {
+        const portions = prompt('How many dough portions were used?', '1');
+        if (portions && !isNaN(portions)) {
+            const usedPortions = parseInt(portions);
+            this.updateDoughStock(usedPortions);
+            this.showNotification(`Marked ${usedPortions} dough portions as used!`, 'info');
+        }
+    }
+
+    testPizzaSale() {
+        // Find a pizza item to simulate a sale
+        const pizzaItems = Object.keys(this.stockData).filter(key => {
+            const item = this.stockData[key];
+            return this.isDoughBasedItem(item.name, item.category);
+        });
+
+        if (pizzaItems.length > 0) {
+            const randomPizza = pizzaItems[Math.floor(Math.random() * pizzaItems.length)];
+            const currentStock = this.stockData[randomPizza].stock;
+            
+            if (currentStock > 0) {
+                this.updateStock(randomPizza, currentStock - 1);
+                this.stockData[randomPizza].sold += 1;
+                this.showNotification(`Test sale: ${this.stockData[randomPizza].name} - 1 dough portion used!`, 'success');
+            } else {
+                this.showNotification('No pizza stock available for test sale!', 'warning');
+            }
+        } else {
+            this.showNotification('No pizza items found for testing!', 'warning');
         }
     }
 
