@@ -5,7 +5,7 @@ class StockManager {
         this.stockData = {};
         this.timeSlotSettings = {
             duration: 30,
-            ordersPerSlot: 8,
+            pizzasPerSlot: 8,
             startTime: '17:00',
             endTime: '22:00'
         };
@@ -210,8 +210,21 @@ class StockManager {
                         enabled: true
                     };
                 });
+            } else if (item.types) {
+                // For items with types (like drinks, sides)
+                item.types.forEach(type => {
+                    const key = `${item.name}-${type.name}`;
+                    this.stockData[key] = {
+                        name: item.name,
+                        size: type.name,
+                        category: item.category,
+                        stock: this.settings.defaultStockAmount,
+                        sold: 0,
+                        enabled: true
+                    };
+                });
             } else {
-                // For items without sizes
+                // For items without sizes or types (single items)
                 this.stockData[item.name] = {
                     name: item.name,
                     category: item.category,
@@ -261,8 +274,8 @@ class StockManager {
             this.renderTimeSlots();
         });
 
-        document.getElementById('orders-per-slot').addEventListener('change', (e) => {
-            this.timeSlotSettings.ordersPerSlot = parseInt(e.target.value);
+        document.getElementById('pizzas-per-slot').addEventListener('change', (e) => {
+            this.timeSlotSettings.pizzasPerSlot = parseInt(e.target.value);
             this.renderTimeSlots();
         });
 
@@ -368,9 +381,9 @@ class StockManager {
         
         let html = '';
         slots.forEach(slot => {
-            const currentOrders = this.getCurrentOrdersForSlot(slot.time);
-            const capacity = this.timeSlotSettings.ordersPerSlot;
-            const available = capacity - currentOrders;
+            const currentPizzas = this.getCurrentPizzasForSlot(slot.time);
+            const capacity = this.timeSlotSettings.pizzasPerSlot;
+            const available = capacity - currentPizzas;
             
             let statusClass = 'available';
             let statusText = 'Available';
@@ -427,10 +440,10 @@ class StockManager {
         return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
     }
 
-    getCurrentOrdersForSlot(timeSlot) {
-        // This would normally fetch from your orders database
+    getCurrentPizzasForSlot(timeSlot) {
+        // This would normally fetch from your orders database and count pizzas
         // For now, return a random number for demonstration
-        return Math.floor(Math.random() * this.timeSlotSettings.ordersPerSlot);
+        return Math.floor(Math.random() * this.timeSlotSettings.pizzasPerSlot);
     }
 
     getStockStatus(stock) {
@@ -481,7 +494,7 @@ class StockManager {
             item => item.stock <= this.settings.lowStockThreshold && item.stock > 0
         ).length;
         const availableSlots = this.generateTimeSlots().length;
-        const totalCapacity = availableSlots * this.timeSlotSettings.ordersPerSlot;
+        const totalCapacity = availableSlots * this.timeSlotSettings.pizzasPerSlot;
         
         document.getElementById('total-items-count').textContent = totalItems;
         document.getElementById('low-stock-count').textContent = lowStockItems;
@@ -491,7 +504,7 @@ class StockManager {
 
     applySettingsToUI() {
         document.getElementById('slot-duration').value = this.timeSlotSettings.duration;
-        document.getElementById('orders-per-slot').value = this.timeSlotSettings.ordersPerSlot;
+        document.getElementById('pizzas-per-slot').value = this.timeSlotSettings.pizzasPerSlot;
         document.getElementById('start-time').value = this.timeSlotSettings.startTime;
         document.getElementById('end-time').value = this.timeSlotSettings.endTime;
         document.getElementById('low-stock-threshold').value = this.settings.lowStockThreshold;
