@@ -16,6 +16,10 @@
 			<a href="checkout-enhanced.html" class="active">Checkout</a>
 			<a href="allergens.html">Allergens</a>
 		</nav>
+		<!-- Mobile back button -->
+		<div class="mobile-nav-helper">
+			<a href="menu.html" class="mobile-back-btn">← Back to Menu</a>
+		</div>
 	</header>
 	
 	<main class="checkout-main">
@@ -68,14 +72,16 @@
 								<div class="form-group">
 									<label for="customer-name" class="required">Full Name</label>
 									<input type="text" id="customer-name" name="customerName" required 
-										   placeholder="Enter your full name" class="form-input">
+										   placeholder="Enter your full name" class="form-input"
+										   autocomplete="name" autocapitalize="words">
 									<div class="error-message" id="name-error"></div>
 								</div>
 
 								<div class="form-group">
 									<label for="customer-phone" class="required">Phone Number</label>
 									<input type="tel" id="customer-phone" name="customerPhone" required 
-										   placeholder="Enter your phone number" class="form-input">
+										   placeholder="Enter your phone number" class="form-input"
+										   autocomplete="tel">
 									<div class="error-message" id="phone-error"></div>
 								</div>
 							</div>
@@ -83,7 +89,8 @@
 							<div class="form-group">
 								<label for="customer-email">Email Address</label>
 								<input type="email" id="customer-email" name="customerEmail" 
-									   placeholder="Enter email for order confirmation (optional)" class="form-input">
+									   placeholder="Enter email for order confirmation (optional)" class="form-input"
+									   autocomplete="email" inputmode="email">
 								<small class="field-hint">We'll send you an order confirmation</small>
 							</div>
 						</div>
@@ -113,14 +120,16 @@
 									<div class="form-group address-group">
 										<label for="customer-address" class="required">Delivery Address</label>
 										<input type="text" id="customer-address" name="customerAddress" 
-											   placeholder="Enter your full address" class="form-input">
+											   placeholder="Enter your full address" class="form-input"
+											   autocomplete="street-address">
 										<div class="error-message" id="address-error"></div>
 									</div>
 
 									<div class="form-group postcode-group">
 										<label for="customer-postcode" class="required">Postcode</label>
 										<input type="text" id="customer-postcode" name="customerPostcode" 
-											   placeholder="Enter your postcode" class="form-input">
+											   placeholder="Enter your postcode" class="form-input"
+											   autocomplete="postal-code">
 										<div class="error-message" id="postcode-error"></div>
 									</div>
 								</div>
@@ -196,7 +205,7 @@
 		</div>
 
 		<!-- Loading Overlay -->
-		<div id="loading-overlay" class="loading-overlay" style="display: none;">
+		<div id="loading-overlay" class="loading-overlay hidden">
 			<div class="loading-content">
 				<div class="spinner"></div>
 				<p>Processing your order...</p>
