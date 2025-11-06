@@ -223,18 +223,33 @@ function displayMenuItems(items) {
         const itemCard = document.createElement('div');
         itemCard.className = 'menu-item-card';
         
-        // Handle both array and object formats for sizes
-        let sizes = {};
+        // Handle different option formats: sizes, types, or single price
+        let options = {};
+        let optionType = '';
+        
         if (item.sizes && Array.isArray(item.sizes)) {
-            // Convert array format to object format
+            // Pizza sizes format: [{size: "Small", price: 9.99}]
             item.sizes.forEach(sizeObj => {
-                sizes[sizeObj.size] = sizeObj.price;
+                options[sizeObj.size] = sizeObj.price;
             });
+            optionType = 'sizes';
+        } else if (item.types && Array.isArray(item.types)) {
+            // Drinks/dips format: [{name: "330ml Can", price: 1.50}]
+            item.types.forEach(typeObj => {
+                options[typeObj.name] = typeObj.price;
+            });
+            optionType = 'types';
         } else if (item.sizes && typeof item.sizes === 'object') {
-            sizes = item.sizes;
+            // Object format sizes
+            options = item.sizes;
+            optionType = 'sizes';
+        } else if (item.price) {
+            // Single price item
+            options[item.name] = item.price;
+            optionType = 'single';
         }
         
-        const hasMultipleSizes = Object.keys(sizes).length > 1;
+        const hasMultipleOptions = Object.keys(options).length > 1;
         const isOutOfStock = item.stockInfo && !item.isInStock;
         const isLowStock = item.stockInfo && item.isLowStock;
         
@@ -260,22 +275,25 @@ function displayMenuItems(items) {
                 <h4>${item.name || 'Unnamed Item'}</h4>
                 <p class="menu-item-description">${item.description || ''}</p>
                 ${stockStatus}
-                ${hasMultipleSizes ? '<p class="menu-item-sizes">Multiple sizes available</p>' : ''}
+                ${hasMultipleOptions ? `<p class="menu-item-sizes">Multiple ${optionType} available</p>` : ''}
             </div>
             <div class="menu-item-actions">
-                ${hasMultipleSizes ? 
-                    Object.entries(sizes).map(([size, price]) => 
-                        `<button class="menu-add-btn ${isOutOfStock ? 'disabled' : ''}" 
-                                ${isOutOfStock ? 'disabled' : ''} 
-                                onclick="addToManualCart('${item.name} (${size})', ${price}, ${isOutOfStock})">
-                            ${size} - £${parseFloat(price).toFixed(2)}
-                        </button>`
-                    ).join('') :
-                    `<button class="menu-add-btn ${isOutOfStock ? 'disabled' : ''}" 
-                            ${isOutOfStock ? 'disabled' : ''} 
-                            onclick="addToManualCart('${item.name}', ${item.price || 0}, ${isOutOfStock})">
-                        £${parseFloat(item.price || 0).toFixed(2)}
-                    </button>`
+                ${hasMultipleOptions ? 
+                    Object.entries(options).map(([optionName, price]) => {
+                        const displayName = optionType === 'single' ? optionName : item.name + ' (' + optionName + ')';
+                        const buttonLabel = optionType === 'single' ? '£' + parseFloat(price).toFixed(2) : optionName + ' - £' + parseFloat(price).toFixed(2);
+                        const safeName = displayName.replace(/'/g, "\\'");
+                        return '<button class="menu-add-btn ' + (isOutOfStock ? 'disabled' : '') + '" ' +
+                                (isOutOfStock ? 'disabled' : '') + ' ' +
+                                'onclick="addToManualCart(\'' + safeName + '\', ' + price + ', ' + isOutOfStock + ')">' +
+                            buttonLabel +
+                        '</button>';
+                    }).join('') :
+                    '<button class="menu-add-btn ' + (isOutOfStock ? 'disabled' : '') + '" ' +
+                            (isOutOfStock ? 'disabled' : '') + ' ' +
+                            'onclick="addToManualCart(\'' + item.name.replace(/'/g, "\\'") + '\', ' + (Object.values(options)[0] || item.price || 0) + ', ' + isOutOfStock + ')">' +
+                        '£' + parseFloat(Object.values(options)[0] || item.price || 0).toFixed(2) +
+                    '</button>'
                 }
             </div>
         `;
