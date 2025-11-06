@@ -350,28 +350,43 @@
     margin-bottom: 2rem;
 }
 
+.payment-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.order-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
 .payment-btn {
     display: flex;
     align-items: center;
     width: 100%;
+    min-height: 60px;
     padding: 0.75rem 1.5rem;
     border: none !important;
     border-radius: 6px;
-    background: #6c757d !important;
+    background: #000000 !important;
     color: white !important;
     cursor: pointer;
     font-weight: 600;
     text-align: left;
     transition: background-color 0.3s ease;
+    box-sizing: border-box;
 }
 
 .payment-btn:hover {
-    background: #5a6268 !important;
+    background: #333333 !important;
     color: white !important;
 }
 
 .payment-btn:active {
-    background: #5a6268 !important;
+    background: #333333 !important;
     color: white !important;
 }
 
