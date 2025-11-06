@@ -54,6 +54,36 @@
     "description": "Mixed greens with feta cheese, olives, tomatoes and Mediterranean dressing"
   },
   {
+    "name": "Buffalo Wings",
+    "category": "CHICKEN",
+    "description": "Spicy buffalo chicken wings",
+    "sizes": [
+      {"size": "6 pieces", "price": 6.99},
+      {"size": "12 pieces", "price": 12.99},
+      {"size": "18 pieces", "price": 17.99}
+    ]
+  },
+  {
+    "name": "BBQ Wings",
+    "category": "CHICKEN",
+    "description": "Sweet and tangy BBQ chicken wings",
+    "sizes": [
+      {"size": "6 pieces", "price": 6.99},
+      {"size": "12 pieces", "price": 12.99},
+      {"size": "18 pieces", "price": 17.99}
+    ]
+  },
+  {
+    "name": "Chicken Strips",
+    "category": "CHICKEN",
+    "description": "Crispy breaded chicken strips",
+    "sizes": [
+      {"size": "3 pieces", "price": 5.99},
+      {"size": "6 pieces", "price": 9.99},
+      {"size": "9 pieces", "price": 13.99}
+    ]
+  },
+  {
     "name": "Garlic Bread",
     "price": 4.99,
     "category": "SIDES",
