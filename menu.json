@@ -36,6 +36,24 @@
     "description": "Test pizza with everything - pepperoni, mushrooms, peppers"
   },
   {
+    "name": "Caesar Salad",
+    "price": 7.99,
+    "category": "SALADS",
+    "description": "Crisp romaine lettuce with Caesar dressing, croutons and parmesan"
+  },
+  {
+    "name": "Garden Salad",
+    "price": 6.99,
+    "category": "SALADS",
+    "description": "Fresh mixed greens with tomatoes, cucumber and your choice of dressing"
+  },
+  {
+    "name": "Greek Salad",
+    "price": 8.99,
+    "category": "SALADS",
+    "description": "Mixed greens with feta cheese, olives, tomatoes and Mediterranean dressing"
+  },
+  {
     "name": "Garlic Bread",
     "price": 4.99,
     "category": "SIDES",
