@@ -27,10 +27,19 @@ class StreamlinedCheckout {
 
     async loadCart() {
         try {
-            const cartData = localStorage.getItem('cart');
+            // First try to load from checkoutCart (set by menu.js checkout function)
+            let cartData = localStorage.getItem('checkoutCart');
+            if (!cartData) {
+                // Fallback to regular cart
+                cartData = localStorage.getItem('cart');
+            }
+            
             if (cartData) {
                 this.cart = JSON.parse(cartData);
                 console.log('Cart loaded:', this.cart);
+                
+                // Clear checkoutCart to prevent stale data
+                localStorage.removeItem('checkoutCart');
             } else {
                 console.warn('No cart data found');
                 this.cart = [];
