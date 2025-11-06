@@ -354,25 +354,24 @@
     align-items: center;
     width: 100%;
     padding: 1.25rem;
-    border: 2px solid #000;
+    border: 2px solid #FF9B7A;
     border-radius: 8px;
-    background: #000;
+    background: #FF9B7A;
     color: white;
     cursor: pointer;
     text-align: left;
+    font-weight: bold;
 }
 
 .payment-btn:hover {
-    /* No hover effects - keep consistent styling */
-    border-color: #000;
-    background: #000;
+    border-color: #e88a6b;
+    background: #e88a6b;
     color: white;
 }
 
 .payment-btn:active {
-    /* No active effects - keep consistent styling */
-    background: #000;
-    border-color: #000;
+    background: #d67a5b;
+    border-color: #d67a5b;
 }
 
 .payment-icon {
@@ -395,10 +394,12 @@
 /* Ensure payment button text is white */
 .payment-btn .btn-content strong {
     color: white;
+    font-weight: bold;
 }
 
 .payment-btn .btn-content small {
     color: white;
+    opacity: 0.9;
 }
 
 .payment-btn .btn-icon {
