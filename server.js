@@ -111,6 +111,51 @@ app.get('/menu', async (req, res) => {
   }
 });
 
+// Get menu with stock information for manual orders (admin only)
+app.get('/menu-with-stock', requireAdminAuth, async (req, res) => {
+  try {
+    console.log('GET /menu-with-stock - Fetching menu and stock data');
+    
+    // Get menu items
+    let menu = [];
+    try {
+      await client.connect();
+      const db = client.db('pizza_shop');
+      const menuCollection = db.collection('menu');
+      menu = await menuCollection.find({}).toArray();
+      console.log(`Found ${menu.length} menu items from MongoDB`);
+    } catch (mongoError) {
+      console.log('MongoDB failed, falling back to local menu.json');
+      menu = JSON.parse(fs.readFileSync('menu.json', 'utf8'));
+    }
+    
+    // Get stock data
+    let stockData = {};
+    try {
+      stockData = JSON.parse(fs.readFileSync('stock-data.json', 'utf8'));
+      console.log(`Found stock data for ${Object.keys(stockData).length} items`);
+    } catch (stockError) {
+      console.log('No stock data file found, using defaults');
+    }
+    
+    // Combine menu with stock information
+    const menuWithStock = menu.map(item => {
+      const stockInfo = stockData[item.name] || { stock: 999, minStock: 0 };
+      return {
+        ...item,
+        stockInfo: stockInfo,
+        isInStock: stockInfo.stock > 0,
+        isLowStock: stockInfo.stock <= stockInfo.minStock && stockInfo.stock > 0
+      };
+    });
+    
+    res.json(menuWithStock);
+  } catch (error) {
+    console.error('GET /menu-with-stock error:', error);
+    res.status(500).json({ error: 'Failed to fetch menu with stock data' });
+  }
+});
+
 // Add new menu item
 app.post('/menu', async (req, res) => {
   try {
@@ -573,9 +618,9 @@ app.get('/checkout', (req, res) => {
   res.redirect(301, '/checkout-enhanced.html');
 });
 
-// Handle root route - serve customer homepage
+// Handle root route - serve admin dashboard
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'index.html'));
+  res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
 });
 
 // Set cache control headers for static files
