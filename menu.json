@@ -133,5 +133,34 @@
       {"name": "Small Glass", "price": 2.99},
       {"name": "Large Glass", "price": 3.99}
     ]
+  },
+  {
+    "name": "Chocolate Brownie",
+    "price": 4.99,
+    "category": "DESSERTS",
+    "description": "Rich chocolate brownie served warm with vanilla ice cream"
+  },
+  {
+    "name": "Tiramisu",
+    "price": 5.99,
+    "category": "DESSERTS",
+    "description": "Classic Italian coffee-flavored dessert with mascarpone"
+  },
+  {
+    "name": "Cheesecake",
+    "price": 5.49,
+    "category": "DESSERTS",
+    "description": "Creamy New York style cheesecake with berry compote"
+  },
+  {
+    "name": "Ice Cream",
+    "category": "DESSERTS",
+    "description": "Premium ice cream",
+    "types": [
+      {"name": "Vanilla (2 scoops)", "price": 3.99},
+      {"name": "Chocolate (2 scoops)", "price": 3.99},
+      {"name": "Strawberry (2 scoops)", "price": 3.99},
+      {"name": "Mixed (3 scoops)", "price": 5.99}
+    ]
   }
 ]
