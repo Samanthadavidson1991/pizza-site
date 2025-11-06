@@ -195,7 +195,8 @@
 }
 
 .delivery-section {
-    display: none;
+    display: block;
+    margin-top: 1rem;
 }
 
 .loading-overlay {
