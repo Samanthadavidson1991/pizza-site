@@ -355,10 +355,10 @@
     align-items: center;
     width: 100%;
     padding: 0.75rem 1.5rem;
-    border: none;
+    border: none !important;
     border-radius: 6px;
-    background: #6c757d;
-    color: white;
+    background: #6c757d !important;
+    color: white !important;
     cursor: pointer;
     font-weight: 600;
     text-align: left;
@@ -366,11 +366,20 @@
 }
 
 .payment-btn:hover {
-    background: #5a6268;
+    background: #5a6268 !important;
+    color: white !important;
 }
 
 .payment-btn:active {
-    background: #5a6268;
+    background: #5a6268 !important;
+    color: white !important;
+}
+
+/* Ensure payment button content is visible */
+.payment-btn .btn-content strong,
+.payment-btn .btn-content small,
+.payment-btn .btn-icon {
+    color: white !important;
 }
 
 .payment-icon {
