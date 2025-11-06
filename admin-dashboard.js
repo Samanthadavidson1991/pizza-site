@@ -75,7 +75,7 @@ function printSingleOrder(idx) {
   printWin.print();
   printWin.close();
 }
-// Point to customer website where orders are stored
+// Point to main website for API endpoints (orders, etc.)
 const BACKEND = 'https://thecrustatngb.co.uk';
 
 // Test function to debug API connectivity

@@ -20,6 +20,23 @@ app.use(session({
   cookie: { secure: false, maxAge: 24 * 60 * 60 * 1000 } // 24 hours
 }));
 
+// Subdomain routing middleware
+app.use((req, res, next) => {
+  const host = req.get('host') || '';
+  console.log('Request host:', host, 'Path:', req.path);
+  
+  // Check if this is an admin subdomain request
+  if (host.startsWith('admin.') || host === 'admin.thecrustatngb.co.uk') {
+    req.isAdminSubdomain = true;
+    console.log('Admin subdomain detected');
+  } else {
+    req.isAdminSubdomain = false;
+    console.log('Customer site request');
+  }
+  
+  next();
+});
+
 // Admin authentication middleware
 const requireAdminAuth = (req, res, next) => {
   // For development, you can bypass auth by setting a header
@@ -618,22 +635,59 @@ app.get('/checkout', (req, res) => {
   res.redirect(301, '/checkout-enhanced.html');
 });
 
-// Handle root route - serve admin dashboard
+// Handle root route - serve different content based on subdomain
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+  if (req.isAdminSubdomain) {
+    // Admin subdomain - serve admin dashboard
+    res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
+  } else {
+    // Main domain - serve customer homepage
+    res.sendFile(path.join(__dirname, 'index.html'));
+  }
 });
 
-// Set cache control headers for static files
-app.use(express.static(__dirname, {
-  setHeaders: (res, path) => {
-    if (path.endsWith('.html')) {
-      // Don't cache HTML files to prevent old checkout from being cached
-      res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
-      res.setHeader('Pragma', 'no-cache');
-      res.setHeader('Expires', '0');
-    }
+// Subdomain-aware static file serving
+app.use((req, res, next) => {
+  // Set cache control headers
+  if (req.path.endsWith('.html')) {
+    res.setHeader('Cache-Control', 'no-cache, no-store, must-revalidate');
+    res.setHeader('Pragma', 'no-cache');
+    res.setHeader('Expires', '0');
   }
-}));
+
+  // Handle admin subdomain requests
+  if (req.isAdminSubdomain) {
+    // Only serve admin files for admin subdomain
+    const adminFiles = [
+      'admin-dashboard.html', 'admin-dashboard.js', 'admin-dashboard.css',
+      'admin-menu.html', 'admin-menu.js', 'admin-menu.css',
+      'admin-manual-order.html', 'admin-manual-order.js', 'admin-manual-order.css',
+      'admin-sales.html', 'admin-sales.js', 'admin-sales.css',
+      'admin-stock-management.html', 'admin-stock-management.js', 'admin-stock-management.css',
+      'admin-running-orders.html', 'admin-running-orders.js', 'admin-running-orders.css',
+      'admin-monthly-sales.html', 'admin-monthly-sales.js',
+      'admin-menu-auth.js', 'admin-menu-new.js'
+    ];
+    
+    const requestedFile = req.path.substring(1); // Remove leading slash
+    
+    if (adminFiles.includes(requestedFile) || req.path.startsWith('/admin')) {
+      // Serve admin files
+      return express.static(__dirname)(req, res, next);
+    } else {
+      // Block non-admin files on admin subdomain
+      return res.status(404).send('Page not found on admin subdomain');
+    }
+  } else {
+    // Customer site - block admin files
+    if (req.path.startsWith('/admin-') || req.path.startsWith('/admin/')) {
+      return res.status(404).send('Admin pages not accessible on main domain');
+    }
+    
+    // Serve customer files
+    return express.static(__dirname)(req, res, next);
+  }
+});
 
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => {
