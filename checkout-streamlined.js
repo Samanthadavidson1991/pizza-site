@@ -325,7 +325,8 @@ class StreamlinedCheckout {
         // Add order details
         orderData.orderType = 'delivery'; // This checkout is delivery-only
         orderData.paymentMethod = paymentMethod;
-        orderData.items = this.cart;
+        orderData.cart = this.cart; // Use 'cart' to match admin dashboard expectations
+        orderData.items = this.cart; // Keep 'items' for backward compatibility
         orderData.subtotal = this.calculateSubtotal();
         orderData.deliveryFee = this.deliveryFee;
         orderData.total = orderData.subtotal + orderData.deliveryFee;

@@ -297,8 +297,8 @@ app.post('/submit-order', (req, res) => {
   }
 });
 
-// Get orders endpoint
-app.get('/orders.json', (req, res) => {
+// Get orders endpoint (admin only)
+app.get('/orders.json', requireAdminAuth, (req, res) => {
   try {
     const ordersData = fs.readFileSync('orders.json', 'utf8');
     const orders = JSON.parse(ordersData);
@@ -309,8 +309,8 @@ app.get('/orders.json', (req, res) => {
   }
 });
 
-// Update order status endpoint
-app.post('/update-order', (req, res) => {
+// Update order status endpoint (admin only)
+app.post('/update-order', requireAdminAuth, (req, res) => {
   try {
     const { index, status, username } = req.body;
     
