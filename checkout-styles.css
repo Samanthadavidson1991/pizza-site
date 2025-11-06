@@ -7,9 +7,13 @@
 }
 
 .checkout-main {
-    padding: 2rem 0;
+    padding: 1rem 0;
     max-width: 1200px;
     margin: 0 auto;
+    /* Ensure it fits on one screen */
+    min-height: calc(100vh - 2rem);
+    max-height: calc(100vh - 2rem);
+    overflow-y: auto;
 }
 
 .checkout-container {
@@ -25,7 +29,7 @@
 .checkout-progress {
     display: flex;
     background: #FFF0E8; /* Lighter peach for progress bar */
-    padding: 1.5rem;
+    padding: 1rem;
     justify-content: space-between;
     border-bottom: 1px solid #FFD4C4;
 }
@@ -99,15 +103,20 @@
 .checkout-content {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
-    gap: 1.5rem;
-    padding: 2rem;
+    gap: 1rem;
+    padding: 1.5rem;
+    /* Optimize for single screen fit */
+    max-height: calc(100vh - 200px);
+    overflow-y: auto;
 }
 
 .checkout-section {
     background: #FFF8F5; /* Very light peachy white for sections */
     border-radius: 8px;
-    padding: 1.5rem;
+    padding: 1rem;
     height: fit-content;
+    max-height: calc(100vh - 300px);
+    overflow-y: auto;
     border: 1px solid #FFE5D4;
 }
 
@@ -136,7 +145,7 @@
 }
 
 .checkout-section h3.section-title {
-    margin: 1.5rem 0 1rem 0;
+    margin: 1rem 0 0.75rem 0;
     color: #495057;
     font-size: 1.1rem;
     border-bottom: 1px solid #dee2e6;
@@ -284,7 +293,7 @@
 
 /* Radio Button Styles */
 .order-type-group {
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .radio-group {
@@ -358,14 +367,14 @@
 .payment-methods {
     display: grid;
     gap: 1rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1.5rem;
 }
 
 .payment-buttons {
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 1.5rem;
+    margin-bottom: 1rem;
 }
 
 .order-actions {
@@ -1092,5 +1101,77 @@
     
     .step-label {
         font-size: 0.8rem;
+    }
+}
+
+/* Desktop optimization for single-screen checkout */
+@media (min-width: 1024px) and (min-height: 768px) {
+    .checkout-main {
+        padding: 0.5rem 0;
+        max-height: 100vh;
+        overflow: hidden;
+    }
+    
+    .checkout-container {
+        margin: 0 1rem;
+        max-height: calc(100vh - 1rem);
+        display: flex;
+        flex-direction: column;
+    }
+    
+    .checkout-progress {
+        padding: 0.75rem;
+        flex-shrink: 0;
+    }
+    
+    .checkout-content {
+        padding: 1rem;
+        gap: 0.75rem;
+        flex: 1;
+        overflow: hidden;
+        max-height: none;
+    }
+    
+    .checkout-section {
+        padding: 0.75rem;
+        max-height: calc(100vh - 200px);
+        overflow-y: auto;
+    }
+    
+    .checkout-section h3.section-title {
+        margin: 0.75rem 0 0.5rem 0;
+        font-size: 1rem;
+    }
+    
+    .order-type-group {
+        margin-bottom: 0.75rem;
+    }
+    
+    .payment-buttons {
+        margin-bottom: 0.75rem;
+    }
+    
+    .customer-fields {
+        margin-bottom: 1rem;
+    }
+    
+    .form-group {
+        margin-bottom: 0.75rem;
+    }
+}
+
+/* Large desktop optimization */
+@media (min-width: 1440px) and (min-height: 900px) {
+    .checkout-main {
+        max-width: 1400px;
+    }
+    
+    .checkout-content {
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+    
+    .checkout-section {
+        padding: 1rem;
     }
 }
