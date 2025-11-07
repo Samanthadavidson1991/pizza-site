@@ -1,13 +1,10 @@
-const CACHE_NAME = 'pizza-site-v3';
+const CACHE_NAME = 'pizza-site-v5-FORCE-CACHE-BUST';
 const urlsToCache = [
 	'/index.html',
 	'/menu.html',
-	'/checkout.html',
+	'/checkout-enhanced.html',
 	'/allergens.html',
-	'/admin-menu.html',
-	'/admin-dashboard.html',
 	'/style.css',
-	'/admin-dashboard.css',
 	'/menu.css',
 	'/pizza-icon-192.png',
 	'/pizza-shop-logo.png',
