@@ -1,17 +1,36 @@
 // Delivery Radius Validation System
+
 class DeliveryValidator {
     constructor() {
         this.basePostcode = 'LS18 5HZ';
         this.maxDeliveryDistance = 4; // miles
         this.baseCoords = null;
+        this.settingsLoaded = false;
         this.init();
     }
 
+    async fetchSettings() {
+        try {
+            const res = await fetch('/delivery-settings.json');
+            if (!res.ok) throw new Error('Settings not found');
+            const data = await res.json();
+            if (data.basePostcode) this.basePostcode = data.basePostcode;
+            if (data.deliveryRadius) this.maxDeliveryDistance = Number(data.deliveryRadius);
+            this.settingsLoaded = true;
+        } catch (e) {
+            // Use defaults if fetch fails
+            this.basePostcode = 'LS18 5HZ';
+            this.maxDeliveryDistance = 4;
+            this.settingsLoaded = true;
+        }
+    }
+
     async init() {
+        await this.fetchSettings();
         try {
             // Get coordinates for base postcode
             this.baseCoords = await this.getPostcodeCoordinates(this.basePostcode);
-            console.log('Delivery base set:', this.basePostcode, this.baseCoords);
+            console.log('Delivery base set:', this.basePostcode, this.baseCoords, 'Radius:', this.maxDeliveryDistance);
         } catch (error) {
             console.error('Failed to initialize delivery validator:', error);
             // Fallback coordinates for LS18 5HZ (Leeds)
