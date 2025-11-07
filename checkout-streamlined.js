@@ -124,6 +124,9 @@ class StreamlinedCheckout {
                 e.preventDefault();
             });
         }
+
+        // Delivery validation
+        this.setupDeliveryValidation();
     }
 
     setMinDate() {
@@ -441,6 +444,124 @@ class StreamlinedCheckout {
         setTimeout(() => {
             notification.classList.remove('show');
         }, 4000);
+    }
+
+    setupDeliveryValidation() {
+        const postcodeInput = document.getElementById('customer-postcode');
+        const checkDeliveryBtn = document.getElementById('check-delivery-btn');
+        const deliveryStatus = document.getElementById('delivery-status');
+
+        if (!postcodeInput || !checkDeliveryBtn || !deliveryStatus) {
+            console.warn('Delivery validation elements not found');
+            return;
+        }
+
+        // Auto-format postcode as user types
+        postcodeInput.addEventListener('input', (e) => {
+            const formatted = this.formatPostcodeInput(e.target.value);
+            if (formatted !== e.target.value) {
+                e.target.value = formatted;
+            }
+            
+            // Hide previous status when typing
+            deliveryStatus.classList.remove('show');
+            this.updatePaymentSection(null);
+        });
+
+        // Check delivery on button click
+        checkDeliveryBtn.addEventListener('click', () => {
+            this.validateDeliveryPostcode();
+        });
+
+        // Also check on Enter key in postcode field
+        postcodeInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.validateDeliveryPostcode();
+            }
+        });
+    }
+
+    formatPostcodeInput(value) {
+        // Remove spaces and make uppercase
+        let clean = value.replace(/\s+/g, '').toUpperCase();
+        
+        // Add space before last 3 characters if length > 3
+        if (clean.length > 3) {
+            clean = clean.slice(0, -3) + ' ' + clean.slice(-3);
+        }
+        
+        return clean;
+    }
+
+    async validateDeliveryPostcode() {
+        const postcodeInput = document.getElementById('customer-postcode');
+        const checkDeliveryBtn = document.getElementById('check-delivery-btn');
+        
+        const postcode = postcodeInput.value.trim();
+        
+        if (!postcode) {
+            this.showDeliveryStatus('Please enter a postcode', 'invalid');
+            return;
+        }
+
+        // Show checking state
+        checkDeliveryBtn.classList.add('checking');
+        checkDeliveryBtn.disabled = true;
+        checkDeliveryBtn.textContent = 'Checking';
+        
+        this.showDeliveryStatus('Checking delivery area...', 'checking');
+
+        try {
+            // Wait for delivery validator to be ready
+            if (!window.deliveryValidator || !window.deliveryValidator.baseCoords) {
+                await new Promise(resolve => setTimeout(resolve, 1000));
+            }
+            
+            const result = await window.deliveryValidator.validateDeliveryPostcode(postcode);
+            
+            if (result.valid) {
+                const distanceBadge = result.distance ? 
+                    ` <span class="distance-badge">${result.distance} miles</span>` : '';
+                this.showDeliveryStatus(result.message + distanceBadge, 'valid');
+                this.updatePaymentSection(true);
+            } else {
+                this.showDeliveryStatus(result.message, 'invalid');
+                this.updatePaymentSection(false);
+            }
+
+        } catch (error) {
+            console.error('Delivery validation error:', error);
+            this.showDeliveryStatus('Unable to check delivery area. Please try again.', 'invalid');
+            this.updatePaymentSection(false);
+        } finally {
+            // Reset button
+            checkDeliveryBtn.classList.remove('checking');
+            checkDeliveryBtn.disabled = false;
+            checkDeliveryBtn.textContent = 'Check Delivery';
+        }
+    }
+
+    showDeliveryStatus(message, type) {
+        const deliveryStatus = document.getElementById('delivery-status');
+        if (!deliveryStatus) return;
+
+        deliveryStatus.innerHTML = message;
+        deliveryStatus.className = `delivery-status show ${type}`;
+    }
+
+    updatePaymentSection(isValid) {
+        const paymentSection = document.querySelector('.payment-section');
+        if (!paymentSection) return;
+
+        if (isValid === null) {
+            // Reset state
+            paymentSection.classList.remove('delivery-invalid');
+        } else if (isValid) {
+            paymentSection.classList.remove('delivery-invalid');
+        } else {
+            paymentSection.classList.add('delivery-invalid');
+        }
     }
 }
 

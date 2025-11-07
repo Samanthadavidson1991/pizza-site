@@ -8,6 +8,7 @@
 	<link rel="stylesheet" href="checkout-styles.css">
 	<link rel="stylesheet" href="mobile-fixes.css">
 	<link rel="stylesheet" href="unified-scroll.css">
+	<link rel="stylesheet" href="delivery-styles.css">
 </head>
 <body class="checkout-page app-body">
 	<header>
@@ -127,13 +128,22 @@
 										<div class="error-message" id="address-error"></div>
 									</div>
 
-									<div class="form-group postcode-group">
-										<label for="customer-postcode" class="required">Postcode</label>
+								<div class="form-group postcode-group">
+									<label for="customer-postcode" class="required">Postcode</label>
+									<div class="postcode-input-wrapper">
 										<input type="text" id="customer-postcode" name="customerPostcode" 
-											   placeholder="Enter your postcode" class="form-input"
-											   autocomplete="postal-code">
-										<div class="error-message" id="postcode-error"></div>
+											   placeholder="Enter your postcode (e.g. LS18 5HZ)" class="form-input"
+											   autocomplete="postal-code" maxlength="8" style="text-transform: uppercase;">
+										<button type="button" id="check-delivery-btn" class="check-delivery-btn">
+											Check Delivery
+										</button>
 									</div>
+									<div class="delivery-status" id="delivery-status"></div>
+									<div class="error-message" id="postcode-error"></div>
+									<div class="delivery-info">
+										<small>We deliver within 4 miles of LS18 5HZ</small>
+									</div>
+								</div>
 								</div>
 							</div>
 						</div>
@@ -215,6 +225,7 @@
 		</div>
 	</main>
 
+	<script src="delivery-validator.js"></script>
 	<script src="checkout-streamlined.js"></script>
 	<script src="mobile-debug.js"></script>
 </body>
