@@ -581,12 +581,13 @@
 
 /* Mobile styles (up to 768px) */
 @media (max-width: 768px) {
-    /* Overall layout */
+    /* Overall layout - ensure natural flow */
     .checkout-main {
         padding: 0.5rem;
         margin: 0;
         width: 100%;
         overflow-x: hidden;
+        position: relative; /* Remove any fixed positioning */
     }
     
     .checkout-container {
@@ -597,6 +598,8 @@
         width: 100%;
         max-width: 100vw;
         overflow-x: hidden;
+        position: relative; /* Ensure normal document flow */
+        display: block; /* Change from flex to block for natural stacking */
     }
     
     .checkout-content {
@@ -605,13 +608,20 @@
         gap: 1rem;
         width: 100%;
         box-sizing: border-box;
+        position: relative; /* No absolute positioning */
+        overflow: visible; /* Allow content to flow naturally */
     }
     
-    /* Reset column assignments for mobile */
+    /* Reset column assignments for mobile - ensure sections stack naturally */
     .order-summary,
     .customer-info,
     .payment-section {
         grid-column: 1;
+        position: relative; /* No absolute positioning */
+        width: 100%;
+        max-width: 100%;
+        margin-bottom: 1rem;
+        z-index: auto; /* Remove any z-index that might cause layering issues */
     }
     
     .checkout-section {
@@ -623,6 +633,23 @@
         overflow-x: hidden;
         word-wrap: break-word;
         hyphens: auto;
+        position: relative; /* Ensure normal flow */
+        background: white; /* Ensure proper background */
+        border: 1px solid #FFD4C4; /* Consistent border */
+    }
+    
+    /* Ensure payment section doesn't overlay anything */
+    .payment-section {
+        background: white !important;
+        border: 1px solid #FFD4C4 !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        position: relative !important;
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        z-index: 1 !important; /* Low z-index to prevent overlay */
     }
     
     /* Progress indicator - make it more compact */
@@ -1044,6 +1071,387 @@
         word-wrap: break-word;
         overflow-wrap: break-word;
         hyphens: auto;
+    }
+}
+
+/* Ultra-small mobile devices (360px and below) - Minimal payment design */
+@media (max-width: 360px) {
+    /* Ultra-compact main container - prevent any overlay behavior */
+    .checkout-main {
+        padding: 0.25rem;
+        margin: 0;
+        width: 100%;
+        min-height: 100vh;
+        max-height: none; /* Remove height constraints */
+        position: relative;
+        overflow: visible; /* Allow natural scrolling */
+    }
+    
+    .checkout-container {
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+        min-height: 100vh;
+        width: 100%;
+        max-width: 100vw;
+        display: block; /* Natural document flow */
+        position: relative;
+        overflow: visible;
+    }
+    
+    .checkout-content {
+        padding: 0.5rem;
+        gap: 0.5rem;
+        width: 100%;
+        box-sizing: border-box;
+        display: block; /* Remove grid to ensure natural stacking */
+        position: relative;
+        overflow: visible;
+    }
+    
+    /* Ensure all sections stack naturally without overlaying */
+    .order-summary,
+    .customer-info,
+    .payment-section {
+        position: relative !important;
+        width: 100% !important;
+        margin-bottom: 0.75rem !important;
+        z-index: auto !important;
+        top: auto !important;
+        left: auto !important;
+        transform: none !important;
+    }
+    
+    /* Make cash payment button more prominent */
+    .cash-btn {
+        background: #28a745 !important; /* Green for go/confirm action */
+        border-color: #28a745 !important;
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cash-btn:hover,
+    .cash-btn:focus {
+        background: #218838 !important;
+        border-color: #218838 !important;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+    }
+    
+    .cash-btn .btn-content strong {
+        color: white !important;
+        font-weight: 700;
+    }
+    
+    .cash-btn .btn-content small {
+        color: rgba(255, 255, 255, 0.9) !important;
+    }
+    
+    .cash-btn .btn-icon {
+        color: white !important;
+    }
+    
+    /* Add a subtle pulse animation to draw attention */
+    .cash-btn::before {
+        content: '';
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.1);
+        opacity: 0;
+        transition: opacity 0.3s ease;
+    }
+    
+    @keyframes pulse {
+        0% { transform: scale(1); }
+        50% { transform: scale(1.02); }
+        100% { transform: scale(1); }
+    }
+    
+    .cash-btn {
+        animation: pulse 2s ease-in-out infinite;
+    }
+    
+    /* Disable card button more clearly */
+    .card-btn {
+        opacity: 0.6;
+        background: #6c757d !important;
+        border-color: #6c757d !important;
+    }
+    
+    .payment-section {
+        padding: 0.5rem;
+        background: white !important;
+        border: 1px solid #FFD4C4 !important;
+        border-radius: 8px !important;
+        /* Remove any potential overlay styles */
+        position: relative !important;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+        /* Ensure it doesn't act like a modal */
+        top: auto !important;
+        left: auto !important;
+        right: auto !important;
+        bottom: auto !important;
+        transform: none !important;
+        z-index: 1 !important;
+        max-height: none !important;
+        overflow: visible !important;
+    }
+    
+    /* Remove any modal-like behavior from payment buttons */
+    .payment-buttons {
+        position: relative !important;
+        z-index: auto !important;
+    }
+    
+    .payment-btn {
+        position: relative !important;
+        z-index: auto !important;
+    }
+    
+    .payment-section h2 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        padding: 0;
+    }
+    
+    .step-icon {
+        display: none; /* Remove icon to save space */
+    }
+    
+    /* Ultra-compact payment summary */
+    .payment-summary {
+        padding: 0.5rem;
+        margin-bottom: 0.75rem;
+        border-radius: 4px;
+    }
+    
+    .summary-row {
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    
+    /* Ultra-compact payment buttons - stack vertically for easier tapping */
+    .payment-buttons {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .payment-btn {
+        min-height: 48px;
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        gap: 0.5rem;
+        border-radius: 6px;
+        flex-direction: row;
+        text-align: left;
+        justify-content: flex-start;
+    }
+    
+    .btn-icon {
+        font-size: 1.1rem;
+        flex-shrink: 0;
+    }
+    
+    .btn-content {
+        text-align: left;
+        flex: 1;
+    }
+    
+    .btn-content strong {
+        font-size: 0.85rem;
+        margin-bottom: 0.1rem;
+        display: block;
+    }
+    
+    .btn-content small {
+        font-size: 0.65rem;
+        line-height: 1.1;
+        display: block;
+        opacity: 0.8;
+    }
+    
+    /* Make back button smaller */
+    .order-actions {
+        margin-top: 0.5rem;
+    }
+    
+    .order-actions .payment-btn {
+        min-height: 40px;
+        font-size: 0.8rem;
+        padding: 0.5rem 0.75rem;
+        justify-content: center;
+    }
+    
+    /* Make all sections more compact */
+    .checkout-section {
+        margin-bottom: 0.5rem;
+        padding: 0.5rem;
+    }
+    
+    .checkout-section h2 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .checkout-section h3.section-title {
+        font-size: 0.9rem;
+        margin: 0.5rem 0 0.25rem 0;
+    }
+    
+    /* Compact order summary for tiny screens */
+    .cart-item-enhanced {
+        padding: 0.5rem 0;
+        gap: 0.25rem;
+    }
+    
+    .item-name {
+        font-size: 0.85rem;
+        line-height: 1.2;
+    }
+    
+    .item-price {
+        font-size: 0.8rem;
+    }
+    
+    /* Compact form elements */
+    .form-input,
+    .form-textarea,
+    .form-select {
+        padding: 0.75rem;
+        font-size: 16px; /* Keep at 16px to prevent zoom */
+        margin-bottom: 0.5rem;
+    }
+    
+    .form-row {
+        gap: 0.5rem;
+    }
+    
+    /* Compact progress indicator */
+    .checkout-progress {
+        padding: 0.5rem 1rem;
+    }
+    
+    .step-number {
+        width: 24px;
+        height: 24px;
+        font-size: 0.75rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .step-label {
+        font-size: 0.65rem;
+        line-height: 1.1;
+    }
+}
+
+/* Small mobile devices (480px and below) - Compact payment design */
+@media (max-width: 480px) {
+    .payment-section {
+        padding: 0.75rem;
+    }
+    
+    .payment-section h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    /* Make payment summary more compact */
+    .payment-summary {
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        border-radius: 6px;
+    }
+    
+    .summary-row {
+        font-size: 0.9rem;
+    }
+    
+    /* Compact payment buttons */
+    .payment-buttons {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+    }
+    
+    .payment-btn {
+        min-height: 60px;
+        padding: 0.5rem;
+        font-size: 0.85rem;
+        gap: 0.5rem;
+        border-radius: 8px;
+        flex-direction: column;
+        text-align: center;
+        justify-content: center;
+    }
+    
+    .btn-icon {
+        font-size: 1.5rem;
+        margin-bottom: 0.25rem;
+    }
+    
+    .btn-content {
+        text-align: center;
+    }
+    
+    .btn-content strong {
+        font-size: 0.9rem;
+        margin-bottom: 0.1rem;
+        display: block;
+    }
+    
+    .btn-content small {
+        font-size: 0.7rem;
+        line-height: 1.1;
+        display: block;
+    }
+    
+    /* Compact order actions */
+    .order-actions {
+        margin-top: 0.75rem;
+    }
+    
+    .order-actions .payment-btn {
+        min-height: 44px;
+        font-size: 0.9rem;
+        padding: 0.6rem 1rem;
+    }
+    
+    /* If card payment form is added later, make it compact */
+    .card-payment-form {
+        padding: 0.75rem;
+        margin-top: 1rem;
+    }
+    
+    .card-payment-form .form-input {
+        padding: 0.75rem;
+        font-size: 16px;
+        margin-bottom: 0.75rem;
+    }
+    
+    .card-payment-form .form-row {
+        gap: 0.75rem;
+    }
+    
+    /* Ensure all sections fit better on small screens */
+    .checkout-section {
+        margin-bottom: 0.75rem;
+        padding: 0.75rem;
+    }
+    
+    .checkout-section h2 {
+        font-size: 1.1rem;
+        margin-bottom: 0.75rem;
+    }
+    
+    .checkout-section h3.section-title {
+        font-size: 0.95rem;
+        margin: 0.75rem 0 0.5rem 0;
     }
 }
 
