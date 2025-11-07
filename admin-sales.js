@@ -1,6 +1,6 @@
 // admin-sales.js
 // Loads and displays daily sales summary and order details
-const BACKEND = 'https://pizza-site-c8t6.onrender.com';
+const BACKEND = window.location.hostname === 'localhost' ? 'http://localhost:4242' : 'https://thecrustatngb.co.uk';
 let allOrders = [];
 function printSales() {
   window.print();
@@ -33,6 +33,11 @@ function renderSales(selectedDate) {
   let totalSales = 0;
   let cashSales = 0;
   let cardSales = 0;
+  let manualOrders = 0;
+  let manualSales = 0;
+  let onlineOrders = 0;
+  let onlineSales = 0;
+  
   filtered.forEach((order, idx) => {
     const dateStr = order.placedAt || order.time;
     let placedAt = '';
@@ -44,10 +49,32 @@ function renderSales(selectedDate) {
         placedAt = dateStr;
       }
     }
+    
     totalSales += order.total || 0;
     if (order.method === 'cash') cashSales += order.total || 0;
     if (order.method === 'card') cardSales += order.total || 0;
+    
+    // Track manual vs online orders
+    if (order.isManualOrder) {
+      manualOrders++;
+      manualSales += order.total || 0;
+    } else {
+      onlineOrders++;
+      onlineSales += order.total || 0;
+    }
+    
+    // Determine row color class based on order source and payment method
+    let rowClass = '';
+    if (order.isManualOrder) {
+      rowClass = 'sales-row-manual';
+    } else if (order.method === 'cash') {
+      rowClass = 'sales-row-cash';
+    } else if (order.method === 'card') {
+      rowClass = 'sales-row-card';
+    }
+    
     const tr = document.createElement('tr');
+    tr.className = rowClass;
     tr.innerHTML = `
       <td>${idx + 1}</td>
       <td>${order.customerName || ''}</td>
@@ -55,15 +82,50 @@ function renderSales(selectedDate) {
       <td>${order.total ? order.total.toFixed(2) : ''}</td>
       <td>${order.orderTimeSlot || ''}</td>
       <td>${placedAt}</td>
-      <td>${order.method || ''}</td>
+      <td>
+        <span class="payment-method ${order.isManualOrder ? 'manual-order' : order.method}">
+          ${order.isManualOrder ? 'Manual (' + (order.method || 'cash') + ')' : (order.method || '')}
+        </span>
+      </td>
     `;
     tbody.appendChild(tr);
   });
-  summaryDiv.innerHTML = `<h3>Sales Summary</h3>
-    <p><strong>Total Sales:</strong> £${totalSales.toFixed(2)}</p>
-    <p><strong>Card Sales:</strong> £${cardSales.toFixed(2)}</p>
-    <p><strong>Cash Sales:</strong> £${cashSales.toFixed(2)}</p>
-    <p><strong>Orders:</strong> ${filtered.length}</p>`;
+  summaryDiv.innerHTML = `
+    <h3>Sales Summary</h3>
+    <div class="sales-summary-grid">
+      <div class="summary-stat">
+        <span class="stat-label">Total Sales:</span>
+        <span class="stat-value">£${totalSales.toFixed(2)}</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-label">Total Orders:</span>
+        <span class="stat-value">${filtered.length}</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-label">Card Sales:</span>
+        <span class="stat-value stat-card">£${cardSales.toFixed(2)}</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-label">Cash Sales:</span>
+        <span class="stat-value stat-cash">£${cashSales.toFixed(2)}</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-label">Manual Orders:</span>
+        <span class="stat-value stat-manual">${manualOrders} (£${manualSales.toFixed(2)})</span>
+      </div>
+      <div class="summary-stat">
+        <span class="stat-label">Online Orders:</span>
+        <span class="stat-value stat-online">${onlineOrders} (£${onlineSales.toFixed(2)})</span>
+      </div>
+    </div>
+    <div class="sales-legend">
+      <h4>Color Legend:</h4>
+      <div class="legend-items">
+        <span class="legend-item"><span class="color-box sales-row-cash"></span> Cash Orders</span>
+        <span class="legend-item"><span class="color-box sales-row-card"></span> Card Orders</span>
+        <span class="legend-item"><span class="color-box sales-row-manual"></span> Manual/Phone Orders</span>
+      </div>
+    </div>`;
 }
 document.addEventListener('DOMContentLoaded', function() {
   const dateInput = document.getElementById('sales-date');

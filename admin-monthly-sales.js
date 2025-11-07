@@ -1,6 +1,6 @@
 // admin-monthly-sales.js
 // Loads and displays monthly sales breakdown by item
-const BACKEND = 'https://pizza-site-c8t6.onrender.com';
+const BACKEND = window.location.hostname === 'localhost' ? 'http://localhost:4242' : 'https://thecrustatngb.co.uk';
 let allOrders = [];
 function printMonthlySales() {
   window.print();

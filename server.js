@@ -592,111 +592,6 @@ app.get('/timeslot-availability', (req, res) => {
   }
 });
 
-// Delivery Settings Endpoints (Admin Only)
-// Get delivery settings
-app.get('/admin/delivery-settings', requireAdminAuth, (req, res) => {
-  try {
-    let settings;
-    try {
-      const data = fs.readFileSync('delivery-settings.json', 'utf8');
-      settings = JSON.parse(data);
-    } catch (error) {
-      // Default settings if file doesn't exist
-      settings = {
-        basePostcode: 'LS18 5HZ',
-        deliveryRadius: 4,
-        deliveryEnabled: true,
-        deliveryMessage: '',
-        minimumOrder: 15.00,
-        deliveryFee: 3.50,
-        lastUpdated: new Date().toISOString()
-      };
-    }
-    
-    res.json(settings);
-  } catch (error) {
-    console.error('Get delivery settings error:', error);
-    res.status(500).json({ error: 'Failed to get delivery settings' });
-  }
-});
-
-// Save delivery settings
-app.post('/admin/delivery-settings', requireAdminAuth, (req, res) => {
-  try {
-    const {
-      basePostcode,
-      deliveryRadius,
-      deliveryEnabled,
-      deliveryMessage,
-      minimumOrder,
-      deliveryFee
-    } = req.body;
-
-    // Validate input
-    if (!basePostcode || typeof basePostcode !== 'string') {
-      return res.status(400).json({ error: 'Valid base postcode is required' });
-    }
-    
-    if (!deliveryRadius || deliveryRadius < 1 || deliveryRadius > 20) {
-      return res.status(400).json({ error: 'Delivery radius must be between 1 and 20 miles' });
-    }
-
-    const settings = {
-      basePostcode: basePostcode.trim().toUpperCase(),
-      deliveryRadius: parseFloat(deliveryRadius),
-      deliveryEnabled: Boolean(deliveryEnabled),
-      deliveryMessage: deliveryMessage || '',
-      minimumOrder: parseFloat(minimumOrder) || 15.00,
-      deliveryFee: parseFloat(deliveryFee) || 3.50,
-      lastUpdated: new Date().toISOString()
-    };
-
-    // Save to file
-    fs.writeFileSync('delivery-settings.json', JSON.stringify(settings, null, 2));
-    
-    console.log('Delivery settings updated:', settings);
-    res.json({ success: true, message: 'Delivery settings saved successfully', settings });
-    
-  } catch (error) {
-    console.error('Save delivery settings error:', error);
-    res.status(500).json({ error: 'Failed to save delivery settings' });
-  }
-});
-
-// Get public delivery settings (for customer checkout)
-app.get('/delivery-settings', (req, res) => {
-  try {
-    let settings;
-    try {
-      const data = fs.readFileSync('delivery-settings.json', 'utf8');
-      settings = JSON.parse(data);
-    } catch (error) {
-      // Default settings
-      settings = {
-        basePostcode: 'LS18 5HZ',
-        deliveryRadius: 4,
-        deliveryEnabled: true,
-        minimumOrder: 15.00,
-        deliveryFee: 3.50
-      };
-    }
-    
-    // Only send public settings (no admin messages)
-    const publicSettings = {
-      basePostcode: settings.basePostcode,
-      deliveryRadius: settings.deliveryRadius,
-      deliveryEnabled: settings.deliveryEnabled,
-      minimumOrder: settings.minimumOrder,
-      deliveryFee: settings.deliveryFee
-    };
-    
-    res.json(publicSettings);
-  } catch (error) {
-    console.error('Get public delivery settings error:', error);
-    res.status(500).json({ error: 'Failed to get delivery settings' });
-  }
-});
-
 // Admin login endpoint
 app.post('/admin/login', async (req, res) => {
   try {
@@ -744,10 +639,10 @@ app.get('/checkout', (req, res) => {
 app.get('/', (req, res) => {
   if (req.isAdminSubdomain) {
     // Admin subdomain - serve admin dashboard
-    res.sendFile(path.join(__dirname, 'admin', 'admin-dashboard.html'));
+    res.sendFile(path.join(__dirname, 'admin-dashboard.html'));
   } else {
     // Main domain - serve customer homepage
-    res.sendFile(path.join(__dirname, 'customer-site', 'index.html'));
+    res.sendFile(path.join(__dirname, 'index.html'));
   }
 });
 
@@ -762,21 +657,35 @@ app.use((req, res, next) => {
 
   // Handle admin subdomain requests
   if (req.isAdminSubdomain) {
-    // Serve admin files from admin folder
-    if (req.path.startsWith('/admin-') || req.path === '/admin-dashboard.html' || req.path === '/') {
-      return express.static(path.join(__dirname, 'admin'))(req, res, next);
+    // Only serve admin files for admin subdomain
+    const adminFiles = [
+      'admin-dashboard.html', 'admin-dashboard.js', 'admin-dashboard.css',
+      'admin-menu.html', 'admin-menu.js', 'admin-menu.css',
+      'admin-manual-order.html', 'admin-manual-order.js', 'admin-manual-order.css',
+      'admin-sales.html', 'admin-sales.js', 'admin-sales.css',
+      'admin-stock-management.html', 'admin-stock-management.js', 'admin-stock-management.css',
+      'admin-running-orders.html', 'admin-running-orders.js', 'admin-running-orders.css',
+      'admin-monthly-sales.html', 'admin-monthly-sales.js',
+      'admin-menu-auth.js', 'admin-menu-new.js'
+    ];
+    
+    const requestedFile = req.path.substring(1); // Remove leading slash
+    
+    if (adminFiles.includes(requestedFile) || req.path.startsWith('/admin')) {
+      // Serve admin files
+      return express.static(__dirname)(req, res, next);
     } else {
       // Block non-admin files on admin subdomain
       return res.status(404).send('Page not found on admin subdomain');
     }
   } else {
-    // Customer site - serve from customer-site folder
+    // Customer site - block admin files
     if (req.path.startsWith('/admin-') || req.path.startsWith('/admin/')) {
       return res.status(404).send('Admin pages not accessible on main domain');
     }
     
-    // Serve customer files from customer-site folder
-    return express.static(path.join(__dirname, 'customer-site'))(req, res, next);
+    // Serve customer files
+    return express.static(__dirname)(req, res, next);
   }
 });
 
@@ -786,7 +695,7 @@ app.get('/health', (req, res) => {
     status: 'healthy', 
     timestamp: new Date().toISOString(),
     uptime: process.uptime(),
-    service: 'pizza-shop-admin'
+    service: 'pizza-site'
   });
 });
 

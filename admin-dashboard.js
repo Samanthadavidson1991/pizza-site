@@ -76,7 +76,7 @@ function printSingleOrder(idx) {
   printWin.close();
 }
 // Point to main website for API endpoints (orders, etc.)
-const BACKEND = 'https://thecrustatngb.co.uk';
+const BACKEND = window.location.hostname === 'localhost' ? 'http://localhost:4242' : 'https://thecrustatngb.co.uk';
 
 // Test function to debug API connectivity
 async function testAPI() {
