@@ -30,12 +30,6 @@
     ]
   },
   {
-    "name": "TEST PIZZA - Supreme",
-    "price": 18.99,
-    "category": "PIZZAS",
-    "description": "Test pizza with everything - pepperoni, mushrooms, peppers"
-  },
-  {
     "name": "Caesar Salad",
     "price": 7.99,
     "category": "SALADS",
