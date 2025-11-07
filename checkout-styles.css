@@ -581,13 +581,18 @@
 
 /* Mobile styles (up to 768px) */
 @media (max-width: 768px) {
-    /* Overall layout - ensure natural flow */
+    /* Add smooth scrolling to the page */
+    html {
+        scroll-behavior: smooth;
+    }
+    
+    /* Overall layout - ensure natural flow with good spacing */
     .checkout-main {
-        padding: 0.5rem;
+        padding: 1rem 0.5rem; /* More top/bottom padding for better scrolling */
         margin: 0;
         width: 100%;
         overflow-x: hidden;
-        position: relative; /* Remove any fixed positioning */
+        position: relative; /* Ensure normal document flow */
     }
     
     .checkout-container {
@@ -600,12 +605,13 @@
         overflow-x: hidden;
         position: relative; /* Ensure normal document flow */
         display: block; /* Change from flex to block for natural stacking */
+        padding-bottom: 2rem; /* Extra space at bottom for easier scrolling */
     }
     
     .checkout-content {
         grid-template-columns: 1fr;
         padding: 1rem;
-        gap: 1rem;
+        gap: 2rem; /* Increase gap between sections for better visual separation */
         width: 100%;
         box-sizing: border-box;
         position: relative; /* No absolute positioning */
@@ -620,14 +626,14 @@
         position: relative; /* No absolute positioning */
         width: 100%;
         max-width: 100%;
-        margin-bottom: 1rem;
+        margin-bottom: 2rem; /* Increase spacing between major sections */
         z-index: auto; /* Remove any z-index that might cause layering issues */
     }
     
     .checkout-section {
-        padding: 1rem;
-        margin-bottom: 1rem;
-        border-radius: 8px;
+        padding: 1.5rem; /* Increase padding for better usability */
+        margin-bottom: 1.5rem; /* More space between sections */
+        border-radius: 12px; /* Slightly more rounded for better visual separation */
         width: 100%;
         box-sizing: border-box;
         overflow-x: hidden;
@@ -636,13 +642,111 @@
         position: relative; /* Ensure normal flow */
         background: white; /* Ensure proper background */
         border: 1px solid #FFD4C4; /* Consistent border */
+        min-height: 200px; /* Ensure minimum height for easy interaction */
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Better visual separation */
+        transition: box-shadow 0.3s ease; /* Smooth hover effect */
+    }
+    
+    /* Enhanced section hover for better interaction feedback */
+    .checkout-section:hover {
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+    }
+    
+    /* Add visual indicators for section completion */
+    .checkout-section.completed {
+        border-left: 4px solid #28a745;
+        background: linear-gradient(to right, #f8fff9 0%, white 5%);
+    }
+    
+    .checkout-section.active {
+        border-left: 4px solid #FF9B7A;
+        background: linear-gradient(to right, #FFF8F5 0%, white 5%);
+    }
+    
+    /* Ensure sections maintain their full content size */
+    .checkout-section h2 {
+        font-size: 1.4rem;
+        margin-bottom: 1.5rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid #FFD4C4;
+        color: #d32f2f;
+        position: sticky;
+        top: 0;
+        background: white;
+        z-index: 5;
+        margin-top: -1.5rem;
+        padding-top: 1.5rem;
+    }
+    
+    .checkout-section h3.section-title {
+        font-size: 1.1rem;
+        margin: 1.25rem 0 1rem 0;
+        color: #495057;
+        padding-bottom: 0.5rem;
+        border-bottom: 1px solid #dee2e6;
+    }
+    
+    /* Order summary - keep full size and readable */
+    .order-summary .cart-item-enhanced {
+        padding: 1rem 0;
+        border-bottom: 1px solid #f1f3f4;
+        min-height: 60px; /* Ensure consistent height */
+    }
+    
+    .order-summary .item-details h4 {
+        font-size: 1rem;
+        margin-bottom: 0.5rem;
+        line-height: 1.4;
+    }
+    
+    .order-summary .item-price {
+        font-size: 1rem;
+        font-weight: 600;
+        color: #d32f2f;
+    }
+    
+    /* Customer info - maintain form usability */
+    .customer-info .form-input,
+    .customer-info .form-textarea,
+    .customer-info .form-select {
+        padding: 1rem;
+        font-size: 16px; /* Prevent zoom on iOS */
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        border: 2px solid #dee2e6;
+        transition: border-color 0.3s ease;
+    }
+    
+    .customer-info .form-input:focus,
+    .customer-info .form-textarea:focus,
+    .customer-info .form-select:focus {
+        border-color: #FF9B7A;
+        box-shadow: 0 0 0 3px rgba(255, 155, 122, 0.2);
+    }
+    
+    /* Radio options - keep them large and easy to tap */
+    .radio-option {
+        padding: 1.25rem;
+        margin-bottom: 0.75rem;
+        border-radius: 10px;
+        border: 2px solid #dee2e6;
+        transition: all 0.3s ease;
+    }
+    
+    .radio-option:hover {
+        border-color: #FF9B7A;
+        background-color: #FFF8F5;
+    }
+    
+    .radio-option input[type="radio"]:checked + .radio-content {
+        color: #d32f2f;
     }
     
     /* Ensure payment section doesn't overlay anything */
     .payment-section {
         background: white !important;
-        border: 1px solid #FFD4C4 !important;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+        border: 2px solid #FF9B7A !important; /* Make payment section more prominent */
+        box-shadow: 0 8px 24px rgba(255, 155, 122, 0.2) !important; /* Peachy shadow */
         position: relative !important;
         top: auto !important;
         left: auto !important;
@@ -650,6 +754,46 @@
         bottom: auto !important;
         transform: none !important;
         z-index: 1 !important; /* Low z-index to prevent overlay */
+        border-radius: 12px !important;
+    }
+    
+    /* Make payment section header more prominent */
+    .payment-section h2 {
+        background: linear-gradient(135deg, #FF9B7A, #d32f2f);
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        background-clip: text;
+        font-size: 1.6rem !important;
+        font-weight: 700 !important;
+    }
+    
+    /* Add quick navigation helper for mobile */
+    .mobile-section-nav {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        background: rgba(255, 155, 122, 0.9);
+        border-radius: 50px;
+        padding: 0.5rem 1rem;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        z-index: 1000;
+        display: none; /* Will be shown via JavaScript */
+    }
+    
+    .mobile-section-nav button {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 0.8rem;
+        padding: 0.25rem 0.5rem;
+        margin: 0 0.25rem;
+        border-radius: 20px;
+        transition: background 0.3s ease;
+    }
+    
+    .mobile-section-nav button:hover,
+    .mobile-section-nav button.active {
+        background: rgba(255, 255, 255, 0.3);
     }
     
     /* Progress indicator - make it more compact */
