@@ -689,6 +689,21 @@ app.use((req, res, next) => {
   }
 });
 
+// Health check endpoint for Render
+app.get('/health', (req, res) => {
+  res.status(200).json({ 
+    status: 'healthy', 
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    service: 'pizza-site'
+  });
+});
+
+// Ping endpoint for quick health checks
+app.get('/ping', (req, res) => {
+  res.status(200).send('pong');
+});
+
 const PORT = process.env.PORT || 4242;
 app.listen(PORT, () => {
   console.log('SERVER.JS STARTED - Updated Version');
