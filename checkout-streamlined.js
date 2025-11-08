@@ -132,14 +132,11 @@ class StreamlinedCheckout {
     setMinDate() {
         const dateInput = document.getElementById('order-date');
         if (dateInput) {
-            // Set minimum date to today
+            // Set minimum date to today (allow same-day orders)
             const today = new Date();
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
-            
-            dateInput.min = tomorrow.toISOString().split('T')[0];
-            dateInput.value = tomorrow.toISOString().split('T')[0];
-            
+            const todayStr = today.toISOString().split('T')[0];
+            dateInput.min = todayStr;
+            dateInput.value = todayStr;
             this.updateTimeSlots();
         }
     }
